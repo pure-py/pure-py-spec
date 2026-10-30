@@ -85,7 +85,7 @@ spec-anon.pdf: $(TEXFILES)
 check-consistency:
 	uv run --locked python test/consistency.py
 
-# Wheel of the conformance package
+# Wheel of the conformance suite and runner
 wheel: check-consistency
 	rm -rf dist && uv build --wheel
 
