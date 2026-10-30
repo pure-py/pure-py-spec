@@ -104,11 +104,18 @@ class Results:
 
 
 class Runner(Results):
-    def __init__(self, type_checker: list[str], interpreter: str | None, python: bool) -> None:
+    def __init__(
+        self,
+        type_checker: list[str],
+        interpreter: list[str] | None,
+        python: bool,
+        run_undefined: bool = False,
+    ) -> None:
         super().__init__()
         self.type_checker = type_checker
         self.interpreter = interpreter  # None: tests not run
         self.python = python  # Implementation under test is Python itself
+        self.run_undefined = run_undefined  # Interpreter also run on tests undefined in PurePy
         self.type_checked = 0
         self.run_only = 0
 
@@ -160,7 +167,7 @@ class Runner(Results):
             return [f"run: needs exactly one of {expected.name} and {exception.name}"]
         if accepts != expected.exists():
             return [f"run: misfiled, has {expected.name if expected.exists() else exception.name}"]
-        proc = run([self.interpreter, path.name], cwd=path.parent)
+        proc = run([*self.interpreter, path.name], cwd=path.parent)
         if accepts:
             status_path = path.with_suffix(STATUS_EXPECTED)
             status = int(status_path.read_text()) if status_path.exists() else 0
@@ -178,21 +185,29 @@ class Runner(Results):
             return [f"run: expected {name}, got: {proc.stderr.strip()}"]
         return []
 
+    def runs(self, purepy: PurePyOutcome) -> bool:
+        """Whether the interpreter runs a test of the PurePy outcome: Python itself runs every test, and an
+        implementation of PurePy runs a test it agrees with Python on, and an undefined test only if asked,
+        since any behaviour conforms there"""
+        if self.interpreter is None:
+            return False
+        return (
+            self.python
+            or purepy == PurePyOutcome.AGREES
+            or (purepy == PurePyOutcome.UNDEFINED and self.run_undefined)
+        )
+
     def run_test(self, suite: pathlib.Path, test: pathlib.Path) -> list[str]:
         """Failures of a test at a path below suite: <Python outcome>/<PurePy outcome>[/<subset>]/...
         /<test>.py, or .../<test>/main.py for a program of several modules."""
         dirs = test.relative_to(suite).parts[:-1]
-        exit, error_checked, python = expectation(PythonOutcome(dirs[0]), PurePyOutcome(dirs[1]))
+        purepy = PurePyOutcome(dirs[1])
+        exit, error_checked, python = expectation(PythonOutcome(dirs[0]), purepy)
         path = test / MAIN if test.is_dir() else test
+        ran = self.run_python(path, python) if self.runs(purepy) else []
         if self.python:
-            return [
-                *(self.accepts(test) if exit == Exit.OK else []),
-                *(self.run_python(path, python) if self.interpreter is not None else []),
-            ]
-        return [
-            *self.check(path, exit, error_checked),
-            *(self.run_python(path, python) if self.interpreter is not None else []),
-        ]
+            return [*(self.accepts(test) if exit == Exit.OK else []), *ran]
+        return [*self.check(path, exit, error_checked), *ran]
 
     def run_suite(self, suite: pathlib.Path, jobs: int | None) -> None:
         """Tests run in parallel on jobs threads (default: one per core), reported in order."""
@@ -250,11 +265,19 @@ def main(argv: Sequence[str] | None = None) -> None:
         help="test Python itself: run every test, and type-check only the tests well-formed in PurePy, which must be accepted",
     )
     parser.add_argument(
+        "--run-undefined",
+        action="store_true",
+        help="also run the tests for which PurePy semantics is undefined",
+    )
+    parser.add_argument(
         "--jobs", type=int, help="number of tests run in parallel (default: number of cores)"
     )
     args = parser.parse_args(argv)
     r = Runner(
-        shlex.split(args.type_checker), None if args.no_run else args.interpreter, args.python
+        shlex.split(args.type_checker),
+        None if args.no_run else shlex.split(args.interpreter),
+        args.python,
+        args.run_undefined,
     )
     with suite() as path:
         r.run_suite(path, args.jobs)
