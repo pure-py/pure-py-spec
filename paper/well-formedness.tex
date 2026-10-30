@@ -69,7 +69,7 @@ gives the component type at that position, counting from the end when the index 
 \end{DeletedBlock}
 \added{Operators are overloaded, as specified in \specfigref{operator-overloads}, and the \ruleName{binop} and
 \ruleName{unop} rules synthesise the return type of the most specific overload at the operand types, so
-\pyinline{1 + 2} is an \pyinline{int} and \pyinline{1 + 2.0} \added{is }a \pyinline{float}. }\replaced{Union types need dedicated rules at elimination forms. A call in which the callee synthesises a union is typed at each disjunct, as a call of a fresh variable of that type, and synthesises the
+\pyinline{1 + 2} is an \pyinline{int} and \pyinline{1 + 2.0} is a \pyinline{float}. }\replaced{Union types need dedicated rules at elimination forms. A call in which the callee synthesises a union is typed at each disjunct, as a call of a fresh variable of that type, and synthesises the
 join of the two results; subscripts and attribute references have analogous rules, as do binary operators when overload
 resolution fails at an operand of union type:}{A subscript, attribute reference or call with a subject synthesising a union is typed at each disjunct, with a variable in place of the subject, and synthesises the
 join of the results:}
