@@ -180,7 +180,7 @@ of the most specific overload at the operand types, $\resolveOp{\Sigma}$ (\S\ref
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}. \added{When no overload applies at an operand of union type, the operator is typed at each
 disjunct of that operand, as for calls, and synthesises the join of the results, the left operand first
 (\ruleName{binop-union-left}, \ruleName{binop-union-right}, \ruleName{unop-union}); with \pyinline{x} of type
-\pyinline{int | str}, \pyinline{x * 2} synthesises \pyinline{int | str}. The order follows the argument type expansion
+\pyinline{int | str}, the expression \pyinline{x * 2} synthesises \pyinline{int | str}. The order follows the argument type expansion
 of the Python typing specification for calls to overloaded functions~\cite{typingcouncil2025}.}
 
 \input{spec/fig/needs-eq}
