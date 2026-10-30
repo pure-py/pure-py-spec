@@ -177,7 +177,7 @@ types to the resolved overloads of an operator.
 
 The \ruleName{binop} and \ruleName{unop} rules (\specfigref{typing-synth}) take the return type
 of the most specific overload at the operand types, $\resolveOp{\Sigma}$ (\S\ref{aux:resolve-op}), so \pyinline{1 + 2} is an
-\pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}. \added{Binary operators also have rules for elimination at a union type (\figref{typing-synth-elim}), which
+\pyinline{int} and \pyinline{1 + 2.0} \added{is }a \pyinline{float}. \added{Binary operators also have rules for elimination at a union type (\figref{typing-synth-elim}), which
 apply when overload resolution fails at an operand of union type: the application synthesises a type at each disjunct,
 left operand first, and the type of the application is the join of those types (\ruleName{binop-union-left}, \ruleName{binop-union-right}). With \pyinline{x} of type
 $\tyUnion{\tyInt}{\tyStr}$, the expression \pyinline{x * 2} synthesises $\tyUnion{\tyInt}{\tyStr}$. The rules follow the Python typing specification for overloaded calls~\citep{typingcouncil2025}. The unary operators
