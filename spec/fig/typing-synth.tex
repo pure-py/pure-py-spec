@@ -243,17 +243,6 @@
 {
   \Sigma; \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \joinTy{\Sigma}{\tau}{\tau'}
 }}
-\and
-\added{\inferrule*[lab={\ruleName{unop-union}}]
-{
-  \Sigma; \Gamma \vdash e \synth \tyUnion{\sigma}{\sigma'} \\
-  \resolveOp{\Sigma}(\ominus, \tyUnion{\sigma}{\sigma'}) \text{ undefined} \\
-  \Sigma; \Gamma \override \set{\bind{y}{\sigma}} \vdash \exUnOp{\ominus}{y} \synth \tau \\
-  \Sigma; \Gamma \override \set{\bind{y}{\sigma'}} \vdash \exUnOp{\ominus}{y} \synth \tau'
-}
-{
-  \Sigma; \Gamma \vdash \exUnOp{\ominus}{e} \synth \joinTy{\Sigma}{\tau}{\tau'}
-}}
 \end{mathpar}
 \caption{Expression synthesis: subscripts, and elimination at a union}
 \label{fig:typing-synth-elim}
