@@ -180,10 +180,9 @@ of the most specific overload at the operand types, $\resolveOp{\Sigma}$ (\S\ref
 \pyinline{int} and \pyinline{1 + 2.0} a \pyinline{float}. \added{Binary operators also have rules for elimination at a union type (\figref{typing-synth-elim}), which
 apply when overload resolution fails at an operand of union type: the application synthesises a type at each disjunct,
 left operand first, and the type of the application is the join of those types (\ruleName{binop-union-left}, \ruleName{binop-union-right}). With \pyinline{x} of type
-$\tyUnion{\tyInt}{\tyStr}$, the expression \pyinline{x * 2} synthesises $\tyUnion{\tyInt}{\tyStr}$. The rules follow the Python typing specification for overloaded calls~\citep{typingcouncil2025}. Unary operators
-need no such rule, since the overloads of each unary operator apply at all subtypes of a single type, \tyBool{} for
-\pyinline{not} and \tyFloat{} for unary \pyinline{+} and \pyinline{-}, so a unary operator with an overload at each
-disjunct of a union type also has one at the union type.}
+$\tyUnion{\tyInt}{\tyStr}$, the expression \pyinline{x * 2} synthesises $\tyUnion{\tyInt}{\tyStr}$. The rules follow the Python typing specification for overloaded calls~\citep{typingcouncil2025}. The unary operators
+need no such rule, since the overloads in \figref{operator-overloads} apply at all subtypes of \tyBool{} or of
+\tyFloat{}, and so at a union type whenever they apply at each disjunct.}
 
 \input{spec/fig/needs-eq}
 
