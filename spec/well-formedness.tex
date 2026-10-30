@@ -182,7 +182,7 @@ apply when overload resolution fails at an operand of union type: the applicatio
 left operand first, and the type of the application is the join of those types (\ruleName{binop-union-left}, \ruleName{binop-union-right}). With \pyinline{x} of type
 $\tyUnion{\tyInt}{\tyStr}$, the expression \pyinline{x * 2} synthesises $\tyUnion{\tyInt}{\tyStr}$. The rules follow the Python typing specification for overloaded calls~\citep{typingcouncil2025}. The unary operators
 need no such rule, since the overloads in \figref{operator-overloads} apply at all subtypes of \tyBool{} or
-\tyFloat{}, and so at a union type whenever they apply at each disjunct.}
+\tyFloat{}, including unions of such subtypes.}
 
 \input{spec/fig/needs-eq}
 
