@@ -76,8 +76,8 @@ gives the component type at that position, counting from the end when the index 
 \ruleName{unop} rules synthesise the return type of the most specific overload at the operand types. }\replaced{Union types need dedicated rules at elimination forms, operators included: with \pyinline{x} of type
 $\tyUnion{\tyInt}{\tyStr}$, no overload of \pyinline{*} applies at $\exBinOp{\pyinline{x}}{\pyinline{*}}{\pyinline{2}}$, which is
 instead typed at \pyinline{int} and at \pyinline{str} and synthesises $\tyUnion{\tyInt}{\tyStr}$. Calls in which the callee
-synthesises a union are typed at each disjunct, as calls of a fresh variable of that type, and synthesise the join of
-the two results; subscripts and attribute references have analogous rules:}{A subscript, attribute reference or call with a subject synthesising a union is typed at each disjunct, with a variable in place of the subject, and synthesises the
+synthesises a union are typed at each disjunct, with the callee replaced by a fresh variable bound at that disjunct,
+and synthesise the join of the two results; subscripts and attribute references have analogous rules:}{A subscript, attribute reference or call with a subject synthesising a union is typed at each disjunct, with a variable in place of the subject, and synthesises the
 join of the results:}
 \begin{mathpar}
 \small
