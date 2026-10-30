@@ -67,19 +67,18 @@ gives the component type at that position, counting from the end when the index 
 \input{spec/rules/subscript-tuple}
 \end{mathpar}
 \end{DeletedBlock}
-\replaced{Union types need dedicated rules at elimination forms. A call in which the callee synthesises a union is typed once at each disjunct, as a call of a fresh variable of that type, and synthesises the
-join of the two results; subscripts and attribute references have analogous rules:}{A subscript, attribute reference or call with a subject synthesising a union is typed at each disjunct, with a variable in place of the subject, and synthesises the
+\replaced{Union types need dedicated rules at elimination forms. A call in which the callee synthesises a union is typed at each disjunct, as a call of a fresh variable of that type, and synthesises the
+join of the two results; subscripts and attribute references have analogous rules, as do binary operators when overload
+resolution fails at an operand of union type:}{A subscript, attribute reference or call with a subject synthesising a union is typed at each disjunct, with a variable in place of the subject, and synthesises the
 join of the results:}
 \begin{mathpar}
 \small
 \input{spec/rules/call-union}
 \end{mathpar}
 \deleted{Generators need no such rule, because $\elemTy{\Sigma}$ takes a union to the join of its disjuncts' element types.
-}\replaced{The standard bidirectional treatment of unions~\citep{dunfield2004} states union elimination once, for an
-arbitrary evaluation context, which a checker must apply by search~\citep{dunfield2011}. \PurePy instead states union
-elimination for each elimination form, which keeps both judgements syntax-directed. In exchange, an operator applied to an operand of union type is accepted only if a single overload
-covers the whole union: with \pyinline{x} of type $\tyUnion{\tyInt}{\tyStr}$, \PurePy rejects \pyinline{x * 2}, although each
-disjunct has an overload of \pyinline{*}, and mypy accepts it.}{\citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is
+}\replaced{Dedicated rules keep both judgements syntax-directed. An alternative design has a single union elimination
+rule for an arbitrary evaluation context~\citep{dunfield2004}, under which type checking requires a search over the
+decompositions of a term~\citep{dunfield2011}.}{\citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is
 stated separately for each elimination form. }
 
 \begin{DeletedBlock}
