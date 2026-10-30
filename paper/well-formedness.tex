@@ -102,7 +102,7 @@ the arguments against $\seq{\sigma}$, and the call synthesises $\sigma$. The aux
 \pyinline{Callable} type gives the parameter and return types of that type.
 \end{DeletedBlock}
 \added{Generic functions, bound in the context at type schemes rather than types, do not have types on their own,
-and are typed only at calls or against expected types. Calls of generic functions }\deleted{A name bound at a
+but are typed only at calls or against expected types. Calls of generic functions }\deleted{A name bound at a
 type scheme $\scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\sigma}}$ }\replaced{instantiate}{instantiates} the type parameters from the arguments\deleted{
 (\ruleName{callee-scheme})}. The type arguments are \replaced{determined by matching each parameter type against the type synthesised by the corresponding argument}{collected by $\typeArgs{\Sigma}$ over the arguments that synthesise,
 by a one-way unification of each parameter type with the synthesised type, in which the type parameters $\seq{\alpha}$ are the
