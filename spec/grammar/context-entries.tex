@@ -1,0 +1,18 @@
+\begin{tabular}[t]{rcll}
+\grammarGroup{Context entries} \\
+$\theta$ & $\coloncolonequals$ & $\tau$ & (Definitely assigned) \\
+    & $\mid$ & $\DU{\tau}$ & (Definitely unassigned) \\
+    & $\mid$ & $\PU{\tau}$ & (Possibly unassigned) \\
+    & $\mid$ & $\Unbound$ & (Unbound) \\
+    & $\mid$ & $\scheme{\seq{\alpha}}{\tau}$ & (Type scheme, $\seq{\alpha}$ non-empty) \\
+    & $\mid$ & $\PU{\scheme{\seq{\alpha}}{\tau}}$ & (Possibly unassigned type scheme) \\
+    & $\mid$ & $\modStub{q}$ & (Module stub) \\
+    & $\mid$ & $\modLoaded{q}{\Gamma}$ & (Checked module, with signature $\Gamma$) \\
+    & $\mid$ & $\Type{C}$ & (Class) \\
+    & $\mid$ & $\TypeVar$ & (Type parameter) \\
+    & $\mid$ & $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ & (Type alias) \\
+    & $\mid$ & $\predefName$ & (Predefined name)
+\\[3mm]
+\grammarGroup{Class entries} \\
+\multicolumn{3}{l}{$\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$} & (Class definition)
+\end{tabular}

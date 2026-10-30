@@ -1,0 +1,17 @@
+name: Project integrity
+
+on:
+  schedule:
+    - cron: '0 8 * * *'  # Daily at 08:00 UTC
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check issues and project board
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_PAT }}
+        run: script/check-project-integrity.sh pure-py pure-py-spec 1 "In progress,Awaiting Review"

@@ -1,0 +1,20 @@
+\begin{specdefinition}{Override of context entries}
+\label{def:override}
+\begin{defalign}
+\bot \override \theta & = \theta \\
+\theta \override \bot & = \theta \\
+\theta \override \theta' & = \theta' \quad \text{(otherwise)}
+\end{defalign}
+\end{specdefinition}
+
+\begin{specdefinition}{Merge of context entries}
+\label{def:merge}
+\begin{defalignat}{2}
+\theta \merge_{\Sigma} \theta & {}= \theta \\
+\sigma \merge_{\Sigma} \tau & {}= \joinTy{\Sigma}{\sigma}{\tau} & \quad & \text{if } \sigma \neq \tau \\
+\theta \merge_{\Sigma} \theta' & {}= \PU{\joinTy{\Sigma}{\sigma}{\tau}} & \quad & \text{if } \theta \neq \theta' \text{ and } \theta \in \set{\DU{\sigma}, \PU{\sigma}}, \theta' \in \set{\tau, \DU{\tau}, \PU{\tau}} \\
+\sigma \merge_{\Sigma} \theta & {}= \PU{\joinTy{\Sigma}{\sigma}{\tau}} & \quad & \text{if } \theta \in \set{\DU{\tau}, \PU{\tau}} \\
+\bot \merge_{\Sigma} \theta & {}= \theta \merge_{\Sigma} \bot = \PU{\tau} & \quad & \text{if } \theta \in \set{\tau, \DU{\tau}, \PU{\tau}} \\
+\theta \merge_{\Sigma} \theta' & {}= \PU{\scheme{\seq{\alpha}}{\tau}} & \quad & \text{if } \theta \neq \theta' \in \set{\scheme{\seq{\alpha}}{\tau}, \PU{\scheme{\seq{\alpha}}{\tau}}, \bot}
+\end{defalignat}
+\end{specdefinition}

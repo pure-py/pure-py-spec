@@ -1,0 +1,142 @@
+name: Paper
+
+# Paper, specification and evaluation pipeline as one status
+on:
+  workflow_dispatch:
+  push:
+    paths-ignore:
+      - src/purepy_conformance/**
+      - test/**
+      - script/**
+      - .claude/**
+      - '**/README.md'
+      - .github/workflows/bump-version.yml
+      - .github/workflows/check-project-integrity.yml
+      - .github/workflows/consistency-checks.yml
+
+concurrency:
+  group: paper-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      documents: ${{ steps.paths.outputs.documents }}
+      evaluation: ${{ steps.paths.outputs.evaluation }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: List changed sources
+        id: paths
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "${{ github.event_name }}" != push ] || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            changed=$(git ls-files)
+          else
+            changed=$(git diff --name-only "$BEFORE" "$GITHUB_SHA")
+          fi
+          workflow='^\.github/workflows/paper\.yml$'
+          irrelevant='^(src/purepy_conformance/|test/|script/|\.claude/|(.*/)?README\.md$|\.github/workflows/(bump-version|check-project-integrity|consistency-checks)\.yml$)'
+          relevant=$(grep -vE "$irrelevant" <<< "$changed" || true)
+          documents=$([ -n "$relevant" ] && echo true || echo false)
+          evaluation=$(grep -qE "^evaluation/|$workflow" <<< "$relevant" && echo true || echo false)
+          echo "documents=$documents" >> "$GITHUB_OUTPUT"
+          echo "evaluation=$evaluation" >> "$GITHUB_OUTPUT"
+
+  documents:
+    needs: changes
+    if: needs.changes.outputs.documents == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Install packages
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends \
+            make \
+            texlive-latex-extra texlive-fonts-extra texlive-science \
+            texlive-publishers texlive-bibtex-extra texlive-plain-generic
+
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.2.0
+        with:
+          enable-cache: true
+
+      - name: Build paper and specification
+        run: make paper.pdf paper-anon.pdf PurePy-spec.pdf spec-anon.pdf graduality.pdf
+
+  evaluation:
+    needs: changes
+    if: needs.changes.outputs.evaluation == 'true'
+    name: evaluation (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-14]
+
+    defaults:
+      run:
+        working-directory: evaluation
+
+    env:
+      MPLBACKEND: Agg
+      UV_PROJECT_ENVIRONMENT: .venv
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.2.0
+        with:
+          version: "0.11.13"
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install Linux sandbox
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bubblewrap zstd
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Run pipeline with local model on every benchmark
+        env:
+          SMOKE_BENCHMARKS: humaneval-plus mbpp-plus livecodebench
+          SMOKE_LIMIT: 1
+          SMOKE_OUTPUT_DIR: results/ci/${{ runner.os }}
+        run: bash scripts/smoke.sh
+
+      - name: Import HumanEval+ run into Harbor
+        run: bash scripts/harbor-import.sh --file "results/ci/${{ runner.os }}/humaneval-plus/qwen2.5-coder-0.5b.json"
+
+      - name: Check smoke-run figure compiles
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get install -y --no-install-recommends texlive-latex-base texlive-latex-recommended
+          bash scripts/check-figure.sh "results/ci/${{ runner.os }}/humaneval-plus/qwen2.5-coder-0.5b.tex"
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evaluation-${{ runner.os }}
+          path: evaluation/results/ci/
+          if-no-files-found: warn

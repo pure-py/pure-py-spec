@@ -31,27 +31,15 @@
   \newcommand*{\specinput}[1]{}
   \newenvironment{specdefinition}[1]{\ignorespaces}{\unskip}
 \fi
-% Rows of the auxiliary-functions table: the section column exists only in the specification, and
-% \specauxrow rows appear only there.
-\ifdefined\specmode
-  \newcommand*{\auxrow}[4]{#1 & #2 & #3 & \S\ref{#4} \\}
-  \newcommand*{\specauxrow}[4]{#1 & #2 & #3 & \S\ref{#4} \\}
-  \newcommand*{\auxgroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{4}{l}{\itshape #1} \\}
-\else
-  \newcommand*{\auxrow}[4]{#1 & #2 & #3 \\}
-  \newcommand*{\specauxrow}[4]{}
-  \newcommand*{\auxgroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{3}{l}{\itshape #1} \\}
-\fi
-% Table of the auxiliary-functions index: the specification adds the section defining each.
+% Rows of the auxiliary-functions table, which appears only in the specification.
+\newcommand*{\auxrow}[4]{#1 & #2 & #3 & \S\ref{#4} \\}
+\newcommand*{\auxgroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{4}{l}{\itshape #1} \\}
+% Table of the auxiliary-functions index, with the section defining each.
 \newenvironment{auxindex}{%
   \begin{center}\small
   \setlength{\tabcolsep}{4pt}
-  \ifdefined\specmode
-    \begin{tabular}{>{\raggedright\arraybackslash}p{0.25\textwidth}>{\raggedright\arraybackslash}p{0.18\textwidth}>{\raggedright\arraybackslash}p{0.42\textwidth}>{\raggedright\arraybackslash}p{0.07\textwidth}}
-  \else
-    \begin{tabular}{>{\raggedright\arraybackslash}p{0.21\textwidth}>{\raggedright\arraybackslash}p{0.2\textwidth}>{\raggedright\arraybackslash}p{0.54\textwidth}}
-  \fi
-  \textbf{Function} & \textbf{Result} & \textbf{Meaning}\speconly{ & \textbf{Section}} \\[1mm]
+  \begin{tabular}{>{\raggedright\arraybackslash}p{0.25\textwidth}>{\raggedright\arraybackslash}p{0.18\textwidth}>{\raggedright\arraybackslash}p{0.42\textwidth}>{\raggedright\arraybackslash}p{0.07\textwidth}}
+  \textbf{Function} & \textbf{Result} & \textbf{Meaning} & \textbf{Section} \\[1mm]
 }{\end{tabular}\end{center}}
 % Rows of the index from spec/fig/auxiliary-index-<name>.tex, read by the input primitive so that a
 % coloured group row may follow directly.
@@ -173,7 +161,7 @@
 \newcommand*{\exPass}{\pyinline{pass}}
 \newcommand*{\exReturn}[1]{\pyinline{return}\;#1}
 \newcommand*{\exReturnNone}{\pyinline{return}}
-\newcommand*{\exSeq}[2]{#1\;#2}
+\newcommand*{\exSeq}[2]{#1\,#2}
 
 % Terms: definitions and imports
 \newcommand*{\exDataclass}[2]{@\pyinline{dataclass}\;\pyinline{class}\;#1:\;#2}
@@ -385,5 +373,23 @@
   \setlength{\abovedisplayshortskip}{\dimexpr\abovedisplayshortskip - \baselineskip\relax}%
   \begin{align*}\input{spec/functions/#1}\end{align*}\endgroup}
 
+% Production symbol of the grammar figures: two colons raised so that their centre is that of the equals
+% sign, closed up by kerns that a document may set before loading this file, since the colon's side bearings
+% vary between fonts. The defaults are those of mathtools' \Coloneqq.
+% Size of the grammar figures, which a document may set before loading this file.
+\providecommand*{\grammarsize}{\small}
+\providecommand*{\coloncolonkern}{0.9mu}
+\providecommand*{\colonequalskern}{0mu}
+% Correction to the raise of the colons, for fonts whose glyph boxes do not centre on the ink.
+\providecommand*{\colonequalsraise}{0pt}
+\makeatletter
+\newcommand*{\coloncolon@raised}{%
+  \settoheight{\dimen@}{$=$}\settodepth{\dimen@ii}{$=$}%
+  \@tempdima=\dimexpr(\dimen@-\dimen@ii)/2\relax
+  \settoheight{\dimen@}{$:$}\settodepth{\dimen@ii}{$:$}%
+  \@tempdimb=\dimexpr(\dimen@-\dimen@ii)/2\relax
+  \raisebox{\dimexpr\@tempdima-\@tempdimb+\colonequalsraise\relax}{$:\mkern-\coloncolonkern:$}}
+\newcommand*{\coloncolonequals}{\mathrel{\coloncolon@raised\mkern-\colonequalskern{=}}}
+\makeatother
 \newcommand*{\grammarGroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{4}{l}{#1}}
 \newcommand*{\metaGroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{3}{l}{#1}}

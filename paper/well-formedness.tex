@@ -1,0 +1,217 @@
+\section{Well-formedness}
+\label{sec:well-formedness}
+
+\PurePy excludes some Python behaviours statically and others only at runtime.
+Well-formedness is the static part, a judgement on programs defined in this section; the operational
+semantics (\secref{operational-semantics}) is defined for well-formed programs. A program is well-formed
+when it is well typed, so the rules of this section give each expression a type, each statement a
+static outcome recording either the assignments made or the fact that the statement definitely returns,
+and each module a signature. The section introduces
+types and subtyping, then follows the syntax of \secref{syntax}, taking statements, expressions and
+patterns, then modules and programs, and \secref{operational-semantics} gives each of these a dynamic
+counterpart.
+
+\input{paper/well-formedness/principles}
+
+\subsection{Types}
+\label{sec:types}
+
+Well-formedness is checked relative to a context $\Gamma$, recording what each name in scope denotes, and a
+class table $\Sigma$, recording the classes defined so far (\secref{contexts}). Programs mention types only
+through the type expressions in annotations (\secref{types-schemes}), so each typing rule must resolve these to
+types by looking up the names in $\Gamma$. Class names applied to type arguments resolve to
+instantiated classes, alias names to the bodies of the aliases at their type arguments, and type parameters to type
+variables; the full definition is given in \specfigref{resolve-type}.
+
+\paragraph{Subtyping.}
+
+Subtyping (\specfigref{subtyping}) is structural and follows mypy (\secref{python-compatibility}). Instantiated classes are below their base classes, with type arguments invariant, as
+are lists and dictionaries; tuples are covariant, and callables are contravariant in their parameters and covariant
+in their results. A literal type is below its base type, and \pyinline{int} is below \pyinline{float}, as PEP~484
+requires, whereas \pyinline{bool} is not below \pyinline{int}, although in Python \pyinline{bool} is a subclass of \pyinline{int}. A union $\tyUnion{\sigma}{\tau}$ is a least upper bound of its \emph{disjuncts} $\sigma$ and $\tau$; \pyinline{Never} is the least type and
+\pyinline{object} the greatest. Subtyping is a preorder (Lemma~\specnum{lem:subtyping-transitive}), with distinct
+types such as $\tyUnion{\sigma}{\tau}$ and $\tyUnion{\tau}{\sigma}$ \emph{equivalent}, $\sigma \tyEquiv \tau$, when each
+is a subtype of the other; the notations $\subty$ and $\tyEquiv$ follow \citet{pierce2002}.
+
+\input{spec/well-formedness/join-meet}
+
+\subsection{Expressions}
+\label{sec:expression-typing}
+
+Typing of expressions is bidirectional, with two judgements. \emph{Synthesis} $\Sigma; \Gamma \vdash e \synth \tau$ reads a type out of an expression (\specfigrefThree{typing-synth}{typing-synth-elim}{typing-synth-ctd}),
+and \emph{checking} $\Sigma; \Gamma \vdash e \checks \tau$ tests an expression against a type supplied by its
+surroundings (\specfigref{typing-check}). The division follows the usual recipe for bidirectional
+systems~\citep{davies2000,dunfield2021}, in which introduction forms check and elimination forms synthesise, since an elimination form starts from a subterm whose type is known. Such systems usually provide an annotation form $(e \mathbin{:} \tau)$, which lets a checking form occur
+where synthesis is required. Python does not have an annotation form, so
+\PurePy gives each introduction form a synthesis rule wherever its parts determine the type, an approach also taken
+by Swift, Kotlin and Scala~\citep{swift2025,kotlin2025,odersky2025}. Lambdas and empty lists have only checking rules, since Python does not allow lambda
+parameters to be annotated, and empty lists fail to determine their element types. Lambdas take their parameter types
+from the expected \pyinline{Callable} type, and check their bodies against the return type:
+\begin{mathpar}
+\small
+\input{spec/rules/lambda}
+\end{mathpar}
+Literals other
+than floats synthesise their literal types, such as $\tyLiteral{\pyinline{3}}$, and lists synthesise the join of
+the base types of their elements, since \pyinline{list} is invariant and a literal element type would rule out every other
+element. Expressions that synthesise $\sigma$ check against any supertype of $\sigma$ by subsumption, which applies only
+when no other rule concludes $\Sigma; \Gamma \vdash e \checks \tau$, so both judgements are syntax-directed and
+expressions have at most one synthesis derivation, and at most one checking derivation against a given type.
+
+Operators are overloaded, as specified in \specfigref{operator-overloads}, and the \ruleName{binop} and
+\ruleName{unop} rules synthesise the return type of the most specific overload at the operand types. Union types need dedicated rules at elimination forms, operators included: with \pyinline{x} of type
+$\tyUnion{\tyInt}{\tyStr}$, no overload of \pyinline{*} applies at $\exBinOp{\pyinline{x}}{\pyinline{*}}{\pyinline{2}}$, which is
+instead typed at \pyinline{int} and at \pyinline{str} and synthesises $\tyUnion{\tyInt}{\tyStr}$. Calls in which the callee
+synthesises a union are typed at each disjunct, with the callee replaced by a fresh variable bound at that disjunct,
+and synthesise the join of the two results:
+\begin{mathpar}
+\small
+\input{spec/rules/call-union}
+\end{mathpar}
+Subscripts and attribute references have analogous rules. A single rule for an arbitrary evaluation
+context~\citep{dunfield2004} can instead eliminate a union at any subterm in evaluation position, including an argument,
+which has the advantage of accepting programs in which a function of intersection type is applied to an argument of union
+type, each disjunct needing a different conjunct of the function type. However, the rule does not determine where it applies, so
+type checking requires search~\citep{dunfield2011}. \PurePy lacks intersection types, and the rules above cover
+overloaded operators, which are their closest analogue; stating union elimination separately for
+each elimination form therefore keeps both judgements syntax-directed without rejecting any program which that rule
+would accept.
+
+Generic functions, bound in the context at type schemes rather than types, do not have types on their own,
+but are typed only at calls or against expected types. Calls of generic functions instantiate the type parameters from the arguments. The type arguments are determined by matching each parameter type against the type synthesised by the corresponding argument, with a type parameter found at several positions taking the join of those types,
+and every argument is then checked against its instantiated parameter type:
+\begin{python}
+def keep[T](p: Callable[[T], bool], xs: list[T]) -> list[T]:
+    return [x for x in xs if p(x)]
+ys: list[int] = keep(lambda x: x > 0, [1, -2, 3])
+\end{python}
+
+\noindent The call fixes \pyinline{T} at \pyinline{int} from the list, and the lambda is then checked against
+$\tyCallable{\tyInt}{\tyBool}$. Checking an argument never yields type arguments, which lets all type arguments
+be determined in one step, before any argument is checked, so a call is rejected if a type parameter occurs only in the types of parameters with arguments that do not
+synthesise, such as lambdas. These calls are accepted by mypy, which types each lambda once the other type arguments are known; the
+Python typing specification does not specify how type arguments are inferred in calls of generic functions. Generic functions check against a type $\tau$ by
+instantiating their type parameters from $\tau$ in the same way, provided the instantiated type is a subtype of $\tau$,
+so they can be passed where \pyinline{Callable} types are expected.
+
+
+
+
+
+\subsection{Statements}
+\label{sec:well-formedness-statements}
+
+\input{spec/well-formedness/static-outcome}
+
+The statement judgement $\Sigma; \Gamma; \zeta \vdash s : R$ says that under $\Gamma$ and
+optional return type $\zeta$, statement $s$ has static outcome $R$ (\specfigref{typing-stmt}); every rule passes $\zeta$ down unchanged.
+A sequence $\exSeq{s}{s'}$ types $s$, then types $s'$ under $\Gamma$ overridden by the context assigned
+by $s$. A conditional combines its
+branches with $\merge_{\Sigma}$, merging in $\Assigns{\varnothing}$ when there is no \pyinline{else} branch.
+A call statement with a callee synthesising a union is typed
+once per disjunct (\ruleName{call-stmt-union}), following \ruleName{call-union} for a call expression.
+
+A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
+auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\specfigref{typing-cases}), which threads
+a remaining type, starting from $\sigma$, and a residual $L$ of shapes, starting from the shapes of $\sigma$ (\figref{shapes}),
+through the cases, merging their outcomes into $S$. The \ruleName{match} rule applies when the final remaining type is $\tyNever$, meaning the match is
+exhaustive; the \ruleName{match-partial} rule applies otherwise and also merges in $\Assigns{\varnothing}$, the
+outcome of the path on which the scrutinee is not matched by any of the cases:
+\begin{mathpar}
+\small
+\input{spec/rules/match}
+\and
+\input{spec/rules/match-partial}
+\end{mathpar}
+The remaining type, the residual, reachability and exhaustiveness are the subject of
+\secref{well-formedness-patterns}.
+
+The \ruleName{defs} rule for a mutual def region of function definitions synthesises a type scheme for each definition
+(\specfigref{typing-def}), binds all the function names of the mutual def region at the synthesised type schemes, and checks each
+definition against its type scheme:
+\begin{mathpar}
+\small
+\input{spec/rules/defs}
+\end{mathpar}
+For a definition $\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$,
+the auxiliary judgements $\Sigma; \Gamma \vdash d \synth \pi$ and $\Sigma; \Gamma \vdash d \checks \pi$ synthesise the type
+scheme from the annotations and check the body $s$. Both rules extend the
+context with $\TypeVar$ entries for the type parameters $\seq{\alpha}$. A type scheme without type parameters is identical to its \pyinline{Callable} type, so the \ruleName{defs} rule binds the name of a
+function without type parameters as a variable of that type. The type schemes of functions with type parameters are instantiated
+at a call, by the argument types (\ruleName{callee-scheme}), and when checked against a \pyinline{Callable} type, by that
+type. Since annotations denote types, not type schemes, declarations and
+assignments never bind variables at type schemes, only at types.
+
+The body $s$ is checked with the
+return type denoted by $\psi$, and must have static outcome $\Returns$ unless that type is equivalent to \pyinline{None},
+so a function that declares a result definitely returns one. A return type such as $\tyUnion{\tyInt}{\tyNone}$
+does not exempt the body from returning, nor permit a bare \pyinline{return}, for compatibility with mypy (\secref{python-compatibility}).
+
+\subsection{Pattern matching}
+\label{sec:exhaustiveness}
+\label{sec:well-formedness-patterns}
+
+To check a \pyinline{match} with scrutinee type $\sigma$, the auxiliary judgement
+$\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\specfigref{typing-cases}) threads a \emph{remaining type}
+$\tau$ and a \emph{residual} $L$ through the cases, both over-approximations of the values of $\sigma$ which are not
+matched by any of the earlier cases. The residual is an ordered set of \emph{shapes} (\figref{shapes}), each denoting a
+set of values of a single type, and starts from the shapes of $\sigma$; the remaining type is coarser, a type rather
+than a set of shapes, and starts from $\sigma$ itself. Two auxiliary functions narrow a type $\tau$ by a pattern $p$: $\matchedAs{\Sigma}(\Gamma, \tau, p)$ is
+the type to which $\tau$ is narrowed if $p$ matches, and $\remaining{\Sigma}(\Gamma, \tau, p)$ is the type remaining if
+$p$ fails. Each case's pattern is checked against the remaining type, binding its pattern variables, and matched
+against the residual. Reachability is decided by the
+residual: a case is \emph{reachable} if its pattern matches at least one shape of the residual, and a match with an
+unreachable case is ill-formed. For a reachable case, the body is checked under the bindings and its outcome merged
+into $S$; the shapes left after matching and the type remaining if the pattern fails become the residual and remaining
+type for the case that follows:
+\begin{mathpar}
+\small
+\input{spec/rules/match-cases}
+\end{mathpar}
+
+A match is \emph{exhaustive} when its cases between them match every value of $\sigma$. Exhaustiveness is decided by
+the final remaining type, which the \ruleName{match} rule requires to be $\tyNever$, with \ruleName{match-partial}
+applying otherwise. The remaining type thus determines exhaustiveness as well as the types of pattern variables. The Python typing
+specification leaves narrowing largely unspecified,\footnote{\url{https://typing.python.org/en/latest/spec/narrowing.html}}
+so the remaining type emulates the narrowing of a match scrutinee observed in mypy
+(\secref{python-compatibility}), which subtracts a class only for a
+constructor pattern that matches every value of the class, and a tuple only through one refutable component, i.e.~one whose pattern can fail to match a value of the component's type.
+
+\input{paper/well-formedness/pattern-matching}
+
+The cases needed to exhaust a match therefore depend on the type of the scrutinee: a union is exhausted
+by covering each disjunct, a class type by a pattern for the class itself, \pyinline{bool} by
+\pyinline{True} and \pyinline{False}, and a dictionary type by the empty dictionary pattern, while \pyinline{int}, \pyinline{float}, \pyinline{str} and lists have
+unboundedly many heads and need a variable or wildcard. A literal-typed scrutinee is exhausted by covering
+its literals, so $\exAssign{\pyinline{x}\exAnnot{\tyLiteral{\pyinline{42}}}}{\pyinline{42}}$ admits a match with a case for \pyinline{42} alone, while
+$\exAssign{\pyinline{x}\exAnnot{\tyInt}}{\pyinline{42}}$ keeps the type open. Over
+$\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
+$\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ leave the empty residual,
+although each covers only part of the type.
+
+\subsection{Modules and programs}
+\label{sec:well-formedness-modules}
+
+\emph{Module checking} types a module's body and computes its signature $\Gamma$, the judgement
+$\Sigma \vdash_{\mathsf{mod}} q : \Gamma \binding \Sigma'$ (\specfigref{typing-module}); it mirrors loading at run time
+(\secref{operational-semantics}). The \ruleName{module} rule types the body as a top-level statement.
+Module checking is defined inductively, so a program with an import cycle is ill-formed. Program
+well-formedness (\specfigref{typing-module}) requires the main module to be well typed and hence,
+recursively, every module that the program can load; a module that is never imported is not checked.
+The rule \ruleName{module} types a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
+overridden by the imported context and then, as in \ruleName{def-body}, by an unbound entry for each name
+declared in the body or bound by a pattern in it:
+\begin{mathpar}
+\small
+\input{spec/rules/module}
+\end{mathpar}
+The members of \pyinline{builtins} are thus in scope unqualified, and a name bound by the body
+shadows a builtin throughout the module, so a use of the name before its declaration is rejected. Under mypy such a
+use instead resolves to the builtin, following Python's run-time lookup. As with any scope, the names declared in the
+module, including its imported names, must be distinct from one another and from any pattern variables in its
+body. Since every module declares \pyinline{__name__} (\secref{modules-programs}), a module is ill-formed if its body
+declares that name again, imports it, or binds it in a pattern.
+
+The signature $\Gamma$ produced by module checking (\specfigref{typing-module}) comprises the classes, type aliases
+and variables defined by a module, together with its intrinsic \pyinline{__name__} and a stub for each submodule.
+

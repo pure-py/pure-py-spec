@@ -26,6 +26,10 @@
 \usepackage{changebar}
 \ifdefined\finalmode\nochangebars\fi
 
+% Raise of the production symbol's colons for the paper's fonts; see tex/macros.tex.
+\newcommand*{\colonequalsraise}{0.05em}
+% Grammar figures at the size of the paper's own syntax figures.
+\newcommand*{\grammarsize}{\footnotesize\renewcommand{\arraystretch}{0.92}}
 \input{tex/macros}
 \externaldocument[S-]{xref/PurePy-spec}
 \input{tex/listings}
@@ -136,8 +140,8 @@ grounded in the \PurePy semantics.
 
 \input{paper/introduction}
 \input{paper/overview}
-\input{spec/syntax}
-\input{spec/well-formedness}
+\input{paper/syntax}
+\input{paper/well-formedness}
 \input{spec/operational-semantics}
 \input{paper/reference-implementation}
 \input{paper/case-studies}

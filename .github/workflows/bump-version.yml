@@ -97,7 +97,7 @@ jobs:
           git commit -m "Specification $TAG"
           git push origin gh-pages
 
-      - name: Build the conformance suite wheel
+      - name: Build conformance suite wheel
         run: make wheel
 
       - name: Create release

@@ -81,12 +81,17 @@ paper-anon.pdf: $(TEXFILES)
 spec-anon.pdf: $(TEXFILES)
 	$(call anon,spec-anon,PurePy-spec.tex)
 
-# Specification against the conformance suite, and the suite against mypy
+# Specification against the conformance suite
 check-consistency:
 	uv run --locked python test/consistency.py
 
-# Wheel of the conformance suite and its runner
-wheel: check-consistency
+# Conformance suite against Python, with mypy as type checker
+check-suite:
+	uv run --locked purepy-conformance --python \
+		--type-checker "mypy --python-version $$(cat .python-version) --config-file $(CURDIR)/test/mypy.ini --no-error-summary"
+
+# Wheel of the conformance suite and runner
+wheel: check-consistency check-suite
 	rm -rf dist && uv build --wheel
 
 dependencies.svg:
@@ -116,4 +121,4 @@ clean:
 	rm -f $(AUX) *.pdf *.zip $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(EVALUATION_FIGURE)
 	rm -rf $(dir $(SPEC_LABELS))
 
-.PHONY: default all paper-submission clean check-consistency wheel dependencies.svg
+.PHONY: default all paper-submission clean check-consistency check-suite wheel dependencies.svg
