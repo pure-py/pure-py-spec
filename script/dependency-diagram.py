@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
 """D2 diagram of dependencies between repositories of the organisation, from a directory holding a clone of
-each, written to standard output
-
-An edge is a reference in one repository to a release, pages or git URL of another. A reference to a
-release asset or to the latest pages names its own version; any other reference needs a comment on the
-same or preceding line, "pin: <label>" for a version bumped by hand or "tracks: <label>" for one that
-follows the target. Links to repositories, issues and pull requests aren't dependencies."""
+each, written to standard output"""
 
 import pathlib
 import re
@@ -29,6 +24,7 @@ class Edge:
     target: str
     label: str
     pinned: bool
+    version: str | None = None  # Pinned release
 
 
 def tracked_files(repo: pathlib.Path) -> list[pathlib.Path]:
@@ -36,6 +32,26 @@ def tracked_files(repo: pathlib.Path) -> list[pathlib.Path]:
         ["git", "-C", repo, "ls-files", "-z"], capture_output=True, check=True
     ).stdout
     return [repo / name for name in names.decode().split("\0") if name]
+
+
+def latest_release(repo: str) -> str | None:
+    view = subprocess.run(
+        [
+            "gh",
+            "release",
+            "view",
+            "--repo",
+            f"{ORG}/{repo}",
+            "--json",
+            "tagName",
+            "--jq",
+            ".tagName",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return view.stdout.strip() if view.returncode == 0 else None
 
 
 def edge(source: str, lines: list[str], index: int, match: re.Match[str]) -> Edge | None:
@@ -52,7 +68,9 @@ def edge(source: str, lines: list[str], index: int, match: re.Match[str]) -> Edg
     if repo == source or path.startswith(("/issues/", "/pull/")):
         return None
     if release := RELEASE.match(path):
-        return Edge(source, repo, f"release {release['version']}", pinned=True)
+        return Edge(
+            source, repo, f"release {release['version']}", pinned=True, version=release["version"]
+        )
     if LATEST.match(path):
         return Edge(source, repo, "latest release", pinned=False)
     annotated = [ANNOTATION.search(line) for line in lines[max(index - 1, 0) : index + 1]]
@@ -82,22 +100,40 @@ def edges(repo: pathlib.Path) -> set[Edge]:
 
 
 def d2(repos: list[pathlib.Path]) -> str:
-    def style(e: Edge) -> str:
-        return "pinned" if e.pinned else "tracking"
+    latest = {repo.name: latest_release(repo.name) for repo in repos}
 
-    nodes = "".join(f'"{repo.name}"\n' for repo in repos)
+    def node(repo: pathlib.Path) -> str:
+        label = f"{repo.name}\\n{latest[repo.name]}" if latest[repo.name] else repo.name
+        return f'"{repo.name}": "{label}"\n'
+
+    def link(e: Edge) -> str:
+        behind = e.version is not None and e.version != latest[e.target]
+        label = f"{e.label}, latest {latest[e.target]}" if behind else e.label
+        style = "behind" if behind else "pinned" if e.pinned else "tracking"
+        return f'"{e.source}" -> "{e.target}": {label} {{class: {style}}}\n'
+
+    nodes = "".join(map(node, repos))
     links = "".join(
-        f'"{e.source}" -> "{e.target}": {e.label} {{class: {style(e)}}}\n'
-        for repo in repos
-        for e in sorted(edges(repo), key=lambda e: (e.target, e.label))
+        link(e) for repo in repos for e in sorted(edges(repo), key=lambda e: (e.target, e.label))
     )
     return f"""vars: {{ d2-config: {{ layout-engine: elk }} }}
 direction: right
 classes: {{
   pinned: {{ style.stroke: "#333333" }}
   tracking: {{ style.stroke: "#333333"; style.stroke-dash: 4 }}
+  behind: {{ style.stroke: "#b00020" }}
+  hidden: {{ style.opacity: 0; width: 1; height: 1; label: "" }}
 }}
-{nodes}{links}"""
+{nodes}{links}key: Key {{
+  near: bottom-center
+  direction: right
+  style: {{ fill: "#ffffff"; stroke: "#cccccc"; border-radius: 8; font-size: 18; bold: true }}
+  x1 -> y1: Pin, moved by hand {{class: pinned}}
+  x2 -> y2: Follows target {{class: tracking}}
+  x3 -> y3: Pin behind latest release {{class: behind}}
+  x1.class: hidden; y1.class: hidden; x2.class: hidden; y2.class: hidden; x3.class: hidden; y3.class: hidden
+}}
+"""
 
 
 def main() -> None:
