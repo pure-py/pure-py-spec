@@ -40,7 +40,7 @@ See the Makefile.
 
 Install [uv](https://docs.astral.sh/uv/). The Python version in `.python-version` is read by uv, the
 workflows, mypy and the specification. From the repository root, check that every test cites a rule of the
-specification and that mypy accepts the agreeing tests, then build the wheel:
+specification, run the suite against Python with mypy as type checker, and build the wheel:
 
 ```bash
 make wheel

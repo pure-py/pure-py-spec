@@ -22,6 +22,7 @@ STATUS_EXPECTED = f".status{EXPECTED}"
 
 HELPERS = "helpers"
 MAIN = "main.py"
+MYPY_BUG = "mypy-bug"
 
 
 class PythonOutcome(StrEnum):
@@ -103,10 +104,11 @@ class Results:
 
 
 class Runner(Results):
-    def __init__(self, type_checker: list[str], interpreter: str | None) -> None:
+    def __init__(self, type_checker: list[str], interpreter: str | None, python: bool) -> None:
         super().__init__()
         self.type_checker = type_checker
         self.interpreter = interpreter  # None: tests not run
+        self.python = python  # Implementation under test is Python itself
 
     def check(self, path: pathlib.Path, exit: Exit, error_checked: bool) -> list[str]:
         """Each test is checked in a separate directory, so other tests can't interfere. Single-module tests
@@ -128,7 +130,26 @@ class Runner(Results):
             return [f"check: expected {error.read_text().strip()!r}, got: {got}"]
         return []
 
-    def python(self, path: pathlib.Path, outcome: PythonOutcome) -> list[str]:
+    def accepts(self, test: pathlib.Path) -> list[str]:
+        """Failures of the type checker to accept a test, a module or the directory of a program, or to
+        reject it if the test is filed under a reported mypy bug. The test is copied to a new directory and
+        checked from there, so that its modules resolve and nothing is written into the suite."""
+        with tempfile.TemporaryDirectory() as alone:
+            copy = pathlib.Path(alone) / test.name
+            if test.is_dir():
+                shutil.copytree(test, copy)
+                proc = run([*self.type_checker, MAIN], cwd=copy)
+            else:
+                shutil.copy(test, copy)
+                proc = run([*self.type_checker, test.name], cwd=copy.parent)
+        reported_bug = MYPY_BUG in test.parts
+        if proc.returncode == 0 and reported_bug:
+            return ["check: accepted, but filed as a reported mypy bug"]
+        if proc.returncode != 0 and not reported_bug:
+            return [f"check: rejected: {(proc.stdout + proc.stderr).strip().split(chr(10), 1)[0]}"]
+        return []
+
+    def run_python(self, path: pathlib.Path, outcome: PythonOutcome) -> list[str]:
         assert self.interpreter is not None
         accepts = outcome == PythonOutcome.SUCCEEDS
         expected = path.with_suffix(EXPECTED)
@@ -161,9 +182,15 @@ class Runner(Results):
         dirs = test.relative_to(suite).parts[:-1]
         exit, error_checked, python = expectation(PythonOutcome(dirs[0]), PurePyOutcome(dirs[1]))
         path = test / MAIN if test.is_dir() else test
+        if self.python:
+            agrees = dirs[0] == PythonOutcome.SUCCEEDS and dirs[1] == PurePyOutcome.AGREES
+            return [
+                *(self.accepts(test) if agrees else []),
+                *(self.run_python(path, python) if self.interpreter is not None else []),
+            ]
         return [
             *self.check(path, exit, error_checked),
-            *(self.python(path, python) if self.interpreter is not None else []),
+            *(self.run_python(path, python) if self.interpreter is not None else []),
         ]
 
     def run_suite(self, suite: pathlib.Path, jobs: int | None) -> None:
@@ -211,10 +238,17 @@ def main(argv: Sequence[str] | None = None) -> None:
         "--no-run", action="store_true", help="check the tests without running them"
     )
     parser.add_argument(
+        "--python",
+        action="store_true",
+        help="test Python itself: run every test, and type-check only the agreeing tests, which must be accepted",
+    )
+    parser.add_argument(
         "--jobs", type=int, help="number of tests run in parallel (default: number of cores)"
     )
     args = parser.parse_args(argv)
-    r = Runner(shlex.split(args.type_checker), None if args.no_run else args.interpreter)
+    r = Runner(
+        shlex.split(args.type_checker), None if args.no_run else args.interpreter, args.python
+    )
     with suite() as path:
         r.run_suite(path, args.jobs)
     r.summary()
