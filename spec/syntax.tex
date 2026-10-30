@@ -143,8 +143,11 @@ binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context 
 \end{definition}
 
 \noindent The predefined signatures name types
-that are themselves members, sometimes of another predefined module, so each is well-formed in their union. The class table $\SigmaPredef$ of the predefined modules is
-$\set{\bind{\clsRange}{\ClassDef[\Gamma]{\pyinline{builtins}}{\chi}{1}}}$, where $\chi$ defines the dataclass \pyinline{range} with fields \pyinline{start: int} and
+that are themselves members, sometimes of another predefined module, so each is well-formed in their union. The class table of the predefined modules is
+\[
+\SigmaPredef = \set{\bind{\clsRange}{\ClassDef[\Gamma]{\pyinline{builtins}}{\chi}{1}}}
+\]
+where $\chi$ defines the dataclass \pyinline{range} with fields \pyinline{start: int} and
 \pyinline{stop: int} and $\Gamma$ is the signature of \pyinline{builtins}.
 
 \input{spec/fig/predefined-signatures}
