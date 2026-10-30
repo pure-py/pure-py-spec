@@ -1,6 +1,6 @@
 name: Dependency diagram
 
-# Dependencies between the organisation's repositories, from their pins, published to GitHub Pages
+# Dependencies between the organisation's repositories, published to GitHub Pages
 on:
   workflow_dispatch:
   schedule:
