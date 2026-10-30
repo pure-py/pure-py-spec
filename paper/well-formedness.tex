@@ -55,7 +55,7 @@ than floats synthesise their literal types, such as $\tyLiteral{\pyinline{3}}$, 
 the base types of their elements, since \pyinline{list} is invariant and a literal element type would rule out every other
 element. Expressions that synthesise $\sigma$ check against any supertype of $\sigma$ by subsumption, which applies only
 when no other rule concludes $\Sigma; \Gamma \vdash e \checks \tau$, so both judgements are syntax-directed and
-expressions have at most one derivation in each.}
+expressions have at most one synthesis derivation, and at most one checking derivation against a given type.}
 
 \begin{DeletedBlock}
 Variables, literals, attribute references, calls, constructor calls, operators and subscripts synthesise.
