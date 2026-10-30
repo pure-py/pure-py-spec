@@ -205,7 +205,7 @@
 \and
 \inferrule*[lab={\ruleName{eval-module-fail}}]
 {
-  \replaced{q \Rightarrow_{\mathsf{body}} \prints{\seq{u}}{\aborts{\kappa}}}{\mathcal{M}(q) = \seq{\iota}\;t \quad q, \seq{\iota} \Rightarrow \aborts{\kappa}}
+  \replaced{q \Rightarrow_{\mathsf{body}} \prints{\seq{v}}{\aborts{\kappa}}}{\mathcal{M}(q) = \seq{\iota}\;t \quad q, \seq{\iota} \Rightarrow \aborts{\kappa}}
 }
 {
   q \Rightarrow_{\mathsf{mod}} \aborts{\kappa}
@@ -223,7 +223,7 @@
 }}
 \end{mathpar}
 
-\flushleft \shadebox{$\mathcal{M} \Rightarrow \replaced{\seq{u}, \kappa}{\kappa}$}
+\flushleft \shadebox{$\mathcal{M} \Rightarrow \replaced{\seq{v}, \kappa}{\kappa}$}
 \begin{mathpar}
 \small
 \input{spec/rules/eval-program}
