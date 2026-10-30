@@ -109,6 +109,8 @@ class Runner(Results):
         self.type_checker = type_checker
         self.interpreter = interpreter  # None: tests not run
         self.python = python  # Implementation under test is Python itself
+        self.type_checked = 0
+        self.run_only = 0
 
     def check(self, path: pathlib.Path, exit: Exit, error_checked: bool) -> list[str]:
         """Each test is checked in a separate directory, so other tests can't interfere. Single-module tests
@@ -196,6 +198,9 @@ class Runner(Results):
     def run_suite(self, suite: pathlib.Path, jobs: int | None) -> None:
         """Tests run in parallel on jobs threads (default: one per core), reported in order."""
         found = list(tests(suite))
+        agrees = suite / PythonOutcome.SUCCEEDS / PurePyOutcome.AGREES
+        self.type_checked = sum(1 for test in found if not self.python or agrees in test.parents)
+        self.run_only = len(found) - self.type_checked
         with concurrent.futures.ThreadPoolExecutor(jobs) as pool:
             results = pool.map(lambda test: self.run_test(suite, test), found)
             last = None
@@ -252,6 +257,8 @@ def main(argv: Sequence[str] | None = None) -> None:
     with suite() as path:
         r.run_suite(path, args.jobs)
     r.summary()
+    if args.python:
+        print(f"{r.type_checked} tests type-checked and run, {r.run_only} run only")
     sys.exit(0 if not r.failed else 1)
 
 
