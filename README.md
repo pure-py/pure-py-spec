@@ -18,20 +18,15 @@ semantics.
 - `paper.tex`: the paper
 - `PurePy-spec.tex`: the language specification, a standalone document
 - `spec/`: sources of the specification, including the figures, rules, definitions and lemmas shared with the paper
-- `paper/`: sources of the paper's own prose, and in `paper/fig/` key figures laid out for the paper
+- `paper/`: sources of the paper's own prose
 - `tex/`: macros and bibliography shared by both documents
 - `graduality.tex`, `graduality/`: draft notes on gradual typing, built as a separate document and not part of the 1.0 specification or paper
 - `src/purepy_conformance/`: the conformance suite, as package data, and its runner, the `purepy-conformance` command
-- `test/`: consistency of the specification with the conformance suite, and of the suite with mypy
+- `test/`: consistency of the specification with the conformance suite
 - `script/`: project board integrity check, run daily by CI
 
-Each section has separate prose in the two documents, `paper/<section>.tex` and `spec/<section>.tex`, and
-the technical material has one source: figures in `spec/fig/`, apart from key figures such as the syntax of
-statements, which the paper lays out differently in `paper/fig/`; rules included individually in the paper in
-`spec/rules/`, and definitions and lemmas in `spec/<section>/`, input by both documents. Within a shared
-source, `\paperonly{...}` and `\speconly{...}` restrict a phrase to one document. The syntax and operational
-semantics sections are still assembled from one source each, in which `\paperinput{file}` includes a file in
-the paper only and `\specinput{file}` in the specification only.
+Each section has separate prose in the two documents, and material shared by both lives under `spec/` and is
+input by each. Within a shared source, `\paperonly{...}` and `\speconly{...}` restrict a phrase to one document.
 
 ## Building
 
