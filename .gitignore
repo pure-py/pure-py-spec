@@ -32,5 +32,6 @@ tex/python-version.tex
 tex/mypy-version.tex
 tex/anon-name.tex
 
-# Generated diagram
+# Generated status page
 dependencies.svg
+status.html

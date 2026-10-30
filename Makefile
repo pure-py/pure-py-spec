@@ -95,7 +95,10 @@ wheel: check-consistency check-suite
 	rm -rf dist && uv build --wheel
 
 dependencies.svg:
-	uv run --locked python script/dependency-diagram.py .. | d2 - $@
+	uv run --locked python script/dependency-diagram.py .. | d2 --pad 16 - $@
+
+status.html: dependencies.svg
+	uv run --locked python script/status-page.py .. > $@
 
 # tracks: tag of same version
 PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
@@ -121,4 +124,4 @@ clean:
 	rm -f $(AUX) *.pdf *.zip $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(EVALUATION_FIGURE)
 	rm -rf $(dir $(SPEC_LABELS))
 
-.PHONY: default all paper-submission clean check-consistency check-suite wheel dependencies.svg
+.PHONY: default all paper-submission clean check-consistency check-suite wheel dependencies.svg status.html
