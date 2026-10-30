@@ -37,7 +37,6 @@ class PurePyOutcome(StrEnum):
     AGREES = "agrees"
 
 
-SYNTACTIC_ONLY = "syntactic-only"
 SYNTAX_ERROR = "SyntaxError"
 
 
@@ -49,9 +48,9 @@ class Exit(IntEnum):
 
 
 class Expectation(NamedTuple):
-    exit: Exit | None  # None: type checker not run
+    exit: Exit
     error_checked: bool  # type checker output contains .error.expected
-    python: PythonOutcome | None  # None: not run under Python
+    python: PythonOutcome
 
 
 # Type checker verdict for each PurePy outcome
@@ -105,30 +104,24 @@ class Results:
 
 
 class Runner(Results):
-    def __init__(
-        self, interpreter: str | None, type_checker: list[str] | None, messages: bool
-    ) -> None:
+    def __init__(self, type_checker: list[str], interpreter: str | None) -> None:
         super().__init__()
+        self.type_checker = type_checker
         self.interpreter = interpreter  # None: tests not run
-        self.type_checker = (
-            type_checker  # command given the test path; None: the reference type checker
-        )
-        self.messages = messages  # type checker reports the reference type checker's messages
 
     def check(self, path: pathlib.Path, exit: Exit, error_checked: bool) -> list[str]:
         """Each test is checked in a separate directory, so other tests can't interfere. Single-module tests
         are copied to a new directory before running."""
-        reference = [sys.executable, "-m", "purepy", "--check"]
         with tempfile.TemporaryDirectory() as alone:
             checked = path if path.name == MAIN else pathlib.Path(shutil.copy(path, alone))
-            proc = run([*(self.type_checker or reference), str(checked)])
+            proc = run([*self.type_checker, str(checked)])
         exits = {exit, Exit.ILL_FORMED_PROGRAM} if exit == Exit.ILL_FORMED else {exit}
         output = proc.stdout + proc.stderr
         error = path.with_suffix(ERROR_EXPECTED)
         if proc.returncode not in exits:
             first = output.strip().split("\n", 1)[0].replace(f"{checked.parent}/", "")
             return [f"check: exit {proc.returncode}, expected {sorted(map(int, exits))}: {first}"]
-        if not error_checked or (self.type_checker is not None and not self.messages):
+        if not error_checked:
             return []
         if not error.exists():
             return [f"check: missing {error.name}"]
@@ -166,22 +159,13 @@ class Runner(Results):
 
     def run_test(self, suite: pathlib.Path, test: pathlib.Path) -> list[str]:
         """Failures of a test at a path below suite: <Python outcome>/<PurePy outcome>[/<subset>]/...
-        /<test>.py, or .../<test>/main.py for a program of several modules; or syntactic-only/<test>.py,
-        for a script which builds an AST which cannot be expressed in Python source."""
+        /<test>.py, or .../<test>/main.py for a program of several modules."""
         dirs = test.relative_to(suite).parts[:-1]
-        exit, error_checked, python = (
-            Expectation(None, False, PythonOutcome.SUCCEEDS)
-            if dirs[0] == SYNTACTIC_ONLY
-            else expectation(PythonOutcome(dirs[0]), PurePyOutcome(dirs[1]))
-        )
+        exit, error_checked, python = expectation(PythonOutcome(dirs[0]), PurePyOutcome(dirs[1]))
         path = test / MAIN if test.is_dir() else test
         return [
-            *(self.check(path, exit, error_checked) if exit is not None else []),
-            *(
-                self.python(path, python)
-                if python is not None and self.interpreter is not None
-                else []
-            ),
+            *self.check(path, exit, error_checked),
+            *(self.python(path, python) if self.interpreter is not None else []),
         ]
 
     def run_suite(self, suite: pathlib.Path, jobs: int | None) -> None:
@@ -196,24 +180,6 @@ class Runner(Results):
                     print(header)
                     last = header
                 self.record(test.relative_to(suite), failures)
-
-
-def compare_known_failures(failed: list[str], known_failures: pathlib.Path, update: bool) -> bool:
-    """Whether the failures are exactly those listed; with update, rewrite the list instead."""
-    if update:
-        known_failures.write_text("".join(line + "\n" for line in sorted(failed)))
-        print(f"{len(failed)} failures written to {known_failures}")
-        return True
-    known = set(known_failures.read_text().splitlines()) if known_failures.exists() else set()
-    for line in sorted(set(failed) - known):
-        print(f"{RED}unexpected:{RESET} {line}")
-    for line in sorted(known - set(failed)):
-        print(f"{GREEN}fixed:{RESET} {line}")
-    if set(failed) != known:
-        print(f"{RED}✗ {known_failures} out of date; rerun with --update{RESET}")
-        return False
-    print(f"{GREEN}✓ failures as listed in {known_failures}{RESET}")
-    return True
 
 
 def tests(suite: pathlib.Path) -> Iterator[pathlib.Path]:
@@ -231,7 +197,7 @@ def tests(suite: pathlib.Path) -> Iterator[pathlib.Path]:
 
 @contextlib.contextmanager
 def suite() -> Iterator[pathlib.Path]:
-    with importlib.resources.as_file(importlib.resources.files("purepy") / SUITE) as path:
+    with importlib.resources.as_file(importlib.resources.files(__package__) / SUITE) as path:
         yield path
 
 
@@ -239,42 +205,22 @@ def main(argv: Sequence[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="purepy-conformance")
     parser.add_argument("interpreter", nargs="?", default="python3")
     parser.add_argument(
-        "--no-run", action="store_true", help="check the tests without running them"
-    )
-    parser.add_argument(
         "--type-checker",
-        help="command run on the path of each test in place of the reference type checker, with the same "
-        "exit codes; error messages are compared only with --messages",
+        default="purepy --check",
+        help="command which type-checks the module at the path appended to it (default: purepy --check)",
     )
     parser.add_argument(
-        "--messages",
-        action="store_true",
-        help="compare the error messages of the type checker command with the expected messages",
-    )
-    parser.add_argument(
-        "--known-failures",
-        type=pathlib.Path,
-        help="file listing the expected failures; the run passes if its failures are exactly these",
-    )
-    parser.add_argument(
-        "--update", action="store_true", help="rewrite the known failures file from this run"
+        "--no-run", action="store_true", help="check the tests without running them"
     )
     parser.add_argument(
         "--jobs", type=int, help="number of tests run in parallel (default: number of cores)"
     )
     args = parser.parse_args(argv)
-    r = Runner(
-        None if args.no_run else args.interpreter,
-        shlex.split(args.type_checker) if args.type_checker else None,
-        args.messages,
-    )
+    r = Runner(shlex.split(args.type_checker), None if args.no_run else args.interpreter)
     with suite() as path:
         r.run_suite(path, args.jobs)
     r.summary()
-    ok = not r.failed
-    if args.known_failures is not None:
-        ok = compare_known_failures(r.failed, args.known_failures, args.update)
-    sys.exit(0 if ok else 1)
+    sys.exit(0 if not r.failed else 1)
 
 
 if __name__ == "__main__":

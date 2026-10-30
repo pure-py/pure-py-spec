@@ -1,0 +1,27 @@
+name: Consistency checks
+
+# Check the specification against the conformance suite, and build the wheel of the suite and its runner. The
+# paper and specification are built by the Documents workflow.
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version-file: .python-version
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.2.0
+        with:
+          enable-cache: true
+
+      - name: Run the checks and build the wheel
+        run: make wheel
