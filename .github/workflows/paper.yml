@@ -4,15 +4,6 @@ name: Paper
 on:
   workflow_dispatch:
   push:
-    paths-ignore:
-      - src/purepy_conformance/**
-      - test/**
-      - script/**
-      - .claude/**
-      - '**/README.md'
-      - .github/workflows/bump-version.yml
-      - .github/workflows/check-project-integrity.yml
-      - .github/workflows/consistency-checks.yml
 
 concurrency:
   group: paper-${{ github.ref }}
@@ -22,11 +13,13 @@ permissions:
   contents: read
 
 jobs:
+  # Sources the branch changes relative to main, so every push gets a status and a branch that touched the
+  # paper rebuilds it on every push
   changes:
     runs-on: ubuntu-latest
     outputs:
-      documents: ${{ steps.paths.outputs.documents }}
-      evaluation: ${{ steps.paths.outputs.evaluation }}
+      documents: ${{ github.event_name == 'workflow_dispatch' || steps.paths.outputs.documents == 'true' }}
+      evaluation: ${{ github.event_name == 'workflow_dispatch' || steps.paths.outputs.evaluation == 'true' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -35,21 +28,24 @@ jobs:
 
       - name: List changed sources
         id: paths
-        env:
-          BEFORE: ${{ github.event.before }}
-        run: |
-          if [ "${{ github.event_name }}" != push ] || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
-            changed=$(git ls-files)
-          else
-            changed=$(git diff --name-only "$BEFORE" "$GITHUB_SHA")
-          fi
-          workflow='^\.github/workflows/paper\.yml$'
-          irrelevant='^(src/purepy_conformance/|test/|script/|\.claude/|(.*/)?README\.md$|\.github/workflows/(bump-version|check-project-integrity|consistency-checks)\.yml$)'
-          relevant=$(grep -vE "$irrelevant" <<< "$changed" || true)
-          documents=$([ -n "$relevant" ] && echo true || echo false)
-          evaluation=$(grep -qE "^evaluation/|$workflow" <<< "$relevant" && echo true || echo false)
-          echo "documents=$documents" >> "$GITHUB_OUTPUT"
-          echo "evaluation=$evaluation" >> "$GITHUB_OUTPUT"
+        uses: dorny/paths-filter@v4
+        with:
+          predicate-quantifier: some-with-excludes
+          filters: |
+            documents:
+              - '**'
+              - '!src/purepy_conformance/**'
+              - '!test/**'
+              - '!script/**'
+              - '!.claude/**'
+              - '!**/README.md'
+              - '!.github/workflows/bump-version.yml'
+              - '!.github/workflows/check-project-integrity.yml'
+              - '!.github/workflows/consistency-checks.yml'
+              - '!.github/workflows/status.yml'
+            evaluation:
+              - 'evaluation/**'
+              - '.github/workflows/paper.yml'
 
   documents:
     needs: changes
