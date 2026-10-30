@@ -77,14 +77,15 @@ gives the component type at that position, counting from the end when the index 
 $\tyUnion{\tyInt}{\tyStr}$, no overload of \pyinline{*} applies at $\exBinOp{\pyinline{x}}{\pyinline{*}}{\pyinline{2}}$, which is
 instead typed at \pyinline{int} and at \pyinline{str} and synthesises $\tyUnion{\tyInt}{\tyStr}$. Calls in which the callee
 synthesises a union are typed at each disjunct, with the callee replaced by a fresh variable bound at that disjunct,
-and synthesise the join of the two results; subscripts and attribute references have analogous rules:}{A subscript, attribute reference or call with a subject synthesising a union is typed at each disjunct, with a variable in place of the subject, and synthesises the
+and synthesise the join of the two results:}{A subscript, attribute reference or call with a subject synthesising a union is typed at each disjunct, with a variable in place of the subject, and synthesises the
 join of the results:}
 \begin{mathpar}
 \small
 \input{spec/rules/call-union}
 \end{mathpar}
 \deleted{Generators need no such rule, because $\elemTy{\Sigma}$ takes a union to the join of its disjuncts' element types.
-}\replaced{These rules are stated separately for each elimination form so that both judgements remain
+}\replaced{Subscripts and attribute references have analogous rules. These rules are stated separately for each
+elimination form so that both judgements remain
 syntax-directed. A single rule for an arbitrary evaluation context~\citep{dunfield2004} can eliminate a union at any
 subterm in evaluation position, including an argument, but type checking must then search over the decompositions of a
 term~\citep{dunfield2011}. That rule accepts more programs only where a function of intersection type is applied to an
