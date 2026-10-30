@@ -39,8 +39,8 @@ is a subtype of the other; the notations $\subty$ and $\tyEquiv$ follow \citet{p
 \subsection{Expressions}
 \label{sec:expression-typing}
 
-Within an expression the typing judgement gives each subexpression a type, and
-is bidirectional. \emph{Synthesis} $\Sigma; \Gamma \vdash e \synth \tau$ reads a type out of an expression (\specfigrefThree{typing-synth}{typing-synth-elim}{typing-synth-ctd}),
+\replaced{Typing of expressions is bidirectional, with two judgements.}{Within an expression the typing judgement gives each subexpression a type, and
+is bidirectional.} \emph{Synthesis} $\Sigma; \Gamma \vdash e \synth \tau$ reads a type out of an expression (\specfigrefThree{typing-synth}{typing-synth-elim}{typing-synth-ctd}),
 and \emph{checking} $\Sigma; \Gamma \vdash e \checks \tau$ tests an expression against a type supplied by its
 surroundings (\specfigref{typing-check}). The division follows the usual recipe for bidirectional
 systems~\cite{davies2000,dunfield2021}: introduction forms check, since a lambda's parameters cannot be
