@@ -43,13 +43,13 @@ is a subtype of the other; the notations $\subty$ and $\tyEquiv$ follow \citet{p
 is bidirectional.} \emph{Synthesis} $\Sigma; \Gamma \vdash e \synth \tau$ reads a type out of an expression (\specfigrefThree{typing-synth}{typing-synth-elim}{typing-synth-ctd}),
 and \emph{checking} $\Sigma; \Gamma \vdash e \checks \tau$ tests an expression against a type supplied by its
 surroundings (\specfigref{typing-check}). The division follows the usual recipe for bidirectional
-systems~\cite{davies2000,dunfield2021}\replaced{, in which introduction forms check and elimination forms synthesise, since an elimination form starts from a subterm whose type is known.}{: introduction forms check, since a lambda's parameters cannot be
+systems~\citep{davies2000,dunfield2021}\replaced{, in which introduction forms check and elimination forms synthesise, since an elimination form starts from a subterm whose type is known.}{: introduction forms check, since a lambda's parameters cannot be
 annotated and an empty list does not determine its element type, and elimination forms synthesise, since a call, a subscript or an attribute
 reference starts from a subterm whose type is known.} \replaced{Such systems usually provide an annotation form $(e \mathbin{:} \tau)$, which lets a checking form occur
 where synthesis is required. Python does not have an annotation form, so}{Python has no annotation form
 $(e \mathbin{:} \tau)$, by which such systems usually let a checking form occur where synthesis is required, so}
 \PurePy gives each introduction form a synthesis rule wherever its parts determine the type, an approach also taken
-by Swift, Kotlin and Scala~\cite{swift2025,kotlin2025,odersky2025}. \added{Lambdas and empty lists have only checking rules, since Python does not allow lambda
+by Swift, Kotlin and Scala~\citep{swift2025,kotlin2025,odersky2025}. \added{Lambdas and empty lists have only checking rules, since Python does not allow lambda
 parameters to be annotated and an empty list does not determine its element type.}
 
 \begin{DeletedBlock}
@@ -75,8 +75,8 @@ join of the results:}
 \input{spec/rules/call-union}
 \end{mathpar}
 \deleted{Generators need no such rule, because $\elemTy{\Sigma}$ takes a union to the join of its disjuncts' element types.
-}\replaced{The standard bidirectional treatment of unions~\cite{dunfield2004} states union elimination once, for an
-arbitrary evaluation context, which a checker must apply by search~\cite{dunfield2011}. \PurePy instead states union
+}\replaced{The standard bidirectional treatment of unions~\citep{dunfield2004} states union elimination once, for an
+arbitrary evaluation context, which a checker must apply by search~\citep{dunfield2011}. \PurePy instead states union
 elimination for each elimination form, which keeps both judgements syntax-directed. In exchange, an operator applied to an operand of union type is accepted only if a single overload
 covers the whole union: with \pyinline{x} of type $\tyUnion{\tyInt}{\tyStr}$, \PurePy rejects \pyinline{x * 2}, although each
 disjunct has an overload of \pyinline{*}, and mypy accepts it.}{\citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is

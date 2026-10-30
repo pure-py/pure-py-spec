@@ -25,7 +25,7 @@ function with two parameters of the same name. These exclusions from the grammar
 \label{sec:types-schemes}
 
 \figref{syntax-types} gives the syntax of types $\tau$, familiar from the Python typing
-specification~\cite{typingcouncil2025}, and of schemes $\pi$. \emph{Type expressions} $\psi$, omitted from the figure, are expressions which denote types; they
+specification~\citep{typingcouncil2025}, and of schemes $\pi$. \emph{Type expressions} $\psi$, omitted from the figure, are expressions which denote types; they
 have the form of types, except that where types have \emph{instantiated classes} $C[\seq{\tau}]$ and type variables $\alpha$,
 type expressions have qualified names applied to type arguments, $q[\seq{\psi}]$, naming a class, type alias or type
 parameter, and are resolved to types during type checking (\secref{types}). Parameters, return
@@ -46,7 +46,7 @@ Metavariables $x$, $y$, $z$, $f$, $c$ and $\alpha$ range over \emph{variables}; 
 \input{spec/syntax/context}
 
 \noindent The first four forms of entry record the assignment state of a variable, in the definite-assignment
-terminology of Java~\cite[\S16]{gosling2025}. A variable bound to a type $\tau$ is \emph{definitely assigned}:
+terminology of Java~\citep[\S16]{gosling2025}. A variable bound to a type $\tau$ is \emph{definitely assigned}:
 every path to the current point has assigned it, so it may be used. A variable with entry $\DU{\tau}$ is
 declared at $\tau$ but \emph{definitely unassigned}, like a blank final in Java before its assignment, so it
 may be assigned but not used. A variable with entry $\PU{\tau}$ is \emph{possibly unassigned}, because it is
@@ -66,7 +66,7 @@ in scope, as required to resolve type expressions and type-check class definitio
 expressions is rejected statically.
 
 Classes are identified by fully-qualified name, and class names $C$ are also the types of their instances. A
-\emph{class table} $\Sigma$, following Featherweight Java~\cite{igarashi2001}, maps each class name to a class
+\emph{class table} $\Sigma$, following Featherweight Java~\citep{igarashi2001}, maps each class name to a class
 entry (\figref{context-entries}) recording the definition that introduces the class, together with the mutual
 type region $\seq{\chi}$ and the context in which the definition appears, from which the fields and base class
 of the class are resolved. The well-formedness rules build the class table while checking type definitions

@@ -63,12 +63,12 @@ Within an expression the typing judgement gives each subexpression a type, and
 is bidirectional. \emph{Synthesis} $\Sigma; \Gamma \vdash e \synth \tau$ reads a type out of an expression (\specfigrefThree{typing-synth}{typing-synth-elim}{typing-synth-ctd}),
 and \emph{checking} $\Sigma; \Gamma \vdash e \checks \tau$ tests an expression against a type supplied by its
 surroundings (\specfigref{typing-check}). The division follows the usual recipe for bidirectional
-systems~\cite{davies2000,dunfield2021}: introduction forms check, since a lambda's parameters cannot be
+systems~\citep{davies2000,dunfield2021}: introduction forms check, since a lambda's parameters cannot be
 annotated and an empty list does not determine its element type, and elimination forms synthesise, since a call, a subscript or an attribute
 reference starts from a subterm whose type is known. Python has no annotation form
 $(e \mathbin{:} \tau)$, by which such systems usually let a checking form occur where synthesis is required, so
 \PurePy gives each introduction form a synthesis rule wherever its parts determine the type, an approach also taken
-by Swift, Kotlin and Scala~\cite{swift2025,kotlin2025,odersky2025}.
+by Swift, Kotlin and Scala~\citep{swift2025,kotlin2025,odersky2025}.
 
 Variables, literals, attribute references, calls, constructor calls, operators and subscripts synthesise.
 A variable synthesises a type only when its context entry is a type (\ruleName{var}), so a variable that is not definitely
@@ -182,7 +182,7 @@ apply when overload resolution fails at an operand of union type: the operator i
 first, and synthesises the join of the results (\ruleName{binop-union-left}, \ruleName{binop-union-right},
 \ruleName{unop-union}). With \pyinline{x} of type
 $\tyUnion{\tyInt}{\tyStr}$, the expression \pyinline{x * 2} synthesises $\tyUnion{\tyInt}{\tyStr}$. The order follows the Python typing specification, which expands union-typed arguments of
-overloaded calls from left to right~\cite{typingcouncil2025}.}
+overloaded calls from left to right~\citep{typingcouncil2025}.}
 
 \input{spec/fig/needs-eq}
 
@@ -355,7 +355,7 @@ constructor pattern that matches every value of the class, and a tuple only thro
 type other than $\tyNever$, so a function which returns from each of the cases is rejected as not always returning, and
 at a class with a field of type $\tyUnion{\tyInt}{\tyNone}$ a case \pyinline{Box(n)} after a case \pyinline{Box(None)}
 binds \pyinline{n} at $\tyUnion{\tyInt}{\tyNone}$ rather than at \pyinline{int}. The
-usefulness algorithm for ML~\cite{maranget2007} also checks reachability and exhaustiveness with a single
+usefulness algorithm for ML~\citep{maranget2007} also checks reachability and exhaustiveness with a single
 relation. The residual plays the role of the term descriptions of \citet{sestoft1996}, and the uncovered
 sets of \citet{karachalias2015} likewise let the type exclude cases.
 

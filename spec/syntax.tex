@@ -41,7 +41,7 @@ named after the Python classes \pyinline{type}, \pyinline{typing.TypeVar} and \p
 the objects denoted by a class name, type parameter or alias at run time. The entry $\TypeAlias[\Gamma]{q}{\seq{\chi}}{i}$ records the alias declared by $\chi_i$ in
 the mutual type region $\seq{\chi}$ of module $q$, resolved under $\Gamma$.
 
-The definite-assignment terminology is borrowed from Java~\cite[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}. A variable with entry $\DU{\tau}$ is declared at $\tau$
+The definite-assignment terminology is borrowed from Java~\citep[\S16]{gosling2025}: a variable bound to a type is \emph{definitely assigned}. A variable with entry $\DU{\tau}$ is declared at $\tau$
 and \emph{definitely unassigned}, like a blank final in Java before its assignment. A variable with entry $\PU{\tau}$
 is declared at $\tau$ and \emph{possibly unassigned}, because it is assigned on some paths but not on all. A function name with entry $\PU{\scheme{\seq{\alpha}}{\tau}}$ is bound at the type scheme $\scheme{\seq{\alpha}}{\tau}$ on some paths but not on all. A variable
 with entry $\Unbound$ is declared later in its scope, which Python reports at runtime as an unbound local.
@@ -52,14 +52,14 @@ It is useful to represent contexts as total functions on the set of all variable
 type parameters, fields and base class of $C$ are read from $\Sigma(C)$ by auxiliary functions
 $\typeParams{\Sigma}$, $\fields{\Sigma}$ and $\base{\Sigma}$ (\S\ref{sec:auxiliary-classes}), the latter two resolving
 the field annotations and base class of the definition under the context given by $\typeContext{\Gamma}(q, \seq{\chi}, i)$
-(\S\ref{aux:type-context}). The class table is similar to the class table of Featherweight Java~\cite{igarashi2001}; the well-formedness rules build it while checking the class definitions of the program (\specfigref{typing-top-level}).
+(\S\ref{aux:type-context}). The class table is similar to the class table of Featherweight Java~\citep{igarashi2001}; the well-formedness rules build it while checking the class definitions of the program (\specfigref{typing-top-level}).
 
 \subsubsection{Context operations}
 \label{sec:context-operations}
 
 Contexts admit a non-commutative monoid of sequential composition $\Gamma \override \Delta$ (``override'') and
 up to type equivalence, an idempotent commutative semigroup of parallel composition $\Gamma \merge_{\Sigma} \Delta$ (``merge''). Together these form a
-\emph{right near-semiring}~\cite{vanhoorn1967}: $\override$ right-distributes over $\merge$, but left
+\emph{right near-semiring}~\citep{vanhoorn1967}: $\override$ right-distributes over $\merge$, but left
 distributivity does not hold. Both are defined pointwise, by $(\Gamma \cdot \Delta)(x) = \Gamma(x) \cdot \Delta(x)$
 for each operation $\cdot$, from operations on context entries. Override is right-biased and has $\bot$
 as both left and right unit, and is defined in the same way on any finite map with $\bot$ for undefined, such as an
