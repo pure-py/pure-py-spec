@@ -6,6 +6,7 @@ import pathlib
 import re
 import subprocess
 import sys
+import tomllib
 from dataclasses import dataclass
 
 ORG = "pure-py"
@@ -54,24 +55,37 @@ def latest_release(repo: str) -> str | None:
     return view.stdout.strip() if view.returncode == 0 else None
 
 
-def edge(source: str, lines: list[str], index: int, match: re.Match[str]) -> Edge | None:
-    """Dependency at a URL match on a line, with the preceding line available for an annotation"""
+def use(pyproject: pathlib.Path, url: str) -> str:
+    """Use of the package at a URL in a project file: at run time or only in development"""
+    project = tomllib.loads(pyproject.read_text()).get("project", {})
+    return (
+        "runs with"
+        if any(url in dep for dep in project.get("dependencies", []))
+        else "tests against"
+    )
+
+
+def edge(
+    source: str, path: pathlib.Path, lines: list[str], index: int, match: re.Match[str]
+) -> Edge | None:
+    """Dependency at a URL match on a line of a file, with the preceding line available for an annotation"""
     repo = match["repo"]
-    path = match["path"]
+    url_path = match["path"]
     if repo is None:
-        repo, _, rest = path.lstrip("/").partition("/")
-        path = "/" + rest
+        repo, _, rest = url_path.lstrip("/").partition("/")
+        url_path = "/" + rest
         if repo == "":
             repo = PAGES
     git = repo.endswith(".git")
     repo = repo.removesuffix(".git")
-    if repo == source or path.startswith(("/issues/", "/pull/")):
+    if repo == source or url_path.startswith(("/issues/", "/pull/")):
         return None
-    if release := RELEASE.match(path):
-        return Edge(
-            source, repo, f"release {release['version']}", pinned=True, version=release["version"]
-        )
-    if LATEST.match(path):
+    if release := RELEASE.match(url_path):
+        label = f"release {release['version']}"
+        if path.name == "pyproject.toml":
+            label = f"{use(path, match[0])} {label}"
+        return Edge(source, repo, label, pinned=True, version=release["version"])
+    if LATEST.match(url_path):
         return Edge(source, repo, "latest release", pinned=False)
     annotated = [ANNOTATION.search(line) for line in lines[max(index - 1, 0) : index + 1]]
     if annotation := next((a for a in reversed(annotated) if a), None):
@@ -85,12 +99,14 @@ def edge(source: str, lines: list[str], index: int, match: re.Match[str]) -> Edg
 
 def edges(repo: pathlib.Path) -> set[Edge]:
     def edges_of(path: pathlib.Path) -> set[Edge]:
+        if path.name == "uv.lock":  # Repeats the project file's pins
+            return set()
         try:
             lines = path.read_text().splitlines()
         except (UnicodeDecodeError, OSError):
             return set()
         found = (
-            edge(repo.name, lines, i, match)
+            edge(repo.name, path, lines, i, match)
             for i, line in enumerate(lines)
             for match in URL.finditer(line)
         )
