@@ -154,7 +154,7 @@
   \rho \override \rho', s' \Rightarrow o
 }
 {
-  \rho, \exSeq{s}{s'} \Rightarrow \replaced{\prints{\seq{u}}{\assigns{\rho'} \override o}}{\assigns{\rho'} \override o}
+  \rho, \exSeq{s}{s'} \Rightarrow \replaced{\prints{\seq{u}}{\assigns{\rho'}} \override o}{\assigns{\rho'} \override o}
 }
 \and
 \inferrule*[lab={\ruleName{eval-seq-return}}]
@@ -304,7 +304,7 @@
   q, \rho \override \rho', t' \Rightarrow o
 }
 {
-  q, \rho, t\;t' \Rightarrow \replaced{\prints{\seq{u}}{\assigns{\rho'} \override o}}{\assigns{\rho'} \override o}
+  q, \rho, t\;t' \Rightarrow \replaced{\prints{\seq{u}}{\assigns{\rho'}} \override o}{\assigns{\rho'} \override o}
 }
 \and
 \inferrule*[lab={\ruleName{eval-top-seq-fail}}]
