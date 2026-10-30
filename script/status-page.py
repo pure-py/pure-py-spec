@@ -24,7 +24,6 @@ img { max-width: 100%; }
 table { border-collapse: collapse; }
 th, td { text-align: left; padding: 0.3em 0.8em; border-bottom: 1px solid #ccc; white-space: nowrap; }
 td:nth-child(2) { white-space: normal; }
-.draft { color: #777; }
 """
 
 
@@ -52,11 +51,9 @@ def checks(pr: dict[str, Any]) -> str:
 
 def row(repo: str, pr: dict[str, Any]) -> str:
     title = html.escape(f"#{pr['number']} {pr['title']}")
-    draft = ' class="draft"' if pr["isDraft"] else ""
-    link = f'<a href="{pr["url"]}"{draft}>{title}</a>' + (" (draft)" if pr["isDraft"] else "")
     cells = [
         repo,
-        link,
+        f'<a href="{pr["url"]}">{title}</a>',
         html.escape(pr["author"]["login"]),
         REVIEW.get(pr["reviewDecision"], "none"),
         checks(pr),
@@ -66,8 +63,15 @@ def row(repo: str, pr: dict[str, Any]) -> str:
 
 
 def page(repos: list[str]) -> str:
-    rows = "".join(row(repo, pr) for repo in repos for pr in pull_requests(repo))
+    prs = [(repo, pr) for repo in repos for pr in pull_requests(repo)]
     updated = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d %H:%M")
+
+    def table(draft: bool) -> str:
+        rows = "".join(row(repo, pr) for repo, pr in prs if pr["isDraft"] == draft)
+        return f"""<table>
+<tr><th>Repository</th><th>Pull request</th><th>Author</th><th>Review</th><th>Checks</th><th>Updated</th></tr>
+{rows}</table>"""
+
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -81,9 +85,9 @@ def page(repos: list[str]) -> str:
 <h2>Dependencies</h2>
 <img src="dependencies.svg" alt="Dependencies between repositories">
 <h2>Open pull requests</h2>
-<table>
-<tr><th>Repository</th><th>Pull request</th><th>Author</th><th>Review</th><th>Checks</th><th>Updated</th></tr>
-{rows}</table>
+{table(draft=False)}
+<h2>Draft pull requests</h2>
+{table(draft=True)}
 </body>
 </html>
 """
