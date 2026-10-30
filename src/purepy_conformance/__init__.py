@@ -185,9 +185,8 @@ class Runner(Results):
         exit, error_checked, python = expectation(PythonOutcome(dirs[0]), PurePyOutcome(dirs[1]))
         path = test / MAIN if test.is_dir() else test
         if self.python:
-            agrees = dirs[0] == PythonOutcome.SUCCEEDS and dirs[1] == PurePyOutcome.AGREES
             return [
-                *(self.accepts(test) if agrees else []),
+                *(self.accepts(test) if exit == Exit.OK else []),
                 *(self.run_python(path, python) if self.interpreter is not None else []),
             ]
         return [
@@ -198,8 +197,7 @@ class Runner(Results):
     def run_suite(self, suite: pathlib.Path, jobs: int | None) -> None:
         """Tests run in parallel on jobs threads (default: one per core), reported in order."""
         found = list(tests(suite))
-        agrees = suite / PythonOutcome.SUCCEEDS / PurePyOutcome.AGREES
-        self.type_checked = sum(1 for test in found if not self.python or agrees in test.parents)
+        self.type_checked = sum(1 for test in found if not self.python or well_formed(suite, test))
         self.run_only = len(found) - self.type_checked
         with concurrent.futures.ThreadPoolExecutor(jobs) as pool:
             results = pool.map(lambda test: self.run_test(suite, test), found)
@@ -210,6 +208,10 @@ class Runner(Results):
                     print(header)
                     last = header
                 self.record(test.relative_to(suite), failures)
+
+
+def well_formed(suite: pathlib.Path, test: pathlib.Path) -> bool:
+    return TYPE_CHECKER[PurePyOutcome(test.relative_to(suite).parts[1])][0] == Exit.OK
 
 
 def tests(suite: pathlib.Path) -> Iterator[pathlib.Path]:
@@ -245,7 +247,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     parser.add_argument(
         "--python",
         action="store_true",
-        help="test Python itself: run every test, and type-check only the agreeing tests, which must be accepted",
+        help="test Python itself: run every test, and type-check only the tests well-formed in PurePy, which must be accepted",
     )
     parser.add_argument(
         "--jobs", type=int, help="number of tests run in parallel (default: number of cores)"
