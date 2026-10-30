@@ -69,7 +69,7 @@ arguments supplied, and applying a partial application appends the new arguments
 once the declared arity is reached. \Fluid also applies a function called with more arguments than it
 declares to the first $n$ of them and the result to the rest, which is well typed only when the return type
 is itself a \pyinline{Callable}: given \pyinline{def adder(x: int) -> Callable[[int], int]}, the call
-\pyinline{adder(1, 2)} applies the function returned by \pyinline{adder(1)} to \pyinline{2}.
+\replaced{$\exCall{\pyinline{adder}}{\pyinline{1}, \pyinline{2}}$}{\pyinline{adder(1, 2)}} applies the function returned by \pyinline{adder(1)} to \pyinline{2}.
 
 \subsubsection{Piecewise function definitions}
 \label{sec:extension-piecewise}

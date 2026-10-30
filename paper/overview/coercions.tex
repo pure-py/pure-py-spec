@@ -1,9 +1,9 @@
 Python accepts several implicit coercions and lax matches, which \PurePy excludes, in most cases statically.
 The test of an \pyinline{if} or \pyinline{assert} must be a \pyinline{bool}, an assertion message must be a
 \pyinline{str}, and dictionary keys must be strings, whereas Python accepts any value in each of these
-positions. The operands of \pyinline{==} and \pyinline{!=} must have comparable types, so \pyinline{1 == "1"} is
+positions. The operands of \pyinline{==} and \pyinline{!=} must have comparable types, so \replaced{$\exBinOp{\pyinline{1}}{\pyinline{==}}{\pyinline{"1"}}$}{\pyinline{1 == "1"}} is
 rejected rather than giving \pyinline{False}. The types \pyinline{bool} and \pyinline{int} are not comparable,
-so \pyinline{True == 1} is also rejected, although Python compares Booleans as numbers. Python compares functions by identity, so two textually
+so \replaced{$\exBinOp{\pyinline{True}}{\pyinline{==}}{\pyinline{1}}$}{\pyinline{True == 1}} is also rejected, although Python compares Booleans as numbers. Python compares functions by identity, so two textually
 identical lambdas are unequal, and \PurePy rejects comparisons of functions. A list pattern at a tuple or range type is rejected, as is a tuple pattern at a list or range type, although Python matches list and tuple patterns against both lists and tuples, and against ranges. A constructor pattern must give a sub-pattern for each field of the
 class, whereas Python ignores the remaining fields.
 
