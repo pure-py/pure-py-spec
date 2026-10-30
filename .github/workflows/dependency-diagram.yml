@@ -33,6 +33,8 @@ jobs:
         run: curl -fsSL https://d2lang.com/install.sh | sh -s -- --version v0.9.0
 
       - name: Draw diagram
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: python3 script/dependency-diagram.py repos | d2 - dependencies.svg
 
       - name: Publish diagram to GitHub Pages
