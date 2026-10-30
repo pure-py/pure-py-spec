@@ -85,8 +85,8 @@ join of the results:}
 \end{mathpar}
 \deleted{Generators need no such rule, because $\elemTy{\Sigma}$ takes a union to the join of its disjuncts' element types.
 }\replaced{Subscripts and attribute references have analogous rules. A single rule for an arbitrary evaluation
-context~\citep{dunfield2004} can instead eliminate a union at any subterm in evaluation position, including an argument.
-This has the advantage of accepting programs in which a function of intersection type is applied to an argument of union
+context~\citep{dunfield2004} can instead eliminate a union at any subterm in evaluation position, including an argument,
+which has the advantage of accepting programs in which a function of intersection type is applied to an argument of union
 type, each disjunct needing a different conjunct of the function type. In return, type checking must search over the
 decompositions of a term~\citep{dunfield2011}. \PurePy does not have intersection types, and the rules above cover
 overloaded operators, which are the closest analogue of intersection types. Stating union elimination separately for
