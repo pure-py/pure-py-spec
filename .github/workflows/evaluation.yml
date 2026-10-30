@@ -42,7 +42,7 @@ jobs:
           python-version: "3.12"
           enable-cache: true
 
-      - name: Install the Linux sandbox
+      - name: Install Linux sandbox
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
@@ -52,17 +52,17 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked
 
-      - name: Run the pipeline with a local model on every benchmark
+      - name: Run pipeline with local model on every benchmark
         env:
           SMOKE_BENCHMARKS: humaneval-plus mbpp-plus livecodebench
           SMOKE_LIMIT: 1
           SMOKE_OUTPUT_DIR: results/ci/${{ runner.os }}
         run: bash scripts/smoke.sh
 
-      - name: Import the HumanEval+ run into Harbor
+      - name: Import HumanEval+ run into Harbor
         run: bash scripts/harbor-import.sh --file "results/ci/${{ runner.os }}/humaneval-plus/qwen2.5-coder-0.5b.json"
 
-      - name: Compile the generated figure
+      - name: Compile generated figure
         if: runner.os == 'Linux'
         run: |
           sudo apt-get install -y --no-install-recommends texlive-latex-base texlive-latex-recommended
