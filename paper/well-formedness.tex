@@ -78,7 +78,7 @@ join of the results:}
 }\replaced{The standard bidirectional treatment of unions~\cite{dunfield2004} states union elimination once, for an
 arbitrary evaluation context, which a checker must apply by search~\cite{dunfield2011}. \PurePy instead states union
 elimination for each elimination form, which keeps both judgements syntax-directed. In exchange, an operator applied to an operand of union type is accepted only if a single overload
-covers the whole union: with \pyinline{x} of type \pyinline{int | str}, \PurePy rejects \pyinline{x * 2}, although each
+covers the whole union: with \pyinline{x} of type $\tyUnion{\tyInt}{\tyStr}$, \PurePy rejects \pyinline{x * 2}, although each
 disjunct has an overload of \pyinline{*}, and mypy accepts it.}{\citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is
 stated separately for each elimination form. }
 
