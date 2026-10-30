@@ -80,11 +80,7 @@ type checker are checked by the `build` action of their repository.
 
 ## Release workflow
 
-Run the `Bump version` GitHub Action manually with a version in the form `x.y.z` (for example, `0.1.4`). The
-action updates and commits the version numbers on `main` and creates and pushes the tag `v0.1.4`. It then builds
-`PurePy-spec.pdf` and publishes it to GitHub Pages under `v0.1.4/` and `latest/`
-(https://pure-py.github.io/pure-py-spec/), builds the `purepy-conformance` wheel and creates the GitHub Release
-for the tag with the wheel attached. The `purepy` package is released from the `isabelle-purepy` repository.
+Run the `Bump version` GitHub Action manually with a version in the form `x.y.z`.
 
 ### Zotero export settings
 
