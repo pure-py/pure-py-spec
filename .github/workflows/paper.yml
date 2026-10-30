@@ -127,7 +127,7 @@ jobs:
       - name: Import HumanEval+ run into Harbor
         run: bash scripts/harbor-import.sh --file "results/ci/${{ runner.os }}/humaneval-plus/qwen2.5-coder-0.5b.json"
 
-      - name: Compile generated figure
+      - name: Check smoke-run figure compiles
         if: runner.os == 'Linux'
         run: |
           sudo apt-get install -y --no-install-recommends texlive-latex-base texlive-latex-recommended
