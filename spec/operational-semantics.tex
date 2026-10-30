@@ -9,7 +9,7 @@ name alone, such as the class \pyinline{int} or decorator \pyinline{dataclass}. 
 marks a variable of the current scope before its declaration is reached, which Python reports as an unbound
 local. An environment binds a variable to $\Unbound$ wherever the corresponding context binds the variable to
 the entry $\Unbound$, so that a shadowed binding of an enclosing scope is not visible. Throughout this section, $\Sigma$ is the class table produced by module checking of the program
-(\secref{well-formedness-modules}) and, like $\mathcal{M}$ and $\mathcal{P}$, is ambient. For a statement $s$, the outcome
+(\secref{well-formedness-modules}) and, like $\mathcal{M}$, $\mathcal{P}$ and $\mathcal{A}$, is ambient. For a statement $s$, the outcome
 $\assigns{\rho}$ represents $s$ running to its end, with accumulated environment $\rho$; the outcome
 $\returns{v}$ represents $s$ returning the value $v$; and the outcome $\aborts{\kappa}$ represents the whole run
 aborting, with termination kind $\kappa$.
@@ -43,7 +43,8 @@ semantics to model the attributes Python assigns to a value, the keys which Pyth
 is an instance of an opaque class such as \pyinline{int} (\secref{eval-expressions}, \secref{eval-patterns}). A primitive
 $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a function from
 arguments to results (\specfigref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\seq{v}$ has result
-$\primFn(\seq{v})$.
+$\primFn(\seq{v})$. The semantics models no output: \pyinline{print} has result $\val{\pyinline{None}}$ for any
+given argument, and the output action itself is left to the implementation.
 
 The rules are given in a monadic metalanguage over results (\figref{values}). If $r$ is
 $\val{v}$, then $\mlet{v}{r}{\ldots}$ is the body with $v$ bound to that value; if $r$ is
