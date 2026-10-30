@@ -90,7 +90,7 @@ wheel: check-consistency
 	rm -rf dist && uv build --wheel
 
 PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
-# Mechanisation at the purepy release of this specification's version
+# Mechanisation from the purepy release at the version of the specification
 PUREPY_RELEASE := v$(shell uv version --short --color never)
 
 supplementary.zip: spec-anon.pdf
