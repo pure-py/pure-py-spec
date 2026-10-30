@@ -77,10 +77,11 @@ join of the results:}
 \end{mathpar}
 \deleted{Generators need no such rule, because $\elemTy{\Sigma}$ takes a union to the join of its disjuncts' element types.
 }\replaced{These rules are stated separately for each elimination form so that both judgements remain
-syntax-directed. A single rule for an arbitrary evaluation context~\citep{dunfield2004} would require type checking to
-search over the decompositions of a term~\citep{dunfield2011}. The extra generality of such a rule lets an argument of
-union type select one part of a function of intersection type, but \PurePy does not have intersection types, and the
-rules above cover overloaded operators, the closest analogue.}{\citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is
+syntax-directed. A single rule for an arbitrary evaluation context~\citep{dunfield2004} can eliminate a union at any
+subterm in evaluation position, including an argument, but type checking must then search over the decompositions of a
+term~\citep{dunfield2011}. The programs accepted by that rule and rejected by the rules of \PurePy are programs in
+which an argument of union type selects one part of a function of intersection type. \PurePy does not have
+intersection types, and the rules above cover overloaded operators, the closest analogue.}{\citet{dunfield2004} state union elimination once, for an arbitrary evaluation context; here union elimination is
 stated separately for each elimination form. }
 
 \begin{DeletedBlock}
