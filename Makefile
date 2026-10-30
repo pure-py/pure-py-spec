@@ -89,6 +89,7 @@ check-consistency:
 wheel: check-consistency
 	rm -rf dist && uv build --wheel
 
+# tracks: tag of same version
 PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
 # Mechanisation from the purepy release at the version of the specification
 PUREPY_RELEASE := v$(shell uv version --short --color never)
