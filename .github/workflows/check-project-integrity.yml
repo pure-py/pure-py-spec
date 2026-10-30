@@ -1,4 +1,4 @@
-name: check-project-integrity
+name: Project integrity
 
 on:
   schedule:
@@ -9,11 +9,9 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: ./.github/actions/check-project-integrity
-      with:
-        org: pure-py
-        repo: pure-py-spec
-        project: 1
-        active-statuses: In progress,Awaiting Review
-        token: ${{ secrets.PROJECT_PAT }}
+      - uses: actions/checkout@v7
+
+      - name: Check issues and project board
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_PAT }}
+        run: script/check-project-integrity.sh pure-py pure-py-spec 1 "In progress,Awaiting Review"
