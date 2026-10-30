@@ -40,11 +40,11 @@ $q, \rho, t \Rightarrow o$ & top-level statement $t$ of module $q$ evaluates to 
 $\rho, e \Rightarrow r$ & expression $e$ evaluates to result $r$ & \figref{eval-result} \\
 $\rho, \seq{e} \Rightarrow r$ & expressions $\seq{e}$ evaluate, left to right, to result $r$ & \figref{eval-seq} \\
 $\rho, \seq{g} \Rightarrow r$ & comprehension qualifiers $\seq{g}$ evaluate to result $r$ & \figref{eval-quals-result} \\
-$\rho, x \importsR r$ & name $x$ imported from module environment $\rho$ has result $r$ & \figref{eval-imports} \\
-$q, \seq{\iota} \Rightarrow r$ & imports $\seq{\iota}$ of module $q$ evaluate to result $r$ & \figref{eval-import-prefix} \\
-$q, \rho, \seq{x} \Rightarrow_{\mathsf{sub}} r$ & submodule chain $\seq{x}$ extends environment $\rho$ of module $q$, giving result $r$ & \figref{eval-import-prefix} \\
-$q \Rightarrow_{\mathsf{mod}} r$ & module $q$ loads to result $r$ & \figref{eval-modules} \\
-\added{$q \Rightarrow_{\mathsf{body}} o$} & \added{body of module $q$, after its imports, evaluates to outcome $o$} & \added{\figref{eval-modules}} \\
+\deleted{$\rho, x \importsR r$} & \deleted{name $x$ imported from module environment $\rho$ has result $r$} & \deleted{\figref{eval-imports}} \\
+\deleted{$q, \seq{\iota} \Rightarrow r$} & \deleted{imports $\seq{\iota}$ of module $q$ evaluate to result $r$} & \deleted{\figref{eval-import-prefix}} \\
+\deleted{$q, \rho, \seq{x} \Rightarrow_{\mathsf{sub}} r$} & \deleted{submodule chain $\seq{x}$ extends environment $\rho$ of module $q$, giving result $r$} & \deleted{\figref{eval-import-prefix}} \\
+\deleted{$q \Rightarrow_{\mathsf{mod}} r$} & \deleted{module $q$ loads to result $r$} & \deleted{\figref{eval-modules}} \\
+\added{$q, \mathcal{L} \Rightarrow_{\mathsf{mod}} o$} & \added{body of module $q$ evaluates to outcome $o$ given environments $\mathcal{L}$ of loaded modules} & \added{\figref{eval-modules}} \\
 $\mathcal{M} \Rightarrow \replaced{\seq{v}, \kappa}{\kappa}$ & program $\mathcal{M}$ \replaced{prints $\seq{v}$ and ends with}{evaluates to} termination kind $\kappa$ & \figref{eval-modules}
 \end{tabular}
 \end{center}

@@ -1,8 +1,10 @@
 \inferrule*[lab={\ruleName{eval-program-abort}}]
 {
   \added{\loadOrder(\mathcal{M}) = q_1 \cons \cdots \cons q_n} \\
-  \added{q_i \Rightarrow_{\mathsf{body}} \prints{{\seq{v}}_i}{\assigns{\rho_i}} \quad (\forall i < k)} \\
-  \added{q_k \Rightarrow_{\mathsf{body}} \prints{{\seq{v}}_k}{\aborts{\kappa}}} \\
+  \added{\mathcal{L}_0 = \set{\bind{q}{\rho} \mid \mathcal{P}(q) = (\Gamma, \rho)}} \\
+  \added{q_i, \mathcal{L}_{i-1} \Rightarrow_{\mathsf{mod}} \prints{{\seq{v}}_i}{\assigns{\rho_i}} \quad (\forall i < k)} \\
+  \added{\mathcal{L}_i = \mathcal{L}_{i-1} \override \set{\bind{q_i}{\submods(q_i) \override \rho_i}} \quad (\forall i < k)} \\
+  \added{q_k, \mathcal{L}_{k-1} \Rightarrow_{\mathsf{mod}} \prints{{\seq{v}}_k}{\aborts{\kappa}}} \\
   \deleted{\pymath{\_\_main\_\_} \Rightarrow_{\mathsf{mod}} \aborts{\kappa}}
 }
 {

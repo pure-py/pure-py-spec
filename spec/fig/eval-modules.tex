@@ -1,3 +1,4 @@
+\begin{DeletedBlock}
 \begin{figure}
 \flushleft \shadebox{$\rho, x \importsR r$}
 \begin{mathpar}
@@ -33,7 +34,9 @@
 \caption{Name $x$ imported from module environment $\rho$ has result $r$}
 \label{fig:eval-imports}
 \end{figure}
+\end{DeletedBlock}
 
+\begin{DeletedBlock}
 \begin{figure}
 \begin{subfigure}{\textwidth}
 \flushleft \shadebox{$q, \seq{\iota} \Rightarrow r$}
@@ -162,34 +165,10 @@
 \caption{Import evaluation}
 \label{fig:eval-import-prefix}
 \end{figure}
+\end{DeletedBlock}
 
 \begin{figure}
-\begin{AddedBlock}
-\flushleft \shadebox{$q \Rightarrow_{\mathsf{body}} o$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{eval-body}}]
-{
-  \mathcal{M}(q) = \seq{\iota}\;t \\
-  \mathcal{P}(\pyinline{builtins}) = (\Gamma, \rho) \\
-  q, \seq{\iota} \Rightarrow \val{\rho'} \\
-  q, \rho \mathbin{\override} \rho' \mathbin{\override} \scopeS(\declaresS(\seq{\iota}), t), t \Rightarrow o
-}
-{
-  q \Rightarrow_{\mathsf{body}} o
-}
-\and
-\inferrule*[lab={\ruleName{eval-body-fail}}]
-{
-  \mathcal{M}(q) = \seq{\iota}\;t \\
-  q, \seq{\iota} \Rightarrow \aborts{\kappa}
-}
-{
-  q \Rightarrow_{\mathsf{body}} \aborts{\kappa}
-}
-\end{mathpar}
-\end{AddedBlock}
-
+\begin{DeletedBlock}
 \flushleft \shadebox{$q \Rightarrow_{\mathsf{mod}} r$}
 \begin{mathpar}
 \small
@@ -201,17 +180,27 @@
   q \Rightarrow_{\mathsf{mod}} \val{\rho}
 }
 \and
-\input{spec/rules/eval-module}
+\inferrule*[lab={\ruleName{eval-module}}]
+{
+  \mathcal{M}(q) = \seq{\iota}\;t \\
+  \mathcal{P}(\pyinline{builtins}) = (\Gamma, \rho) \\
+  q, \seq{\iota} \Rightarrow \val{\rho'} \\
+  q, \rho \mathbin{\override} \rho' \mathbin{\override} \scopeS(\declaresS(\seq{\iota}), t), t \Rightarrow \assigns{\rho^\dagger}
+}
+{
+  q \Rightarrow_{\mathsf{mod}} \val{\submods(q) \override \rho^\dagger}
+}
 \and
 \inferrule*[lab={\ruleName{eval-module-fail}}]
 {
-  \replaced{q \Rightarrow_{\mathsf{body}} \prints{\seq{v}}{\aborts{\kappa}}}{\mathcal{M}(q) = \seq{\iota}\;t \quad q, \seq{\iota} \Rightarrow \aborts{\kappa}}
+  \mathcal{M}(q) = \seq{\iota}\;t \\
+  q, \seq{\iota} \Rightarrow \aborts{\kappa}
 }
 {
   q \Rightarrow_{\mathsf{mod}} \aborts{\kappa}
 }
 \and
-\deleted{\inferrule*[lab={\ruleName{eval-module-fail-body}}]
+\inferrule*[lab={\ruleName{eval-module-fail-body}}]
 {
   \mathcal{M}(q) = \seq{\iota}\;t \\
   \mathcal{P}(\pyinline{builtins}) = (\Gamma, \rho) \\
@@ -220,8 +209,25 @@
 }
 {
   q \Rightarrow_{\mathsf{mod}} \aborts{\kappa}
-}}
+}
 \end{mathpar}
+
+\end{DeletedBlock}
+\begin{AddedBlock}
+\flushleft \shadebox{$q, \mathcal{L} \Rightarrow_{\mathsf{mod}} o$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{eval-module}}]
+{
+  \mathcal{M}(q) = \seq{\iota}\;t \\
+  \mathcal{P}(\pyinline{builtins}) = (\Gamma, \rho) \\
+  q, \rho \mathbin{\override} \importEnv(\seq{\iota}, \mathcal{L}) \mathbin{\override} \scopeS(\declaresS(\seq{\iota}), t), t \Rightarrow o
+}
+{
+  q, \mathcal{L} \Rightarrow_{\mathsf{mod}} o
+}
+\end{mathpar}
+\end{AddedBlock}
 
 \flushleft \shadebox{$\mathcal{M} \Rightarrow \replaced{\seq{v}, \kappa}{\kappa}$}
 \begin{mathpar}

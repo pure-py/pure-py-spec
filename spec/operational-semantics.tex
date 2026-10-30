@@ -54,8 +54,8 @@ $\val{v}$, then $\mlet{v}{r}{\ldots}$ is the body with $v$ bound to that value; 
 $\aborts{\kappa}$, it is $\aborts{\kappa}$. The body is a result in the expression rules and an outcome in
 the statement rules. A final
 premise needs no propagation rule; earlier premises have one each, recording the subexpressions evaluated
-before the failing one (\specfigref{eval-propagation}). The sequence and module judgements use
-results carrying a sequence of values or an environment in place of a value.
+before the failing one (\specfigref{eval-propagation}). The sequence \replaced{judgement uses }{and module judgements use }
+results carrying a sequence of values\deleted{ or an environment} in place of a value.
 \paperinput{paper/operational-semantics/evaluation-example}
 
 \specinput{spec/operational-semantics/auxiliary}
@@ -155,6 +155,7 @@ fully-qualified names.
 
 \subsection{Modules and programs}
 
+\begin{DeletedBlock}
 \speconly{Module and program evaluation are given in \figref{eval-modules}; import evaluation in \figref{eval-import-prefix}; importing names from a loaded module in
 \figref{eval-imports}.}\paperonly{Module and program evaluation are given in full in \specfigref{eval-modules}.}\speconly{ Context extension (\secref{well-formedness-modules}) applies to environments as well, with the same equations on values in place of context entries, except that a loaded module value $\modLoaded{q}{\rho}$ carries an environment whereas the context entry $\modLoaded{q}{\Gamma}$ carries a context.} \emph{Loading}, the judgement $q \Rightarrow_{\mathsf{mod}} r$, evaluates the import prefix
 of $q$ and then its statement, mirroring module checking $\vdash_{\mathsf{mod}} q : \Gamma$
@@ -169,20 +170,40 @@ not loaded.
 Since
 imports precede statements, every module that a statement can reference is loaded before the statement runs, and
 loading is deterministic, so the semantics needs no cache
-of loaded modules\added{ to compute environments}. Loading runs\speconly{ (\ruleName{eval-module})} a module body in $\mathcal{P}(\pyinline{builtins})$ overridden by
+of loaded modules. Loading runs\speconly{ (\ruleName{eval-module})} a module body in $\mathcal{P}(\pyinline{builtins})$ overridden by
 the environment of its imports, with each name declared in the body or bound by a pattern in it starting
 unbound, mirroring the \ruleName{module} rule (\secref{well-formedness-modules}).
-\replaced{Printing, however, happens once per module, when its body first runs, so a program runs the body of each of
-its modules once, in load order (\specref{aux:loads}), and its output is the concatenation of the values printed by
-those bodies. Since imports precede statements, a body runs only after every module it imports has loaded, so the
-load order is fixed by the import prefixes alone. A program evaluates to its output and a termination kind
-(\figref{values}): $\errExit{0}$ if every body runs to its end, and otherwise the kind of the first body to abort,
-after whose output nothing more is printed.}{A program evaluates to a termination kind (\figref{values}): $\errExit{0}$ if the main module
-loads, and otherwise the kind it aborted with.} $\errExit{n}$ is a run that exited with status $n$\paperonly{:}\speconly{.}
+A program evaluates to a termination kind (\figref{values}): $\errExit{0}$ if the main module
+loads, and otherwise the kind it aborted with. $\errExit{n}$ is a run that exited with status $n$\paperonly{:}\speconly{.}
 \paperinput{paper/operational-semantics/program}%
-An implementation must agree with the semantics on the termination kind of every run with defined behaviour\added{, and
-on its output, each value written as by Python's \pyinline{str} followed by a newline}; the form in
+An implementation must agree with the semantics on the termination kind of every run with defined behaviour; the form in
 which the kind is reported is not prescribed.
+\end{DeletedBlock}
+\begin{AddedBlock}
+\speconly{Module and program evaluation are given in \figref{eval-modules}.}\paperonly{Module and program evaluation
+are given in full in \specfigref{eval-modules}.}\speconly{ Context extension (\secref{well-formedness-modules}) applies
+to environments as well, with the same equations on values in place of context entries, except that a loaded module
+value $\modLoaded{q}{\rho}$ carries an environment whereas the context entry $\modLoaded{q}{\Gamma}$ carries a
+context.} A program runs the body of each of its modules once, in \emph{load order}\speconly{ (\specref{aux:loads})}.
+Since imports precede statements, a body runs only after every module it imports has loaded, and loading is
+deterministic, so the load order is fixed by the import prefixes alone. The program rules\speconly{
+(\ruleName{eval-program} and \ruleName{eval-program-abort})} run the bodies in that order, threading the environments
+$\mathcal{L}$ of the modules loaded so far, initially those of the predefined modules; the environment of a module is its
+submodule stubs overridden by the environment assigned by its body, mirroring the \ruleName{module} rule
+(\secref{well-formedness-modules}). A body runs\speconly{ (\ruleName{eval-module})} in $\mathcal{P}(\pyinline{builtins})$
+overridden by the environment bound by its imports, computed from its import prefix and $\mathcal{L}$\speconly{
+(\specref{aux:import-env})} following the import rules of \specfigref{typing-import-prefix}, with each name declared
+in the body or bound by a pattern in it starting unbound.
+
+The output of a program is the concatenation of the values printed by its bodies. A program evaluates to its output
+and a termination kind (\figref{values}): $\errExit{0}$ if every body runs to its end, and otherwise the kind of the
+first body to abort, after whose output nothing more is printed. $\errExit{n}$ is a run that exited with status
+$n$\paperonly{:}\speconly{.}
+\paperinput{paper/operational-semantics/program}%
+An implementation must agree with the semantics on the termination kind of every run with defined behaviour, and on
+its output, each value written as by Python's \pyinline{str} followed by a newline; the form in which the kind is
+reported is not prescribed.
+\end{AddedBlock}
 
 \specinput{spec/fig/eval-modules}
 

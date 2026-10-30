@@ -1,9 +1,10 @@
-\loads(q) &= \varepsilon && \quad \text{if } q \in \dom(\mathcal{P}) \\*
-\loads(q) &= \loads(q, \seq{\iota}) \concat q && \quad \text{where } \mathcal{M}(q) = \seq{\iota}\;t \clausegap
+\loads(q) &= \varepsilon \quad \text{if } q \in \dom(\mathcal{P}) \\*
+\loads(q) &= \loads(q, \seq{\iota}) \concat q \quad \text{where } \mathcal{M}(q) = \seq{\iota}\;t \clausegap
 \loads(q, \varepsilon) &= \varepsilon \\*
 \loads(q, \exImport{x_1.\cdots.x_n} \cons \seq{\iota}) &= \loads(x_1) \concat \loads(x_1.x_2) \concat \cdots \concat \loads(x_1.\cdots.x_n) \concat \loads(q, \seq{\iota}) \\*
 \loads(q, \exFromImport{q'}{x_1, \ldots, x_n} \cons \seq{\iota}) &= \loads(q^\dagger_1) \concat \cdots \concat \loads(q^\dagger_m) \concat \loads(q') \\*
 &\qquad {}\concat \loads(q'.y_1) \concat \cdots \concat \loads(q'.y_k) \concat \loads(q, \seq{\iota}) \\*
-&\qquad \rlap{$\text{where } q^\dagger_1 \cons \cdots \cons q^\dagger_m = \uniqueTo(q', q)$, $\mathcal{M}(q') = \seq{\iota}'\;t'$, and $y_1 \cons \cdots \cons y_k$ are the $x_i$} \\*
-&\qquad \rlap{with $q'.x_i \in \dom(\mathcal{M})$ and $x_i \notin \declaresS(\seq{\iota}') \concat \declaresS(t')$, in order} \clausegap
+&\qquad \rlap{$\text{where } q^\dagger_1 \cons \cdots \cons q^\dagger_m = \uniqueTo(q', q)$ and $\mathcal{M}(q') = \seq{\iota}'\;t'$,} \\*
+&\qquad \rlap{and $y_1 \cons \cdots \cons y_k$ are, in order, the $x_i$ with} \\*
+&\qquad \rlap{$q'.x_i \in \dom(\mathcal{M})$ and $x_i \notin \declaresS(\seq{\iota}') \concat \declaresS(t')$} \clausegap
 \loadOrder(\mathcal{M}) &= \text{the first occurrences, in order, of the modules in } \loads(\pymath{\_\_main\_\_})
