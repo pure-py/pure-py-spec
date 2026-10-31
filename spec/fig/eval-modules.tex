@@ -1,5 +1,6 @@
-\begin{DeletedBlock}
 \begin{figure}
+\begin{DeletedBlock}
+\captionsetup{font={color=deletedcolor},labelfont={color=deletedcolor}}
 \flushleft \shadebox{$\rho, x \importsR r$}
 \begin{mathpar}
 \small
@@ -33,11 +34,12 @@
 
 \caption{Name $x$ imported from module environment $\rho$ has result $r$}
 \label{fig:eval-imports}
-\end{figure}
 \end{DeletedBlock}
+\end{figure}
 
-\begin{DeletedBlock}
 \begin{figure}
+\begin{DeletedBlock}
+\captionsetup{font={color=deletedcolor},labelfont={color=deletedcolor}}
 \begin{subfigure}{\textwidth}
 \flushleft \shadebox{$q, \seq{\iota} \Rightarrow r$}
 \begin{mathpar}
@@ -164,8 +166,8 @@
 \end{subfigure}
 \caption{Import evaluation}
 \label{fig:eval-import-prefix}
-\end{figure}
 \end{DeletedBlock}
+\end{figure}
 
 \begin{figure}
 \begin{DeletedBlock}
@@ -224,6 +226,35 @@
 }
 {
   q, \mathcal{L} \Rightarrow_{\mathsf{mod}} o
+}
+\end{mathpar}
+
+\flushleft \shadebox{$\seq{q}, \mathcal{L} \Rightarrow_{\mathsf{mod}} o$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{eval-modules-nil}}]
+{
+  \strut
+}
+{
+  \varepsilon, \mathcal{L} \Rightarrow_{\mathsf{mod}} \outcome{\varepsilon}{\assigns{\varnothing}}
+}
+\and
+\inferrule*[lab={\ruleName{eval-modules-cons}}]
+{
+  q, \mathcal{L} \Rightarrow_{\mathsf{mod}} \outcome{\seq{v}}{\assigns{\rho}} \\
+  \seq{q}, \mathcal{L} \override \set{\bind{q}{\submods(q) \override \rho}} \Rightarrow_{\mathsf{mod}} o
+}
+{
+  q \cons \seq{q}, \mathcal{L} \Rightarrow_{\mathsf{mod}} \outcome{\seq{v}}{\assigns{\varnothing}} \override o
+}
+\and
+\inferrule*[lab={\ruleName{eval-modules-fail}}]
+{
+  q, \mathcal{L} \Rightarrow_{\mathsf{mod}} \outcome{\seq{v}}{\aborts{\kappa}}
+}
+{
+  q \cons \seq{q}, \mathcal{L} \Rightarrow_{\mathsf{mod}} \outcome{\seq{v}}{\aborts{\kappa}}
 }
 \end{mathpar}
 \end{AddedBlock}
