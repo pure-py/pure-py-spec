@@ -382,7 +382,7 @@ $\Sigma \vdash_{\mathsf{mod}} q : \Gamma \binding \Sigma'$ (\specfigref{typing-m
 (\secref{operational-semantics}). The \ruleName{module} rule types the body as a top-level statement, and
 the \ruleName{predefined} rule gives a predefined module the signature of
 Definition~\ref{def:predefined}.
-Both import forms check \replaced{every module which contains the target of the import}{their target, together with its containing modules}
+Both import forms check \replaced{every module containing the target of the import}{their target, together with its containing modules}
 (\figref{typing-import-prefix}). A plain import checks the root and then each module
 along the chain of names, recording each as a member of its parent (\ruleName{submodules-cons}), so that the binding for the root gives attribute
 access along the whole chain. Two imports with the same root, such as \pyinline{a.b} and \pyinline{a.c}, both
