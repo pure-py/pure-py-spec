@@ -3,9 +3,10 @@
 \loads(q_1 \cons \cdots \cons q_n) &= \loads(q_1) \concat \cdots \concat \loads(q_n) \clausegap
 \loads(q, \varepsilon) &= \varepsilon \\*
 \loads(q, \exImport{x_1.\cdots.x_n} \cons \seq{\iota}) &= \loads(x_1 \cons x_1.x_2 \cons \cdots \cons x_1.\cdots.x_n) \concat \loads(q, \seq{\iota}) \\*
-\loads(q, \exFromImport{q'}{x_1, \ldots, x_n} \cons \seq{\iota}) &= \loads(\uniqueTo(q', q) \cons q' \cons q'.y_1 \cons \cdots \cons q'.y_k) \concat \loads(q, \seq{\iota}) \\*
-&\qquad \rlap{where $\mathcal{M}(q') = \seq{\iota}'\;t'$, and $y_1 \cons \cdots \cons y_k$ are, in order, the $x_i$ with} \\*
-&\qquad \rlap{$q'.x_i \in \dom(\mathcal{M})$ and $x_i \notin \declaresS(\seq{\iota}') \concat \declaresS(t')$} \clausegap
+\loads(q, \exFromImport{q'}{x_1, \ldots, x_n} \cons \seq{\iota}) &= \loads(\uniqueTo(q', q) \cons q') \concat \loads(q', x_1) \concat \cdots \concat \loads(q', x_n) \\*
+&\qquad {}\concat \loads(q, \seq{\iota}) \clausegap
+\loads(q, x) &= \loads(q.x) \quad \text{if } q.x \in \dom(\mathcal{M}) \text{ and } x \notin \declaresS(\mathcal{M}(q)) \\*
+\loads(q, x) &= \varepsilon \quad \text{(otherwise)} \clausegap
 \loadOrder(\mathcal{M}) &= \loadOrder(\loads(\pymath{\_\_main\_\_})) \clausegap
 \loadOrder(\varepsilon) &= \varepsilon \\*
 \loadOrder(\seq{q} \cons q) &= \loadOrder(\seq{q}) \quad \text{if } q \in \set{\seq{q}} \\*

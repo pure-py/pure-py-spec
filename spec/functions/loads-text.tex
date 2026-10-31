@@ -1,4 +1,4 @@
-Modules loaded by loading $q$, by loading each module of $\seq{q}$ in turn, or by the import prefix $\seq{\iota}$ of module $q$, in the order in which their bodies
+Modules loaded by loading $q$, by loading each module of $\seq{q}$ in turn, by the import prefix $\seq{\iota}$ of module $q$, or by importing name $x$ from module $q$, in the order in which their bodies
 run, with repeats; predefined modules run no body. A plain import loads the modules containing its target from the
 root down, and a from-import loads the containing modules of $q'$ which do not contain $q$, then $q'$, then each
 imported name which is a submodule of $q'$ not bound by the body of $q'$, following the import rules of \figref{typing-import-prefix}. The load order of a

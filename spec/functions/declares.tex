@@ -9,4 +9,5 @@
 \declaresS(\exImport{(x \cons \seq{x})} \cons \seq{\iota}) &{}= \declaresS(\seq{\iota}) \\*
 &\qquad \text{if } \exImport{(x \cons \seq{x}\,')} \in \seq{\iota} \text{ for some } \seq{x}\,' \\*
 \declaresS(\exImport{(x \cons \seq{x})} \cons \seq{\iota}) &{}= x \cons \declaresS(\seq{\iota}) \quad \text{(otherwise)} \\*
-\declaresS(\exFromImport{q}{x_1, \ldots, x_{n+1}} \cons \seq{\iota}) &{}= x_1 \cons \cdots \cons x_{n+1} \cons \declaresS(\seq{\iota})
+\declaresS(\exFromImport{q}{x_1, \ldots, x_{n+1}} \cons \seq{\iota}) &{}= x_1 \cons \cdots \cons x_{n+1} \cons \declaresS(\seq{\iota}) \clausegap
+\added{\declaresS(\seq{\iota}\;t)} & \added{{}= \declaresS(\seq{\iota}) \concat \declaresS(t)}

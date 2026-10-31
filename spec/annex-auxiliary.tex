@@ -26,7 +26,7 @@ cases are stated with each.
 \funccases{binds}
 \end{auxfunction}
 
-\begin{auxfunction}{\declaresS(t), \declaresS(\seq{\iota})}{sequence of variables}{aux:declares}
+\begin{auxfunction}{\declaresS(t), \declaresS(\seq{\iota})\added{, \declaresS(\mu)}}{sequence of variables}{aux:declares}
 \input{spec/functions/declares-text}
 \funccases{declares}
 \end{auxfunction}
@@ -148,7 +148,7 @@ the resolution of names in an environment.
 \end{auxfunction}
 
 \begin{AddedBlock}
-\begin{auxfunction}{\loads(q), \loads(\seq{q}), \loads(q, \seq{\iota}), \loadOrder(\mathcal{M}), \loadOrder(\seq{q})}{sequence of module names}{aux:loads}
+\begin{auxfunction}{\loads(q), \loads(\seq{q}), \loads(q, \seq{\iota}), \loads(q, x), \loadOrder(\mathcal{M}), \loadOrder(\seq{q})}{sequence of module names}{aux:loads}
 \input{spec/functions/loads-text}
 \funccases{loads}
 \end{auxfunction}
