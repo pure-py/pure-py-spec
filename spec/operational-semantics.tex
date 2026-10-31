@@ -180,10 +180,10 @@ which the kind is reported is not prescribed.
 are given in full in \specfigref{eval-modules}.}\speconly{ Context extension (\secref{well-formedness-modules}) is extended
 to environments, with the same equations on values in place of context entries, except that a loaded module
 value $\modLoaded{q}{\rho}$ carries an environment whereas the context entry $\modLoaded{q}{\Gamma}$ carries a
-context.} A program runs the body of each of its modules once, in \emph{load order}\speconly{ (\specref{aux:loads})}.
+context.} A program runs each module body once, in \emph{load order}\speconly{ (\specref{aux:loads})}.
 Since imports precede statements, a body runs only after every module it imports has loaded, and loading is
 deterministic, so the load order is fixed by the import prefixes alone. The program rules\speconly{
-(\ruleName{eval-program} and \ruleName{eval-program-abort})} run the bodies in that order, threading the environments
+(\ruleName{eval-program} and \ruleName{eval-program-abort})} thread the environments
 $\mathcal{L}$ of the modules loaded so far, initially the predefined environments $\mathcal{E}(\seq{w})$ for the arguments
 $\seq{w}$ of the run; the environment of a module is its
 submodule stubs overridden by the environment assigned by its body, mirroring the \ruleName{module} rule
