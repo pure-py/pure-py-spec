@@ -11,7 +11,7 @@ local. An environment binds a variable to $\Unbound$ wherever the corresponding 
 the entry $\Unbound$, so that a shadowed binding of an enclosing scope is not visible. Throughout this section, $\Sigma$ is the class table produced by module checking of the program
 (\secref{well-formedness-modules}) and, like $\mathcal{M}$ and $\mathcal{P}$, is ambient. For a statement $s$, \added{outcome $\outcome{\seq{v}}{\omega}$ represents $s$ printing the values $\seq{v}$, in order, and completing
 as $\omega$. Completion}\deleted{the outcome}
-$\assigns{\rho}$ represents $s$ running to its end, with accumulated environment $\rho$; \replaced{completion}{the outcome}
+$\assigns{\rho}$ represents $s$ \replaced{completing normally}{running to its end}, with accumulated environment $\rho$; \replaced{completion}{the outcome}
 $\returns{v}$ represents $s$ returning the value $v$; and \replaced{completion}{the outcome} $\aborts{\kappa}$ represents the whole run
 aborting, with termination kind $\kappa$.
 
