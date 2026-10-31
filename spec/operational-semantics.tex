@@ -4,7 +4,7 @@
 \subsection{Values and environments}
 
 Values, environments, outcomes and results are given in \figref{values}. A class value $\Type{C}$ is the
-context entry of the class, and an object $\exObj{C}{\bind{\seq{x}}{\seq{v}}}$ records its class by name and fields in the order given by $\fields{\Sigma}(C)$. An opaque value $\predefVal{q.x}$ represents a predefined member by its
+context entry of the class, and an object $\exObj{C}{\bind{\seq{x}}{\seq{v}}}$ records its class by name and fields in the order given by $\fields{\Sigma}(C)$. \replaced{The value}{An opaque value } $\predefVal{q.x}$ represents a predefined member by its
 name alone, such as the class \pyinline{int} or decorator \pyinline{dataclass}. The value $\Unbound$
 marks a variable of the current scope before its declaration is reached, which Python reports as an unbound
 local. An environment binds a variable to $\Unbound$ wherever the corresponding context binds the variable to
