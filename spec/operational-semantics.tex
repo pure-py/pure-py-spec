@@ -191,7 +191,7 @@ checked\speconly{ (\ruleName{eval-module})}.
 
 The output of a program is the concatenation of the values printed by its bodies. A program evaluates to its output
 and a termination kind (\figref{values}): $\errExit{0}$ if every body runs to its end, and otherwise the kind of the
-first body to abort, after whose output nothing more is printed. $\errExit{n}$ is a run that exited with status
+first body to abort, after which nothing more is printed. $\errExit{n}$ is a run that exited with status
 $n$\paperonly{:}\speconly{.}
 \paperinput{paper/operational-semantics/program}%
 An implementation must agree with the semantics on the termination kind of every run with defined behaviour, and on
