@@ -1,12 +1,12 @@
 \inferrule*[lab={\ruleName{eval-program-abort}}]
 {
   \added{\loadOrder(\mathcal{M}) = q_1 \cons \cdots \cons q_n} \\
-  \added{\mathcal{L}_0 = \mathcal{E}(\seq{w})} \\
+  \added{\mathcal{L}_0 = \mathcal{E}(\mathcal{A})} \\
   \added{q_i, \mathcal{L}_{i-1} \Rightarrow_{\mathsf{mod}} \outcome{{\seq{v}}_i}{\assigns{\rho_i}} \quad (\forall i < k)} \\
   \added{\mathcal{L}_i = \mathcal{L}_{i-1} \override \set{\bind{q_i}{\submods(q_i) \override \rho_i}} \quad (\forall i < k)} \\
   \added{q_k, \mathcal{L}_{k-1} \Rightarrow_{\mathsf{mod}} \outcome{{\seq{v}}_k}{\aborts{\kappa}}} \\
   \deleted{\pymath{\_\_main\_\_} \Rightarrow_{\mathsf{mod}} \aborts{\kappa}}
 }
 {
-  \mathcal{M}\added{, \seq{w}} \Rightarrow \added{{\seq{v}}_1 \concat \cdots \concat {\seq{v}}_k, }\kappa
+  \mathcal{M}\added{, \mathcal{A}} \Rightarrow \added{{\seq{v}}_1 \concat \cdots \concat {\seq{v}}_k, }\kappa
 }

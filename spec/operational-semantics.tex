@@ -184,8 +184,8 @@ context.} A program runs each module body once, in \emph{load order}\speconly{ (
 Since imports precede statements, a body runs only after every module it imports has loaded, and loading is
 deterministic, so the load order is fixed by the import prefixes alone. The program rules\speconly{
 (\ruleName{eval-program} and \ruleName{eval-program-abort})} thread the environments
-$\mathcal{L}$ of the modules loaded so far, initially the environments $\mathcal{E}(\seq{w})$ of the predefined modules, given the
-command-line arguments $\seq{w}$ of the run; the environment of a module is its
+$\mathcal{L}$ of the modules loaded so far, initially the environments $\mathcal{E}(\mathcal{A})$ of the predefined modules, given the
+command-line arguments $\mathcal{A}$ of the run; the environment of a module is its
 submodule stubs overridden by the environment assigned by its body, mirroring the \ruleName{module} rule
 (\secref{well-formedness-modules}). A body runs in the environment of \pyinline{builtins}
 overridden by the environment bound by its imports, computed from its import prefix and $\mathcal{L}$\speconly{
