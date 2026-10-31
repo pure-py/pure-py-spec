@@ -40,12 +40,8 @@ $q, \rho, t \Rightarrow o$ & top-level statement $t$ of module $q$ evaluates to 
 $\rho, e \Rightarrow r$ & expression $e$ evaluates to result $r$ & \figref{eval-result} \\
 $\rho, \seq{e} \Rightarrow r$ & expressions $\seq{e}$ evaluate, left to right, to result $r$ & \figref{eval-seq} \\
 $\rho, \seq{g} \Rightarrow r$ & comprehension qualifiers $\seq{g}$ evaluate to result $r$ & \figref{eval-quals-result} \\
-\deleted{$\rho, x \importsR r$} & \deleted{name $x$ imported from module environment $\rho$ has result $r$} & \deleted{\figref{eval-imports}} \\
-\deleted{$q, \seq{\iota} \Rightarrow r$} & \deleted{imports $\seq{\iota}$ of module $q$ evaluate to result $r$} & \deleted{\figref{eval-import-prefix}} \\
-\deleted{$q, \rho, \seq{x} \Rightarrow_{\mathsf{sub}} r$} & \deleted{submodule chain $\seq{x}$ extends environment $\rho$ of module $q$, giving result $r$} & \deleted{\figref{eval-import-prefix}} \\
-\deleted{$q \Rightarrow_{\mathsf{mod}} r$} & \deleted{module $q$ loads to result $r$} & \deleted{\figref{eval-modules}} \\
-\added{$q, \mathcal{L} \Rightarrow_{\mathsf{mod}} o$} & \added{body of module $q$ evaluates to outcome $o$ given loaded module environments $\mathcal{L}$} & \added{\figref{eval-modules}} \\
-\added{$\seq{q}, \mathcal{L} \Rightarrow_{\mathsf{mod}} o$} & \added{bodies of modules $\seq{q}$ evaluate to outcome $o$ given loaded module environments $\mathcal{L}$} & \added{\figref{eval-modules}} \\
-$\mathcal{M}\added{, \mathcal{A}} \Rightarrow \replaced{\seq{v}, \kappa}{\kappa}$ & program $\mathcal{M}$\added{ run with arguments $\mathcal{A}$} \replaced{prints $\seq{v}$ and ends with}{evaluates to} termination kind $\kappa$ & \figref{eval-modules}
+$q, \mathcal{L} \Rightarrow_{\mathsf{mod}} o$ & body of module $q$ evaluates to outcome $o$ given loaded module environments $\mathcal{L}$ & \figref{eval-modules} \\
+$\seq{q}, \mathcal{L} \Rightarrow_{\mathsf{mod}} o$ & bodies of modules $\seq{q}$ evaluate to outcome $o$ given loaded module environments $\mathcal{L}$ & \figref{eval-modules} \\
+$\mathcal{M}, \mathcal{A} \Rightarrow \seq{v}, \kappa$ & program $\mathcal{M}$ run with arguments $\mathcal{A}$ prints $\seq{v}$ and ends with termination kind $\kappa$ & \figref{eval-modules}
 \end{tabular}
 \end{center}

@@ -27,15 +27,14 @@ $\iota$ & import & \figref{syntax-stmt} \\
 $\phi$ & field list of a dataclass & \figref{syntax-stmt} \\
 $t$ & top-level statement & \figref{syntax-stmt} \\
 $\chi$ & type definition & \figref{syntax-stmt} \\
-\deleted{$\mu$} & \deleted{module body} & \deleted{\figref{syntax-stmt}} \\
 $u$ & argument: an expression, pattern or value & \secref{syntax} \\
 $a$ & argument list & \figref{syntax-expr}
    \\[1mm]
 \metaGroup{Programs} \\
 $\mathcal{M}$ & program, a finite map from module names to bodies & \secref{modules-programs} \\
-$\mathcal{P}$ & predefined modules, each with its \replaced{signature}{environment and context } & \secref{modules-programs} \\
-\added{$\mathcal{A}$} & \added{command-line arguments of a run, a sequence of strings} & \added{\secref{modules-programs}} \\
-\added{$\mathcal{E}(\mathcal{A})$} & \added{predefined modules, each with its environment, for a run with arguments $\mathcal{A}$} & \added{\secref{modules-programs}}
+$\mathcal{P}$ & predefined modules, each with its signature & \secref{modules-programs} \\
+$\mathcal{A}$ & command-line arguments of a run, a sequence of strings & \secref{modules-programs} \\
+$\mathcal{E}(\mathcal{A})$ & predefined modules, each with its environment, for a run with arguments $\mathcal{A}$ & \secref{modules-programs}
    \\[1mm]
 \metaGroup{Contexts} \\
 $\Gamma$, $\Delta$ & context, a finite map from variables to context entries & Definition~\ref{def:context} \\
@@ -54,10 +53,10 @@ $K$, $L$ & ordered sets of shapes, idiomatically $K$ matched and $L$ residual & 
 \metaGroup{Values and results} \\
 $v$ & value & \figref{values} \\
 $\rho$ & environment, a finite map from variables to values & \figref{values} \\
-\added{$\mathcal{L}$} & \added{loaded module environments, a finite map from module names to environments} & \added{\figref{eval-modules}} \\
+$\mathcal{L}$ & loaded module environments, a finite map from module names to environments & \figref{eval-modules} \\
 $\delta$ & dictionary entries & \figref{values} \\
-$o$ & outcome of statement evaluation\added{, a completion with printed values} & \figref{values} \\
-\added{$\omega$} & \added{completion of a statement} & \added{\figref{values}} \\
+$o$ & outcome of statement evaluation, a completion with printed values & \figref{values} \\
+$\omega$ & completion of a statement & \figref{values} \\
 $r$ & result of expression evaluation & \figref{values} \\
 $m$ & match result & \figref{values} \\
 $\kappa$ & termination kind & \figref{values} \\

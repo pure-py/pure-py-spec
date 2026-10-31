@@ -6,7 +6,7 @@ $s$ & $\coloncolonequals$ & $\exSeq{s}{s'}$ & \speconly{(Seq)} \\
     & $\mid$ & $\exAssign{x}{e}$ & \speconly{(Assign)} \\
     & $\mid$ & $\exAssign{x\exAnnot{\psi}}{e}$ & \speconly{(DeclareAssign)} \\
     & $\mid$ & $e$ & \speconly{(ExprStmt)} \\
-    & \added{$\mid$} & \added{$\exPrint{e}$} & \speconly{\added{(Print)}} \\
+    & $\mid$ & $\exPrint{e}$ & \speconly{(Print)} \\
 \speconly{    & $\mid$ & $\exAssert{e}$ & (Assert) \\}
     & $\mid$ & $\exAssertMsg{e}{e'}$ & \speconly{(AssertMsg)} \\
 \speconly{    & $\mid$ & $\exReturnNone$ & (ReturnNone) \\}
@@ -36,9 +36,6 @@ $b$ & $\coloncolonequals$ & $\exCase{p}{s}$ & \speconly{(Case)}
 \grammarGroup{Field lists} \\
 $\phi$ & $\coloncolonequals$ & $\exField{x_1}{\psi_1} \;\ldots\; \exField{x_{n+1}}{\psi_{n+1}}$ & \speconly{(FieldList) \\
     & $\mid$ & $\pyinline{pass}$ & (EmptyFieldList)}
-   \\[3mm]
-\grammarGroup{\deleted{Module bodies}} \\
-\deleted{$\mu$} & \deleted{$\coloncolonequals$} & \deleted{$\iota_1 \;\ldots\; \iota_n \;\; t$} & \deleted{\speconly{(ModuleBody)}}
    \\[3mm]
 \grammarGroup{Names} \\
 $q$ & $\coloncolonequals$ & $x_1.\cdots.x_{n+1}$ & \speconly{(Name)}

@@ -26,7 +26,7 @@ cases are stated with each.
 \funccases{binds}
 \end{auxfunction}
 
-\begin{auxfunction}{\declaresS(t), \declaresS(\seq{\iota})\added{, \declaresS(\seq{\iota}\;t)}}{sequence of variables}{aux:declares}
+\begin{auxfunction}{\declaresS(t), \declaresS(\seq{\iota}), \declaresS(\seq{\iota}\;t)}{sequence of variables}{aux:declares}
 \input{spec/functions/declares-text}
 \funccases{declares}
 \end{auxfunction}
@@ -147,7 +147,6 @@ the resolution of names in an environment.
 \funccases{unique-to}
 \end{auxfunction}
 
-\begin{AddedBlock}
 \begin{auxfunction}{\loads(\seq{q}, \seq{q}'), \submodLoads(\seq{q}, q, \seq{x}), \importLoads(\seq{q}, q, \seq{\iota}), \importLoads(\seq{q}, q, \iota)}{sequence of module names}{aux:loads}
 \input{spec/functions/loads-text}
 \funccasesgroup{loads,import-loads}
@@ -162,7 +161,6 @@ the resolution of names in an environment.
 \input{spec/functions/member-text}
 \funccases{member}
 \end{auxfunction}
-\end{AddedBlock}
 
 \begin{auxfunction}{\ownFields(\phi), \ownFields(\chi)}{sequence of bindings}{aux:own-fields}
 \input{spec/functions/own-fields-text}

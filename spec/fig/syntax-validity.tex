@@ -4,17 +4,17 @@
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.58\textwidth}>{\raggedright\arraybackslash}p{0.3\textwidth}}
 \arrayrulecolor{gray!60}\hline
-\rowcolor{grammarheadcolor}\textit{Form} & \textit{\replaced{Condition}{Pairwise distinct}} \\
-$\exDataclassExtend{c[\seq{\alpha}]}{q[\seq{\psi}]}{\phi}$\speconly{, $\exDataclass{c[\seq{\alpha}]}{\phi}$} & \replaced{distinct type parameters}{type parameters} $\seq{\alpha}$ \\\rowgap
-$\exTypeAlias{x[\seq{\alpha}]}{\psi}$ & \replaced{distinct type parameters}{type parameters} $\seq{\alpha}$ \\\rowgap
-$\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$ & \replaced{distinct type parameters}{type parameters} $\seq{\alpha}$; \replaced{distinct parameters}{parameters} $\seq{x}$ \\\rowgap
-$\exLambda{\seq{x}}{e}$ & \replaced{distinct parameters}{parameters} $\seq{x}$ \\\rowgap
-$\seq{u}, \seq{x} \mathord{=} \seq{u}'$ & \replaced{distinct keyword arguments}{keyword arguments} $\seq{x}$ \\\rowgap
-$\patDict{\bind{\seq{w}}{\seq{p}}}$ & \replaced{distinct keys}{keys} $\seq{w}$ \\\rowgap
-$\exCase{p}{s}$ & \replaced{distinct variables bound by pattern}{variables bound by pattern} $p$ \\\rowgap
-\added{top-level statement $t$} & \added{\pyinline{return} only within function bodies} \\
+\rowcolor{grammarheadcolor}\textit{Form} & \textit{Condition} \\
+$\exDataclassExtend{c[\seq{\alpha}]}{q[\seq{\psi}]}{\phi}$\speconly{, $\exDataclass{c[\seq{\alpha}]}{\phi}$} & distinct type parameters $\seq{\alpha}$ \\\rowgap
+$\exTypeAlias{x[\seq{\alpha}]}{\psi}$ & distinct type parameters $\seq{\alpha}$ \\\rowgap
+$\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$ & distinct type parameters $\seq{\alpha}$; distinct parameters $\seq{x}$ \\\rowgap
+$\exLambda{\seq{x}}{e}$ & distinct parameters $\seq{x}$ \\\rowgap
+$\seq{u}, \seq{x} \mathord{=} \seq{u}'$ & distinct keyword arguments $\seq{x}$ \\\rowgap
+$\patDict{\bind{\seq{w}}{\seq{p}}}$ & distinct keys $\seq{w}$ \\\rowgap
+$\exCase{p}{s}$ & distinct variables bound by pattern $p$ \\\rowgap
+top-level statement $t$ & \pyinline{return} only within function bodies \\
 \hline
 \end{tabular}
-\caption{\replaced{Conditions}{Distinctness conditions} ensuring every program is syntactically valid Python}
+\caption{Conditions ensuring every program is syntactically valid Python}
 \label{fig:syntax-validity}
 \end{figure}

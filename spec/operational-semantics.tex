@@ -9,28 +9,28 @@ name alone, such as the class \pyinline{int} or decorator \pyinline{dataclass}. 
 marks a variable of the current scope before its declaration is reached, which Python reports as an unbound
 local. An environment binds a variable to $\Unbound$ wherever the corresponding context binds the variable to
 the entry $\Unbound$, so that a shadowed binding of an enclosing scope is not visible. Throughout this section, $\Sigma$ is the class table produced by module checking of the program
-(\secref{well-formedness-modules}) and, like $\mathcal{M}$ and $\mathcal{P}$, is ambient. For a statement $s$, \added{outcome $\outcome{\seq{v}}{\omega}$ represents $s$ printing the values $\seq{v}$, in order, and completing
-as $\omega$. Completion}\deleted{the outcome}
-$\assigns{\rho}$ represents $s$ \replaced{completing normally}{running to its end}, with accumulated environment $\rho$; \replaced{completion}{the outcome}
-$\returns{v}$ represents $s$ returning the value $v$; and \replaced{completion}{the outcome} $\aborts{\kappa}$ represents the whole run
+(\secref{well-formedness-modules}) and, like $\mathcal{M}$ and $\mathcal{P}$, is ambient. For a statement $s$, outcome $\outcome{\seq{v}}{\omega}$ represents $s$ printing the values $\seq{v}$, in order, and completing
+as $\omega$. Completion
+$\assigns{\rho}$ represents $s$ completing normally, with accumulated environment $\rho$; completion
+$\returns{v}$ represents $s$ returning the value $v$; and completion $\aborts{\kappa}$ represents the whole run
 aborting, with termination kind $\kappa$.
 
 \begin{specdefinition}{Composition of outcomes}
 Composing statements sequentially composes their outcomes according to the following monoid, analogous
 to sequential composition of static outcomes:
 \begin{defalign}
-\replaced{\outcome{\seq{v}}{\returns{v}} \override o}{\returns{v} \override o } & = \replaced{\outcome{\seq{v}}{\returns{v}}}{\returns{v} } \\
-\replaced{\outcome{\seq{v}}{\aborts{\kappa}} \override o}{\aborts{\kappa} \override o } & = \replaced{\outcome{\seq{v}}{\aborts{\kappa}}}{\aborts{\kappa} } \\
-\replaced{\outcome{\seq{v}}{\assigns{\rho}} \override \outcome{\seq{v}'}{\assigns{\rho'}}}{\assigns{\rho} \override \assigns{\rho'} } & = \replaced{\outcome{\seq{v} \concat \seq{v}'}{\assigns{\rho \override \rho'}}}{\assigns{\rho \override \rho'} } \\
-\replaced{\outcome{\seq{v}}{\assigns{\rho}} \override \outcome{\seq{v}'}{\omega}}{\assigns{\rho} \override o } & = \replaced{\outcome{\seq{v} \concat \seq{v}'}{\omega}}{o } \quad (\text{otherwise})
+\outcome{\seq{v}}{\returns{v}} \override o & = \outcome{\seq{v}}{\returns{v}} \\
+\outcome{\seq{v}}{\aborts{\kappa}} \override o & = \outcome{\seq{v}}{\aborts{\kappa}} \\
+\outcome{\seq{v}}{\assigns{\rho}} \override \outcome{\seq{v}'}{\assigns{\rho'}} & = \outcome{\seq{v} \concat \seq{v}'}{\assigns{\rho \override \rho'}} \\
+\outcome{\seq{v}}{\assigns{\rho}} \override \outcome{\seq{v}'}{\omega} & = \outcome{\seq{v} \concat \seq{v}'}{\omega} \quad (\text{otherwise})
 \end{defalign}
 
-\noindent with \replaced{outcomes of the form $\outcome{\seq{v}}{\returns{v}}$ or $\outcome{\seq{v}}{\aborts{\kappa}}$}{$\returns{v}$ and $\aborts{\kappa}$ } as left zeros, and \replaced{$\outcome{\varepsilon}{\assigns{\varnothing}}$}{$\assigns{\varnothing}$ } as left and right unit.
+\noindent with outcomes of the form $\outcome{\seq{v}}{\returns{v}}$ or $\outcome{\seq{v}}{\aborts{\kappa}}$ as left zeros, and $\outcome{\varepsilon}{\assigns{\varnothing}}$ as left and right unit.
 \end{specdefinition}
 
 \input{spec/fig/eval-values}
 
-\replaced{\emph{Termination kinds} $\kappa$ record}{A \emph{termination kind} $\kappa$ records } how a run ends; all but $\errUndef$ and $\errExcluded$ are named after the exceptions raised by the same program
+\emph{Termination kinds} $\kappa$ record how a run ends; all but $\errUndef$ and $\errExcluded$ are named after the exceptions raised by the same program
 under Python in the same circumstances, except that $\errExit{0}$ also records a run which completes normally. A variable read before its assignment aborts with $\errName$ where
 Python raises \pyinline{UnboundLocalError}, a subclass of \pyinline{NameError}; distinguishing the two would require
 the environment to record whether unbound variables belong to functions or modules. Two termination kinds record operations which Python executes without an error. A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, one which the type system cannot rule out
@@ -45,13 +45,13 @@ $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a functi
 arguments to results (\specfigref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\seq{v}$ has result
 $\primFn(\seq{v})$.
 
-\replaced{Rule conclusions use a monadic let notation over results.}{The rules are given in a monadic metalanguage over results (\figref{values}). } If $r$ is
+Rule conclusions use a monadic let notation over results. If $r$ is
 $\val{v}$, then $\mlet{v}{r}{\ldots}$ is the body with $v$ bound to that value; if $r$ is
-$\aborts{\kappa}$, it is $\aborts{\kappa}$\added{ as a result, or $\outcome{\varepsilon}{\aborts{\kappa}}$ as an outcome}. The body is a result in the expression rules and an outcome in
+$\aborts{\kappa}$, it is $\aborts{\kappa}$ as a result, or $\outcome{\varepsilon}{\aborts{\kappa}}$ as an outcome. The body is a result in the expression rules and an outcome in
 the statement rules. A final
 premise needs no propagation rule; earlier premises have one each, recording the subexpressions evaluated
-before the failing one (\specfigref{eval-propagation}). The sequence \replaced{judgement uses }{and module judgements use }
-results carrying a sequence of values\deleted{ or an environment} in place of a value.
+before the failing one (\specfigref{eval-propagation}). The sequence judgement uses 
+results carrying a sequence of values in place of a value.
 \paperinput{paper/operational-semantics/evaluation-example}
 
 \specinput{spec/operational-semantics/auxiliary}
@@ -151,31 +151,6 @@ fully-qualified names.
 
 \subsection{Modules and programs}
 
-\begin{DeletedBlock}
-\speconly{Module and program evaluation are given in \figref{eval-modules}; import evaluation in \figref{eval-import-prefix}; importing names from a loaded module in
-\figref{eval-imports}.}\paperonly{Module and program evaluation are given in full in \specfigref{eval-modules}.}\speconly{ Context extension (\secref{well-formedness-modules}) applies to environments as well, with the same equations on values in place of context entries, except that a loaded module value $\modLoaded{q}{\rho}$ carries an environment whereas the context entry $\modLoaded{q}{\Gamma}$ carries a context.} \emph{Loading}, the judgement $q \Rightarrow_{\mathsf{mod}} r$, evaluates the import prefix
-of $q$ and then its statement, mirroring module checking $\vdash_{\mathsf{mod}} q : \Gamma$
-(\specfigref{typing-module}); as with the static rules, the mutual
-recursion between loading and evaluation is grounded by program well-formedness, which rules out
-import cycles (\secref{modules-programs}).
-Loading takes a single module; an import loads the modules containing its target from the root down, each
-before the module it contains, mirroring the static rules\speconly{, by the submodules judgement for a plain import and
-as premises of the from-import rule}. If loading one of these modules aborts, the import aborts for the same reason and the modules after it are
-not loaded.
-
-Since
-imports precede statements, every module that a statement can reference is loaded before the statement runs, and
-loading is deterministic, so the semantics needs no cache
-of loaded modules. Loading runs\speconly{ (\ruleName{eval-module})} a module body in $\mathcal{P}(\pyinline{builtins})$ overridden by
-the environment of its imports, with each name declared in the body or bound by a pattern in it starting
-unbound, mirroring the \ruleName{module} rule (\secref{well-formedness-modules}).
-A program evaluates to a termination kind (\figref{values}): $\errExit{0}$ if the main module
-loads, and otherwise the kind it aborted with. $\errExit{n}$ is a run that exited with status $n$\paperonly{:}\speconly{.}
-\paperinput{paper/operational-semantics/program}%
-An implementation must agree with the semantics on the termination kind of every run with defined behaviour; the form in
-which the kind is reported is not prescribed.
-\end{DeletedBlock}
-\begin{AddedBlock}
 \speconly{Module and program evaluation are defined in \figref{eval-modules}.}\paperonly{Module and program evaluation
 are defined in full in \specfigref{eval-modules}.} A program runs each module body once, after its imports have loaded,
 in \emph{load order}\speconly{ (\specref{aux:loads})}. Load order is fixed by the imports alone, since imports
@@ -207,7 +182,6 @@ $\seq{v}$ in order, each as by Python's \pyinline{str} followed by a newline, an
 \end{specdefinition}
 
 \noindent The form in which an implementation reports the termination kind is not prescribed.
-\end{AddedBlock}
 
 \specinput{spec/fig/eval-modules}
 
