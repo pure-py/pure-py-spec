@@ -19,10 +19,10 @@ aborting, with termination kind $\kappa$.
 Composing statements sequentially composes their outcomes according to the following monoid, analogous
 to sequential composition of static outcomes:
 \begin{defalign}
-\replaced{\outcome{\seq{v}}{\assigns{\rho}} \override \outcome{\seq{v}'}{\assigns{\rho'}}}{\assigns{\rho} \override \assigns{\rho'} } & = \replaced{\outcome{\seq{v} \concat \seq{v}'}{\assigns{\rho \override \rho'}}}{\assigns{\rho \override \rho'} } \\
-\replaced{\outcome{\seq{v}}{\assigns{\rho}} \override \outcome{\seq{v}'}{\omega}}{\assigns{\rho} \override o } & = \replaced{\outcome{\seq{v} \concat \seq{v}'}{\omega}}{o } \quad (\text{otherwise}) \\
 \replaced{\outcome{\seq{v}}{\returns{v}} \override o}{\returns{v} \override o } & = \replaced{\outcome{\seq{v}}{\returns{v}}}{\returns{v} } \\
-\replaced{\outcome{\seq{v}}{\aborts{\kappa}} \override o}{\aborts{\kappa} \override o } & = \replaced{\outcome{\seq{v}}{\aborts{\kappa}}}{\aborts{\kappa} }
+\replaced{\outcome{\seq{v}}{\aborts{\kappa}} \override o}{\aborts{\kappa} \override o } & = \replaced{\outcome{\seq{v}}{\aborts{\kappa}}}{\aborts{\kappa} } \\
+\replaced{\outcome{\seq{v}}{\assigns{\rho}} \override \outcome{\seq{v}'}{\assigns{\rho'}}}{\assigns{\rho} \override \assigns{\rho'} } & = \replaced{\outcome{\seq{v} \concat \seq{v}'}{\assigns{\rho \override \rho'}}}{\assigns{\rho \override \rho'} } \\
+\replaced{\outcome{\seq{v}}{\assigns{\rho}} \override \outcome{\seq{v}'}{\omega}}{\assigns{\rho} \override o } & = \replaced{\outcome{\seq{v} \concat \seq{v}'}{\omega}}{o } \quad (\text{otherwise})
 \end{defalign}
 
 \noindent with $\replaced{\outcome{\varepsilon}{\assigns{\varnothing}}}{\assigns{\varnothing} }$ as left and right unit, and \replaced{outcomes of the form $\outcome{\seq{v}}{\returns{v}}$ or $\outcome{\seq{v}}{\aborts{\kappa}}$}{$\returns{v}$ and $\aborts{\kappa}$ } as left zeros.
