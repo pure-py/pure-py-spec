@@ -40,7 +40,7 @@
 \inferrule*[lab={\ruleName{import}}]
 {
   q' = x \cons \seq{x} \\
-  q \not\properPrefixOf q' \\
+  q \not\strictlyContains q' \\
   \Sigma \vdash_{\mathsf{mod}} x : \Delta \binding \Sigma_1 \\
   \Sigma_1 \vdash_{\mathsf{sub}} x, \Delta, \seq{x} : \Delta' \binding \Sigma_2 \\
   \Sigma_2; q \vdash \seq{\iota} : \Gamma \binding \Sigma'

@@ -1,7 +1,7 @@
 % Rows of the auxiliary-functions index; the auxindex environment supplies the table.
 \auxgroup{Functions on classes and modules}
 \auxrow{$\submods(q)$}{context}{stub for each submodule of $q$}{aux:submods}
-\auxrow{$\uniqueTo(q', q)$}{sequence of module names}{proper prefixes of $q'$ not prefixes of $q$, shortest first}{aux:unique-to}
+\auxrow{$\uniqueTo(q', q)$}{sequence of module names}{\replaced{modules strictly containing $q'$ which do not contain $q$}{proper prefixes of $q'$ not prefixes of $q$}, shortest first}{aux:unique-to}
 \auxrow{\added{$\loads(q)$}}{\added{sequence of module names}}{\added{modules loaded by $q$, with duplicates}}{aux:loads}
 \auxrow{\added{$\loadOrder(\mathcal{M})$}}{\added{sequence of module names}}{\added{modules of the program in load order}}{aux:load-order}
 \auxrow{\added{$\importEnv{\mathcal{L}}(\seq{\iota})$}}{\added{environment}}{\added{environment bound by imports $\seq{\iota}$ given loaded module environments $\mathcal{L}$}}{aux:import-env}
@@ -17,8 +17,8 @@
 \auxgroup{Functions on values}
 \auxrow{$\eqOp{\Sigma}(v, v')$}{result}{structural equality; $\aborts{\errUndef}$ between functions, between Boolean and number, and between two \pyinline{nan} values in container}{aux:eq}
 \auxrow{$\eqElems{\Sigma}(\seq{v}, \seq{v}\,')$}{result}{elementwise equality of value sequences}{aux:eq-elems}
-\auxrow{$\contains{\Sigma}(v, v')$}{result}{whether $v'$ is element of $v$; $\errExcluded$ for range or non-string key, $\errType$ otherwise}{aux:contains}
-\auxrow{$\containsElems{\Sigma}(\seq{v}, v)$}{result}{whether $\seq{v}$ has element equal to $v$}{aux:contains-elems}
+\auxrow{$\inOp{\Sigma}(v, v')$}{result}{whether $v$ is element of $v'$; $\errExcluded$ for range or non-string key, $\errType$ otherwise}{aux:in}
+\auxrow{$\inElems{\Sigma}(v, \seq{v})$}{result}{whether $\seq{v}$ has element equal to $v$}{aux:in-elems}
 \auxrow{$\elems(v)$}{sequence of values}{elements of list, tuple or string}{aux:elems}
 \auxrow{$\iterOp(v)$}{sequence of values}{sequence drawn from $v$ by generator; keys if $v$ is dictionary, $m, \ldots, n - 1$ if $v$ is range with start $m$ and stop $n$}{aux:iter}
 \auxrow{$\getitem(v, v')$}{result}{subscripting; $\errIndex$ for index out of range, $\errKey$ for missing key, $\errExcluded$ for range, Boolean index or non-string key, $\errType$ otherwise}{aux:getitem}

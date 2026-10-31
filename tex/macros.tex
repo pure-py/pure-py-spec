@@ -327,8 +327,8 @@
 \newcommand*{\update}{\mathrm{update}}
 
 % Metafunctions: equality and membership
-\newcommand*{\contains}[1]{\mathrm{contains}_{#1}}
-\newcommand*{\containsElems}[1]{\mathrm{contains\text{-}elems}_{#1}}
+\newcommand*{\inOp}[1]{\mathrm{in}_{#1}}
+\newcommand*{\inElems}[1]{\mathrm{in\text{-}elems}_{#1}}
 \newcommand*{\eqElems}[1]{\mathrm{eq\text{-}elems}_{#1}}
 \newcommand*{\eqOp}[1]{\mathrm{eq}_{#1}}
 \newcommand*{\matchOp}[1]{\mathrm{match}_{#1}}
@@ -345,8 +345,8 @@
 \newcommand*{\matchOk}[1]{\mathsf{match}(#1)}
 \newcommand*{\noMatch}{\mathsf{no}\text{-}\mathsf{match}}
 \newcommand*{\notmatches}{\not\rightsquigarrow}
-\newcommand*{\prefixOf}{\preceq}
-\newcommand*{\properPrefixOf}{\prec}
+\newcommand*{\contains}{\preceq}
+\newcommand*{\strictlyContains}{\prec}
 
 % Change markup (a local copy of the shared change-tracking definitions; changebar loaded in the
 % preamble).
