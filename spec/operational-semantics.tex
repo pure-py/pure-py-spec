@@ -9,23 +9,26 @@ name alone, such as the class \pyinline{int} or decorator \pyinline{dataclass}. 
 marks a variable of the current scope before its declaration is reached, which Python reports as an unbound
 local. An environment binds a variable to $\Unbound$ wherever the corresponding context binds the variable to
 the entry $\Unbound$, so that a shadowed binding of an enclosing scope is not visible. Throughout this section, $\Sigma$ is the class table produced by module checking of the program
-(\secref{well-formedness-modules}) and, like $\mathcal{M}$ and $\mathcal{P}$, is ambient. For a statement $s$, the outcome
-$\replaced{\assigns[\seq{v}]{\rho}}{\assigns{\rho}}$ represents $s$ \added{printing the values $\seq{v}$, in order, and }running to its end, with accumulated
-environment $\rho$; the outcome $\replaced{\returns[\seq{v}]{v}}{\returns{v}}$ represents $s$ \added{printing $\seq{v}$ and }returning the value $v$; and the outcome
-$\replaced{\aborts[\seq{v}]{\kappa}}{\aborts{\kappa}}$ represents \replaced{$s$ printing $\seq{v}$ before the whole run aborts}{the whole run aborting}, with termination kind $\kappa$.
+(\secref{well-formedness-modules}) and, like $\mathcal{M}$ and $\mathcal{P}$, is ambient. For a statement $s$, \added{outcome $\prints{\seq{v}}{\omega}$ represents $s$ printing the values $\seq{v}$, in order, and ending
+as base outcome $\omega$. Base outcome}\deleted{the outcome}
+$\assigns{\rho}$ represents $s$ running to its end, with accumulated environment $\rho$; \replaced{base outcome}{the outcome}
+$\returns{v}$ represents $s$ returning the value $v$; and \replaced{base outcome}{the outcome} $\aborts{\kappa}$ represents the whole run
+aborting, with termination kind $\kappa$. \added{A base outcome $\omega$ in the place of an outcome stands for $\prints{\varepsilon}{\omega}$.}
 
 \begin{specdefinition}{Composition of outcomes}
 Composing statements sequentially composes their outcomes according to the following monoid, analogous
-to sequential composition of static outcomes:
+to sequential composition of static outcomes\added{; the first two equations compose base outcomes, and the last two
+extend the composition to outcomes}:
 \begin{defalign}
-\replaced{\assigns[\seq{v}]{\rho} \override \assigns[\seq{v}']{\rho'}}{\assigns{\rho} \override \assigns{\rho'} } & = \replaced{\assigns[\seq{v} \concat \seq{v}']{\rho \override \rho'}}{\assigns{\rho \override \rho'} } \\
-\replaced{\assigns[\seq{v}]{\rho} \override \returns[\seq{v}']{v}}{\assigns{\rho} \override o } & = \replaced{\returns[\seq{v} \concat \seq{v}']{v}}{o \quad (\text{otherwise}) } \\
-\added{\assigns[\seq{v}]{\rho} \override \aborts[\seq{v}']{\kappa}} & \added{{}= \aborts[\seq{v} \concat \seq{v}']{\kappa}} \\
-\replaced{\returns[\seq{v}]{v} \override o}{\returns{v} \override o } & = \replaced{\returns[\seq{v}]{v}}{\returns{v} } \\
-\replaced{\aborts[\seq{v}]{\kappa} \override o}{\aborts{\kappa} \override o } & = \replaced{\aborts[\seq{v}]{\kappa}}{\aborts{\kappa} }
+\assigns{\rho} \override \assigns{\rho'} & = \assigns{\rho \override \rho'} \\
+\assigns{\rho} \override \replaced{\omega}{o} & = \replaced{\omega}{o} \quad (\text{otherwise}) \\
+\deleted{\returns{v} \override o} & \deleted{{}= \returns{v}} \\
+\deleted{\aborts{\kappa} \override o} & \deleted{{}= \aborts{\kappa}} \clausegap
+\added{\prints{\seq{v}}{\assigns{\rho}} \override \prints{\seq{v}'}{\omega}} & \added{{}= \prints{\seq{v} \concat \seq{v}'}{\assigns{\rho} \override \omega}} \\
+\added{\prints{\seq{v}}{\omega} \override o} & \added{{}= \prints{\seq{v}}{\omega} \quad (\text{otherwise})}
 \end{defalign}
 
-\noindent with $\replaced{\assigns[\varepsilon]{\varnothing}}{\assigns{\varnothing} }$ as left and right unit, and \replaced{$\returns[\seq{v}]{v}$ and $\aborts[\seq{v}]{\kappa}$}{$\returns{v}$ and $\aborts{\kappa}$ } as left zeros.
+\noindent with $\replaced{\prints{\varepsilon}{\assigns{\varnothing}}}{\assigns{\varnothing} }$ as left and right unit, and \replaced{outcomes of the form $\prints{\seq{v}}{\returns{v}}$ or $\prints{\seq{v}}{\aborts{\kappa}}$}{$\returns{v}$ and $\aborts{\kappa}$ } as left zeros.
 \end{specdefinition}
 
 \input{spec/fig/eval-values}
@@ -48,7 +51,7 @@ $\primFn(\seq{v})$.
 
 The rules are given in a monadic metalanguage over results (\figref{values}). If $r$ is
 $\val{v}$, then $\mlet{v}{r}{\ldots}$ is the body with $v$ bound to that value; if $r$ is
-$\aborts{\kappa}$, it is $\aborts{\kappa}$\added{ as a result, or $\aborts[\varepsilon]{\kappa}$ as an outcome}. The body is a result in the expression rules and an outcome in
+$\aborts{\kappa}$, it is $\aborts{\kappa}$. The body is a result in the expression rules and an outcome in
 the statement rules. A final
 premise needs no propagation rule; earlier premises have one each, recording the subexpressions evaluated
 before the failing one (\specfigref{eval-propagation}). The sequence \replaced{judgement uses }{and module judgements use }

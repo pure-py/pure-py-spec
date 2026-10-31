@@ -2,7 +2,7 @@
 {
   \added{\loadOrder(\mathcal{M}) = q_1 \cons \cdots \cons q_n} \\
   \added{\mathcal{L}_0 = \mathcal{E}(\seq{w})} \\
-  \added{q_i, \mathcal{L}_{i-1} \Rightarrow_{\mathsf{mod}} \assigns[{\seq{v}}_i]{\rho_i} \quad (\forall i)} \\
+  \added{q_i, \mathcal{L}_{i-1} \Rightarrow_{\mathsf{mod}} \prints{{\seq{v}}_i}{\assigns{\rho_i}} \quad (\forall i)} \\
   \added{\mathcal{L}_i = \mathcal{L}_{i-1} \override \set{\bind{q_i}{\submods(q_i) \override \rho_i}} \quad (\forall i)} \\
   \deleted{\pymath{\_\_main\_\_} \Rightarrow_{\mathsf{mod}} \val{\rho}}
 }
