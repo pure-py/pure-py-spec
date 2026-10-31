@@ -403,8 +403,9 @@ names it imports must be distinct. A
 \replaced{module which strictly contains the target is exempt from checking if it contains the importing module}{containing module of the target is exempt from checking if it is the importing module or one of its
 containing modules} (\S\ref{aux:unique-to}), because at runtime it may still be loading when the import executes. The exemption applies only to from-imports, because
 for a plain import
-the only \replaced{module which strictly contains the target and could never load first}{containing module that could never load first} is the importing module itself, and an import naming a
-module contained in the importing module is excluded outright. Module checking is defined inductively, so a program with an import cycle is ill-formed. Program
+\replaced{a module which strictly contains the target can still be loading only if it is the importing module, and a plain import of a
+module contained in the importing module is excluded outright.}{the only containing module that could never load first is the importing module itself, and an import naming a
+module contained in the importing module is excluded outright.} Module checking is defined inductively, so a program with an import cycle is ill-formed. Program
 well-formedness (\specfigref{typing-module}) requires the main module to be well typed and hence,
 recursively, every module that the program can load; a module that is never imported is not checked.
 The rule \ruleName{module} types a module body under the context of $\mathcal{P}(\pyinline{builtins})$,
