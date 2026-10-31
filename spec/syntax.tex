@@ -133,12 +133,21 @@ directories, each named by its path, so the domain is prefix-closed by construct
 the statement sequence of its \filename{.py} file, or of its \filename{\_\_init\_\_.py} for a directory, preceded by the
 $\pymath{\_\_name\_\_}$ assignment; a directory without an \filename{\_\_init\_\_.py} (a namespace package,
 PEP 420, \url{https://peps.python.org/pep-0420/}) contributes that assignment alone.} The maps
-$\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all definitions that follow.\added{ Following \pyinline{sys.argv} in Python, a run of the program takes a sequence of strings $\mathcal{A}$, the command-line arguments, beginning with the file name of the main module, which determine the environments $\mathcal{E}(\mathcal{A})$ of the predefined modules (Definition~\ref{def:predefined}).}
+$\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all definitions that follow.\added{ Following \pyinline{sys.argv} in Python, a run of the program takes a sequence of strings $\mathcal{A}$, the command-line arguments, beginning with the file name of the main module, which determine the environments $\mathcal{E}(\mathcal{A})$ of the predefined modules (Definition~\ref{def:predefined-environments}).}
 
-\begin{definition}[Predefined \replaced{signatures}{contexts } and environments]
+\begin{definition}[Predefined \replaced{signatures}{contexts and environments }]
 \label{def:predefined}
-\replaced{$\mathcal{P}$ takes each predefined module $q$ to the signature which binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context entry of \figref{predefined-signatures}. For a run with arguments $\mathcal{A}$, $\mathcal{E}(\mathcal{A})$ takes $q$ to the environment which binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value (\figref{predefined-values}).}{$\mathcal{P}$ takes each module $q$ of \figref{predefined-values} to a pair $(\Gamma, \rho)$, where $\Gamma$ binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context entry listed in \figref{predefined-signatures}, and $\rho$ binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value (\figref{predefined-values}). }
+\replaced{$\mathcal{P}$ takes each predefined module $q$ to the signature which binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context entry of \figref{predefined-signatures}.}{$\mathcal{P}$ takes each module $q$ of \figref{predefined-values} to a pair $(\Gamma, \rho)$, where $\Gamma$ binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context entry listed in \figref{predefined-signatures}, and $\rho$ binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value (\figref{predefined-values}). }
 \end{definition}
+
+\begin{AddedBlock}
+\begin{definition}[Predefined environments for a run]
+\label{def:predefined-environments}
+For a run with command-line arguments $\mathcal{A}$, $\mathcal{E}(\mathcal{A})$ takes each predefined module $q$ to the
+environment which binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value
+(\figref{predefined-values}).
+\end{definition}
+\end{AddedBlock}
 
 \noindent The predefined signatures name types
 that are themselves members, sometimes of another predefined module, so each is well-formed in their union. The class table of the predefined modules is
