@@ -1,4 +1,3 @@
-Environment bound by an import prefix $\seq{\iota}$, given the environments $\mathcal{L}$ of the loaded modules. A plain
-import binds its first name to a loaded module value whose environment is extended by its submodules along the chain,
-and a from-import binds each imported name to the member of that name, or to a loaded module value if the member is
-a submodule. Both mirror the import rules of \figref{typing-import-prefix}.
+Environment bound by import prefix $\seq{\iota}$, given environments $\mathcal{L}$ of loaded modules, following the
+import rules of \figref{typing-import-prefix}. Plain imports bind the root to a loaded module value extended along the
+submodule chain; from-imports bind each name to the member of that name, as a loaded module value for a submodule.
