@@ -1,3 +1,4 @@
 \importLoads(\seq{q}, q, \varepsilon) &= \seq{q} \\*
-\importLoads(\seq{q}, q, \exImport{x_1.\cdots.x_n} \cons \seq{\iota}) &= \importLoads(\loads(\seq{q}, x_1 \cons x_1.x_2 \cons \cdots \cons x_1.\cdots.x_n), q, \seq{\iota}) \\*
-\importLoads(\seq{q}, q, \exFromImport{q'}{\seq{x}} \cons \seq{\iota}) &= \importLoads(\submodLoads(\loads(\seq{q}, \uniqueTo(q', q) \cons q'), q', \seq{x}), q, \seq{\iota})
+\importLoads(\seq{q}, q, \iota \cons \seq{\iota}) &= \importLoads(\importLoads(\seq{q}, q, \iota), q, \seq{\iota}) \clausegap
+\importLoads(\seq{q}, q, \exImport{x_1.\cdots.x_n}) &= \loads(\seq{q}, x_1 \cons x_1.x_2 \cons \cdots \cons x_1.\cdots.x_n) \\*
+\importLoads(\seq{q}, q, \exFromImport{q'}{\seq{x}}) &= \submodLoads(\loads(\seq{q}, \uniqueTo(q', q) \cons q'), q', \seq{x})

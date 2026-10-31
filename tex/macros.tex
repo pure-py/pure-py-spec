@@ -381,6 +381,20 @@
   \setlength{\abovedisplayshortskip}{\dimexpr\abovedisplayshortskip - \baselineskip\relax}%
   \begin{align*}\input{spec/functions/#1}\end{align*}\endgroup}
 
+% Several functions defined together, each aligned separately
+\makeatletter
+\newcommand*{\funccasesgroup}[1]{%
+  \begingroup\lineskiplimit=-\baselineskip
+  \setlength{\abovedisplayskip}{\dimexpr\abovedisplayskip - \baselineskip\relax}%
+  \setlength{\abovedisplayshortskip}{\dimexpr\abovedisplayshortskip - \baselineskip\relax}%
+  \def\fc@body{}\def\fc@sep{}%
+  \@for\fc@name:=#1\do{%
+    \edef\fc@body{\unexpanded\expandafter{\fc@body}\unexpanded\expandafter{\fc@sep}%
+      \noexpand\begin{aligned}\noexpand\input{spec/functions/\fc@name}\noexpand\end{aligned}}%
+    \def\fc@sep{\\[4mm]}}%
+  \begin{gather*}\fc@body\end{gather*}\endgroup}
+\makeatother
+
 % Production symbol of the grammar figures: two colons raised so that their centre is that of the equals
 % sign, closed up by kerns that a document may set before loading this file, since the colon's side bearings
 % vary between fonts. The defaults are those of mathtools' \Coloneqq.

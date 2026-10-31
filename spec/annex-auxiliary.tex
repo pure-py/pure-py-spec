@@ -148,19 +148,9 @@ the resolution of names in an environment.
 \end{auxfunction}
 
 \begin{AddedBlock}
-\begin{auxfunction}{\loads(\seq{q}, \seq{q}')}{sequence of module names}{aux:loads}
+\begin{auxfunction}{\loads(\seq{q}, \seq{q}'), \importLoads(\seq{q}, q, \seq{\iota}), \importLoads(\seq{q}, q, \iota), \submodLoads(\seq{q}, q, \seq{x})}{sequence of module names}{aux:loads}
 \input{spec/functions/loads-text}
-\funccases{loads}
-\end{auxfunction}
-
-\begin{auxfunction}{\importLoads(\seq{q}, q, \seq{\iota})}{sequence of module names}{aux:import-loads}
-\input{spec/functions/import-loads-text}
-\funccases{import-loads}
-\end{auxfunction}
-
-\begin{auxfunction}{\submodLoads(\seq{q}, q, \seq{x})}{sequence of module names}{aux:submod-loads}
-\input{spec/functions/submod-loads-text}
-\funccases{submod-loads}
+\funccasesgroup{loads,import-loads,submod-loads}
 \end{auxfunction}
 
 \begin{auxfunction}{\importEnv{\mathcal{L}}(\seq{\iota}), \importEnv{\mathcal{L}}(\iota), \submodEnv{\mathcal{L}}(q, \seq{x})}{environment}{aux:import-env}
