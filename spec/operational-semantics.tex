@@ -30,8 +30,7 @@ to sequential composition of static outcomes:
 
 \input{spec/fig/eval-values}
 
-A \emph{termination
-kind} $\kappa$ records how a run ends; all but $\errUndef$ and $\errExcluded$ are named after the exceptions raised by the same program
+\replaced{\emph{Termination kinds} $\kappa$ record}{A \emph{termination kind} $\kappa$ records } how a run ends; all but $\errUndef$ and $\errExcluded$ are named after the exceptions raised by the same program
 under Python in the same circumstances, except that $\errExit{0}$ also records a run which completes normally. A variable read before its assignment aborts with $\errName$ where
 Python raises \pyinline{UnboundLocalError}, a subclass of \pyinline{NameError}; distinguishing the two would require
 the environment to record whether unbound variables belong to functions or modules. Two termination kinds record operations which Python executes without an error. A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, one which the type system cannot rule out
