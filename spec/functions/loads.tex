@@ -1,9 +1,4 @@
-\setPadWidth{\loads(\loads(\seq{q}, q, \seq{\iota}) \cons q, \seq{q}')}%
+\setPadWidth{\loads(\importLoads(\seq{q}, q, \seq{\iota}) \cons q, \seq{q}')}%
 \loads(\seq{q}, \varepsilon) &= \seq{q} \\*
 \loads(\seq{q}, q \cons \seq{q}') &= \padded{\loads(\seq{q}, \seq{q}')} \quad \text{if } q \in \set{\seq{q}} \cup \dom(\mathcal{P}) \\*
-\loads(\seq{q}, q \cons \seq{q}') &= \padded{\loads(\loads(\seq{q}, q, \seq{\iota}) \cons q, \seq{q}')} \quad \text{if } q \notin \set{\seq{q}} \text{ and } \mathcal{M}(q) = \seq{\iota}\;t \clausegap
-\loads(\seq{q}, q, \varepsilon) &= \seq{q} \\*
-\loads(\seq{q}, q, \exImport{x_1.\cdots.x_n} \cons \seq{\iota}) &= \loads(\loads(\seq{q}, x_1 \cons x_1.x_2 \cons \cdots \cons x_1.\cdots.x_n), q, \seq{\iota}) \\*
-\loads(\seq{q}, q, \exFromImport{q'}{\seq{x}} \cons \seq{\iota}) &= \loads(\loads(\loads(\seq{q}, \uniqueTo(q', q) \cons q'), q', \seq{x}), q, \seq{\iota}) \clausegap
-\loads(\seq{q}, q, x \cons \seq{x}) &= \padded{\loads(\loads(\seq{q}, q.x), q, \seq{x})} \quad \text{if } q.x \in \dom(\mathcal{M}) \text{ and } x \notin \declaresS(\mathcal{M}(q)) \\*
-\loads(\seq{q}, q, x \cons \seq{x}) &= \padded{\loads(\seq{q}, q, \seq{x})} \quad \text{(otherwise)}
+\loads(\seq{q}, q \cons \seq{q}') &= \padded{\loads(\importLoads(\seq{q}, q, \seq{\iota}) \cons q, \seq{q}')} \quad \text{if } q \notin \set{\seq{q}} \text{ and } \mathcal{M}(q) = \seq{\iota}\;t
