@@ -178,9 +178,8 @@ which the kind is reported is not prescribed.
 \begin{AddedBlock}
 \speconly{Module and program evaluation are given in \figref{eval-modules}.}\paperonly{Module and program evaluation
 are given in full in \specfigref{eval-modules}.}\speconly{ Context extension (Definition~\ref{def:context-extension}) is extended
-to environments, with the same equations on values in place of context entries, except that a loaded module
-value $\modLoaded{q}{\rho}$ carries an environment whereas the context entry $\modLoaded{q}{\Gamma}$ carries a
-context.} A program runs each module body once, after its imports have loaded, in \emph{load order}\speconly{ (\specref{aux:load-order})}.
+to environments by the same equations, but with values in place of context entries and environments in place of
+contexts.} A program runs each module body once, after its imports have loaded, in \emph{load order}\speconly{ (\specref{aux:load-order})}.
 Load order is fixed by the imports alone, since imports precede statements and so cannot depend on the outcome of a
 statement. Evaluation of a sequence of module bodies threads the loaded module environments
 $\mathcal{L}$\speconly{ (\ruleName{eval-modules-cons})}. The program rules start from the environments
