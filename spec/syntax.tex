@@ -137,15 +137,15 @@ $\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all definitions that fo
 
 \begin{definition}[Predefined \replaced{signatures}{contexts and environments }]
 \label{def:predefined}
-\replaced{$\mathcal{P}$ takes each predefined module $q$ to the signature which binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context entry of \figref{predefined-signatures}.}{$\mathcal{P}$ takes each module $q$ of \figref{predefined-values} to a pair $(\Gamma, \rho)$, where $\Gamma$ binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context entry listed in \figref{predefined-signatures}, and $\rho$ binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value (\figref{predefined-values}). }
+\replaced{Define $\mathcal{P}$ to be the map taking each predefined module $q$ to the signature which binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context entry given in \figref{predefined-signatures}.}{$\mathcal{P}$ takes each module $q$ of \figref{predefined-values} to a pair $(\Gamma, \rho)$, where $\Gamma$ binds $\pymath{\_\_name\_\_}$ at $\tyStr$ and each member of $q$ at the context entry listed in \figref{predefined-signatures}, and $\rho$ binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value (\figref{predefined-values}). }
 \end{definition}
 
 \begin{AddedBlock}
 \begin{definition}[Predefined environments for a run]
 \label{def:predefined-environments}
-For a run with command-line arguments $\mathcal{A}$, $\mathcal{E}(\mathcal{A})$ takes each predefined module $q$ to the
-environment which binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the corresponding value
-(\figref{predefined-values}).
+For a run with command-line arguments $\mathcal{A}$, define $\mathcal{E}(\mathcal{A})$ to be the map taking each predefined
+module $q$ to the environment which binds $\pymath{\_\_name\_\_}$ to $\nameOf(q)$ and each member to the value given in
+\figref{predefined-values}.
 \end{definition}
 \end{AddedBlock}
 
