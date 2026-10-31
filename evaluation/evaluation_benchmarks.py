@@ -76,6 +76,7 @@ class Verdict:
     failure_mode: dict[str, object] | None = None
     tests_passed: int | None = None
     tests_total: int | None = None
+    runs: list[dict[str, object]] | None = None
 
     def to_dict(self):
         return {key: value for key, value in asdict(self).items()

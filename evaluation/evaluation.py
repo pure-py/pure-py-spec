@@ -537,10 +537,70 @@ def plot(data, summary, destinations):
     plt.close(fig)
 
 
+def plot_comparison(data, destinations):
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.patches import Patch
+    if len(data["groups"]) != 1:
+        raise RuntimeError("a comparison figure requires one matched protocol group")
+    group, = data["groups"].values()
+    protocol, models = group["protocol"], group["models"]
+    n = len(protocol["task_ids"])
+    assert all(model["summary"]["problems"] == n for model in models)
+    series = [("python", "initial", "Python"), ("purepy", "initial", "PurePy initial")]
+    if protocol["repair_rounds"]:
+        series.append(("purepy", "final", "PurePy repaired"))
+    colors = ("#3379A3", "#C78328", "#367C65")
+    width = 0.72 / len(series)
+    with plt.rc_context({"font.family": "STIXGeneral", "font.size": 11, "pdf.fonttype": 42,
+                         "svg.fonttype": "none", "axes.spines.top": False, "axes.spines.right": False}):
+        fig, axes = plt.subplots(1, 2, figsize=(10.4, 4.3))
+        fig.subplots_adjust(left=0.065, right=0.99, top=0.67, bottom=0.14, wspace=0.24)
+        for axis, metric, title in zip(axes, ("tests_pass", "joint_pass"),
+                                       ("(a) Official tests passed", "(b) PurePy checker + tests passed")):
+            for index, (condition, stage, _) in enumerate(series):
+                outcomes = [model["summary"]["conditions"][condition][stage] for model in models]
+                counts = [row["tests_pass" if condition == "python" else metric] for row in outcomes]
+                unknown = [row["outputs"] != n or row["tests_unknown"]
+                           or condition == "purepy" and metric == "joint_pass" and row["checker_unknown"]
+                           for row in outcomes]
+                bars = axis.bar([i + (index - (len(series) - 1) / 2) * width for i in range(len(models))],
+                                [100 * count / n for count in counts], width=width,
+                                color=colors[index], zorder=3)
+                for bar, missing in zip(bars, unknown):
+                    if missing:
+                        bar.set_hatch("//")
+                axis.bar_label(bars, labels=[f"{count}/{n}\n(incomplete)" if missing
+                                            else f"{count}/{n}\n({100 * count / n:.1f}%)"
+                                            for count, missing in zip(counts, unknown)], padding=4, fontsize=9)
+            axis.set_xticks(range(len(models)), [model.get("label", model["model"]) for model in models])
+            axis.set_ylim(0, 111)
+            axis.set_yticks(range(0, 101, 20))
+            axis.set_ylabel("Problems passed (%)")
+            axis.set_title(title, fontsize=12, pad=14)
+            axis.grid(axis="y", color="#e2e5e8", linewidth=0.65, zorder=0)
+            axis.set_axisbelow(True)
+            axis.tick_params(axis="x", length=0, pad=10)
+        manifest = protocol["manifest"]
+        fig.suptitle(f"{manifest['benchmark']} generation and checker-feedback repair", fontsize=16, y=0.98)
+        fig.text(0.5, 0.888, f"{n} of {manifest['total_problems']} problems | "
+                 f"PurePy v{protocol['checker_version']} | Python {protocol['python']}", ha="center", fontsize=10.5)
+        fig.legend(handles=[Patch(facecolor=colors[i], label=label) for i, (_, _, label) in enumerate(series)],
+                   loc="upper center", bbox_to_anchor=(0.5, 0.85), ncol=len(series), frameon=False)
+        for destination in destinations:
+            fig.savefig(destination, dpi=250, facecolor="white")
+        plt.close(fig)
+
+
 def figure(source, destination):
-    data = read_result(source)
+    data = json.loads(source.read_text())
     destination.parent.mkdir(parents=True, exist_ok=True)
-    plot(data, summarize(data), [destination])
+    if "groups" in data:
+        plot_comparison(data, [destination])
+    else:
+        data = read_result(source)
+        plot(data, summarize(data), [destination])
     print(f"Figure: {destination}", flush=True)
 
 

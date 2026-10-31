@@ -242,6 +242,29 @@ class EvaluationTests(unittest.TestCase):
                 else:
                     self.assertIs(encoded["next_round_clears_reported_feature"], clearance)
 
+    def test_published_results_match_comparison(self):
+        import hashlib
+
+        source = e.ROOT / "figures/humaneval-plus.json"
+        comparison = json.loads(source.read_text())
+        for group in comparison["groups"].values():
+            for model in group["models"]:
+                with self.subTest(model=model["model"]):
+                    result = e.ROOT / model["source"]
+                    self.assertEqual(hashlib.sha256(result.read_bytes()).hexdigest(), model["source_sha256"])
+                    data = e.read_result(result)
+                    self.assertEqual(e.summarize(data), model["summary"])
+                    self.assertEqual(sorted(data["tasks"]), group["protocol"]["task_ids"])
+                    for task in data["tasks"].values():
+                        for condition in e.CONDITIONS:
+                            for attempt in task[condition]["attempts"]:
+                                attempt.validate(finished=True)
+        with tempfile.TemporaryDirectory() as folder:
+            for suffix in (".pdf", ".png"):
+                output = Path(folder) / ("comparison" + suffix)
+                e.figure(source, output)
+                self.assertGreater(output.stat().st_size, 0)
+
     def test_invalid_attempt_cannot_replace_a_result(self):
         accepted = e.check(GOOD)
         valid = e.Attempt(round=0, code=GOOD, generation={"status": "complete"}, messages=[],

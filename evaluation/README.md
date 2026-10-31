@@ -137,8 +137,11 @@ uv run --locked python evaluation.py figure results/RUN/MODEL.json --output figu
 
 The paper's evaluation section includes `paper/fig/evaluation-generation.pdf`,
 which `make paper.pdf` in the repository root regenerates with this command from
-`figures/humaneval-qwen2.5-coder-0.5b.json`. That file is an archived original
-HumanEval smoke run, kept for reproducibility; it is not a HumanEval+ result.
+`figures/humaneval-plus.json`. The comparison figure includes Python, initial
+PurePy and checker-feedback repaired PurePy outcomes for Claude Opus 5.5 and
+DeepSeek V4 Pro on 163 HumanEval+ problems. The [results and protocol](figures/humaneval-plus-20261031/README.md)
+link the complete model records, per-problem reports and figure. The archived
+original HumanEval smoke run remains separate from these HumanEval+ results.
 
 ## CI And Harbor
 
