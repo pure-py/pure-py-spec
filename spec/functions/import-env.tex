@@ -1,9 +1,6 @@
-\setPadWidth{\modLoaded{q}{\mathcal{L}(q)}}%
 \importEnv{\mathcal{L}}(\varepsilon) &= \varnothing \\*
 \importEnv{\mathcal{L}}(\iota \cons \seq{\iota}) &= \importEnv{\mathcal{L}}(\iota) \extend \importEnv{\mathcal{L}}(\seq{\iota}) \clausegap
 \importEnv{\mathcal{L}}(\exImport{(x \cons \seq{x})}) &= \set{\bind{x}{\modLoaded{x}{\submodEnv{\mathcal{L}}(x, \seq{x})}}} \\*
 \importEnv{\mathcal{L}}(\exFromImport{q}{x_1, \ldots, x_{n+1}}) &= \set{\bind{x_1}{\member{\mathcal{L}}(\mathcal{L}(q), x_1)}, \ldots, \bind{x_{n+1}}{\member{\mathcal{L}}(\mathcal{L}(q), x_{n+1})}} \clausegap
 \submodEnv{\mathcal{L}}(q, \varepsilon) &= \mathcal{L}(q) \\*
-\submodEnv{\mathcal{L}}(q, x \cons \seq{x}) &= \mathcal{L}(q) \extend \set{\bind{x}{\modLoaded{q.x}{\submodEnv{\mathcal{L}}(q.x, \seq{x})}}} \clausegap
-\member{\mathcal{L}}(\rho, x) &= \padded{\modLoaded{q}{\mathcal{L}(q)}} \quad \text{if } \rho(x) = \modStub{q} \\*
-\member{\mathcal{L}}(\rho, x) &= \padded{\rho(x)} \quad \text{(otherwise)}
+\submodEnv{\mathcal{L}}(q, x \cons \seq{x}) &= \mathcal{L}(q) \extend \set{\bind{x}{\modLoaded{q.x}{\submodEnv{\mathcal{L}}(q.x, \seq{x})}}}
