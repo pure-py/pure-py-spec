@@ -181,8 +181,8 @@ are given in full in \specfigref{eval-modules}.}\speconly{ Context extension (\s
 to environments, with the same equations on values in place of context entries, except that a loaded module
 value $\modLoaded{q}{\rho}$ carries an environment whereas the context entry $\modLoaded{q}{\Gamma}$ carries a
 context.} A program runs each module body once, in \emph{load order}\speconly{ (\specref{aux:loads})}.
-Since imports precede statements, a body runs only after every module it imports has loaded, and loading is
-deterministic, so the load order is fixed by the import prefixes alone. The program rules thread the environments
+Since imports precede statements, no import depends on the outcome of a statement, so the load order is fixed by the
+imports alone, and a body runs only after every module imported by it has loaded. The program rules thread the environments
 $\mathcal{L}$ of the modules loaded so far, initially the environments $\mathcal{E}(\mathcal{A})$ of the predefined modules, given the
 command-line arguments $\mathcal{A}$ of the run\speconly{ (\ruleName{eval-program} and \ruleName{eval-program-abort})}; the environment of a module is its
 submodule stubs overridden by the environment assigned by its body, mirroring the \ruleName{module} rule
