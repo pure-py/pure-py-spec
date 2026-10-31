@@ -45,7 +45,7 @@ $\primVal{\primFn}$ is a predefined function whose meaning $\primFn$ is a functi
 arguments to results (\specfigref{predefined-values}). Calling $\primVal{\primFn}$ with arguments $\seq{v}$ has result
 $\primFn(\seq{v})$.
 
-\replaced{Rule conclusions use a monadic let notation}{The rules are given in a monadic metalanguage } over results (\figref{values}). If $r$ is
+\replaced{Rule conclusions use a monadic let notation over results.}{The rules are given in a monadic metalanguage over results (\figref{values}). } If $r$ is
 $\val{v}$, then $\mlet{v}{r}{\ldots}$ is the body with $v$ bound to that value; if $r$ is
 $\aborts{\kappa}$, it is $\aborts{\kappa}$\added{ as a result, or $\outcome{\varepsilon}{\aborts{\kappa}}$ as an outcome}. The body is a result in the expression rules and an outcome in
 the statement rules. A final
