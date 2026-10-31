@@ -186,10 +186,8 @@ statement. The program rules thread the environments
 $\mathcal{L}$ of the modules loaded so far, initially the environments $\mathcal{E}(\mathcal{A})$ of the predefined modules, given the
 command-line arguments $\mathcal{A}$\speconly{ (\ruleName{eval-program} and \ruleName{eval-program-abort})}. The environment of a module is its
 submodule stubs overridden by the environment assigned by its body, mirroring the \ruleName{module} rule
-(\specfigref{typing-module}). A body runs in the environment of \pyinline{builtins}
-overridden by the environment bound by its imports, computed from its import prefix and $\mathcal{L}$\speconly{
-(\specref{aux:import-env})} following the import rules of \specfigref{typing-import-prefix}, with each name declared
-in the body or bound by a pattern in it starting unbound\speconly{ (\ruleName{eval-module})}.
+(\specfigref{typing-module}). Module bodies run in environments corresponding to the contexts in which those bodies are
+checked\speconly{ (\ruleName{eval-module})}.
 
 The output of a program is the concatenation of the values printed by its bodies. A program evaluates to its output
 and a termination kind (\figref{values}): $\errExit{0}$ if every body runs to its end, and otherwise the kind of the
