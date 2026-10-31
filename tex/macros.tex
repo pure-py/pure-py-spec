@@ -391,7 +391,7 @@
   \@for\fc@name:=#1\do{%
     \edef\fc@body{\unexpanded\expandafter{\fc@body}\unexpanded\expandafter{\fc@sep}%
       \noexpand\begin{aligned}\noexpand\input{spec/functions/\fc@name}\noexpand\end{aligned}}%
-    \def\fc@sep{\\[4mm]}}%
+    \def\fc@sep{\clausegap}}%
   \begin{gather*}\fc@body\end{gather*}\endgroup}
 \makeatother
 
