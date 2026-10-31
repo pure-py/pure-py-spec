@@ -177,7 +177,7 @@ which the kind is reported is not prescribed.
 \end{DeletedBlock}
 \begin{AddedBlock}
 \speconly{Module and program evaluation are given in \figref{eval-modules}.}\paperonly{Module and program evaluation
-are given in full in \specfigref{eval-modules}.}\speconly{ Context extension (\secref{well-formedness-modules}) is extended
+are given in full in \specfigref{eval-modules}.}\speconly{ Context extension (Definition~\ref{def:context-extension}) is extended
 to environments, with the same equations on values in place of context entries, except that a loaded module
 value $\modLoaded{q}{\rho}$ carries an environment whereas the context entry $\modLoaded{q}{\Gamma}$ carries a
 context.} A program runs each module body once, after its imports have loaded, in \emph{load order}\speconly{ (\specref{aux:loads})}.
@@ -186,7 +186,7 @@ statement. The program rules thread the environments
 $\mathcal{L}$ of the modules loaded so far, initially the environments $\mathcal{E}(\mathcal{A})$ of the predefined modules, given the
 command-line arguments $\mathcal{A}$\speconly{ (\ruleName{eval-program} and \ruleName{eval-program-abort})}. The environment of a module is its
 submodule stubs overridden by the environment assigned by its body, mirroring the \ruleName{module} rule
-(\secref{well-formedness-modules}). A body runs in the environment of \pyinline{builtins}
+(\specfigref{typing-module}). A body runs in the environment of \pyinline{builtins}
 overridden by the environment bound by its imports, computed from its import prefix and $\mathcal{L}$\speconly{
 (\specref{aux:import-env})} following the import rules of \specfigref{typing-import-prefix}, with each name declared
 in the body or bound by a pattern in it starting unbound\speconly{ (\ruleName{eval-module})}.

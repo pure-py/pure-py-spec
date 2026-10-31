@@ -390,6 +390,7 @@ bind the root, and their bindings combine by \emph{context extension} $\Gamma \e
 one another. Extension is defined pointwise, like override, and combines module entries for the same module
 recursively, preferring checked modules to stubs:%
 \begin{specdefinition}{Extension of context entries}
+\label{def:context-extension}
 \begin{defalign}
 \modLoaded{q}{\Gamma} \extend \modLoaded{q}{\Gamma'} & = \modLoaded{q}{\Gamma \extend \Gamma'} \\
 \modStub{q} \extend \modLoaded{q}{\Gamma} = \modLoaded{q}{\Gamma} \extend \modStub{q} & = \modLoaded{q}{\Gamma} \\
