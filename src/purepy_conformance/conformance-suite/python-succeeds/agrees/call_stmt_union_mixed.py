@@ -7,8 +7,8 @@ def f(k: Callable[[int], None] | Callable[[int], int]) -> None:
 
 
 def g(n: int) -> int:
-    print(n)
     return n
 
 
 f(g)
+print(g(1))

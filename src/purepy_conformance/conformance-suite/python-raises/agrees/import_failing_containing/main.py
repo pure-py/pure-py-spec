@@ -1,3 +1,3 @@
-# rule: eval-import-fail
+# rule: eval-program-abort
 import pkg.sub
 print(pkg.sub.z)

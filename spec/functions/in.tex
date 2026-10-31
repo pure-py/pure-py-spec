@@ -1,0 +1,9 @@
+\inOp{\Sigma}(v, \exList{\seq{v}}) &{}= \inElems{\Sigma}(v, \seq{v}) \\*
+\inOp{\Sigma}(v, \exTuple{\seq{v}}) &{}= \inElems{\Sigma}(v, \seq{v}) \clausegap
+\inOp{\Sigma}(w, \delta) &{}= \val{\pyinline{True}} && \quad \text{if } w \in \dom(\delta) \\*
+\inOp{\Sigma}(w, \delta) &{}= \val{\pyinline{False}} && \quad \text{if } w \notin \dom(\delta) \\*
+\inOp{\Sigma}(v, \delta) &{}= \aborts{\errExcluded} && \quad \text{if } v \text{ not a string} \clausegap
+\inOp{\Sigma}(w, w') &{}= \val{\pyinline{True}} && \quad \text{if } w' = w_1 \concat w \concat w_2 \text{ for some } w_1, w_2 \\*
+\inOp{\Sigma}(w, w') &{}= \val{\pyinline{False}} && \quad \text{if there are no such } w_1, w_2 \\*
+\inOp{\Sigma}(v, v') &{}= \aborts{\errExcluded} && \quad \text{if } v' \text{ a range} \\*
+\inOp{\Sigma}(v, v') &{}= \aborts{\errType} && \quad \text{otherwise}

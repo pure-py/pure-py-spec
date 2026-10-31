@@ -26,7 +26,7 @@ cases are stated with each.
 \funccases{binds}
 \end{auxfunction}
 
-\begin{auxfunction}{\declaresS(t), \declaresS(\seq{\iota})}{sequence of variables}{aux:declares}
+\begin{auxfunction}{\declaresS(t), \declaresS(\seq{\iota}), \declaresS(\seq{\iota}\;t)}{sequence of variables}{aux:declares}
 \input{spec/functions/declares-text}
 \funccases{declares}
 \end{auxfunction}
@@ -147,6 +147,21 @@ the resolution of names in an environment.
 \funccases{unique-to}
 \end{auxfunction}
 
+\begin{auxfunction}{\loads(\seq{q}, \seq{q}'), \submodLoads(\seq{q}, q, \seq{x}), \importLoads(\seq{q}, q, \seq{\iota}), \importLoads(\seq{q}, q, \iota)}{sequence of module names}{aux:loads}
+\input{spec/functions/loads-text}
+\funccasesgroup{loads,import-loads}
+\end{auxfunction}
+
+\begin{auxfunction}{\importEnv{\mathcal{L}}(\seq{\iota}), \importEnv{\mathcal{L}}(\iota), \submodEnv{\mathcal{L}}(q, \seq{x})}{environment}{aux:import-env}
+\input{spec/functions/import-env-text}
+\funccases{import-env}
+\end{auxfunction}
+
+\begin{auxfunction}{\member{\mathcal{L}}(\rho, x)}{value}{aux:member}
+\input{spec/functions/member-text}
+\funccases{member}
+\end{auxfunction}
+
 \begin{auxfunction}{\ownFields(\phi), \ownFields(\chi)}{sequence of bindings}{aux:own-fields}
 \input{spec/functions/own-fields-text}
 \funccases{own-fields}
@@ -216,14 +231,14 @@ The functions on values used by the evaluation rules.
 \funccases{eq-elems}
 \end{auxfunction}
 
-\begin{auxfunction}{\contains{\Sigma}(v, v')}{result}{aux:contains}
-\input{spec/functions/contains-text}
-\funccases{contains}
+\begin{auxfunction}{\inOp{\Sigma}(v, v')}{result}{aux:in}
+\input{spec/functions/in-text}
+\funccases{in}
 \end{auxfunction}
 
-\begin{auxfunction}{\containsElems{\Sigma}(\seq{v}, v)}{result}{aux:contains-elems}
-\input{spec/functions/contains-elems-text}
-\funccases{contains-elems}
+\begin{auxfunction}{\inElems{\Sigma}(v, \seq{v})}{result}{aux:in-elems}
+\input{spec/functions/in-elems-text}
+\funccases{in-elems}
 \end{auxfunction}
 
 \begin{auxfunction}{\elems(v)}{sequence of values}{aux:elems}

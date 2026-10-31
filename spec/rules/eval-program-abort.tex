@@ -1,7 +1,7 @@
 \inferrule*[lab={\ruleName{eval-program-abort}}]
 {
-  \pymath{\_\_main\_\_} \Rightarrow_{\mathsf{mod}} \aborts{\kappa}
+  \loads(\varepsilon, \pymath{\_\_main\_\_}), \mathcal{E}(\mathcal{A}) \Rightarrow_{\mathsf{mod}} \outcome{\seq{v}}{\aborts{\kappa}}
 }
 {
-  \mathcal{M} \Rightarrow \kappa
+  \mathcal{M}, \mathcal{A} \Rightarrow \seq{v}, \kappa
 }

@@ -4,8 +4,7 @@
 \begin{tabular}{llll}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Module & Member & \multicolumn{2}{l}{Value} \\
-\textup{\pyinline{builtins}} & \pyinline{print} & & \\
- & \pyinline{len} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
+\textup{\pyinline{builtins}} & \pyinline{len} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
  & & $\quad \primFn(v) = \val{n}$ & if $\iterOp(v) = v_1 \cons \ldots \cons v_n$ \\
  & & $\quad \primFn(\seq{v}) = \aborts{\errType}$ & otherwise \\
  & \pyinline{range} & \multicolumn{2}{l}{$\Type{\clsRange}$} \\
@@ -26,7 +25,7 @@
  & \pyinline{list} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{list}}$} \\
  & \pyinline{dict} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{dict}}$} \\
  & \pyinline{tuple} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{tuple}}$} \\
-\pyinline{sys} & \pyinline{argv} & & \\
+\pyinline{sys} & \pyinline{argv} & \multicolumn{2}{l}{$\exList{w_1, \ldots, w_n}$ where $\mathcal{A} = w_1 \cons \cdots \cons w_n$} \\
  & \pyinline{exit} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
  & & $\quad \primFn(n) = \aborts{\errExit{n}}$ & if $n$ integer \\
  & & $\quad \primFn() = \aborts{\errExcluded}$ & \\
@@ -39,6 +38,6 @@
 \pyinline{dataclasses} & \pyinline{dataclass} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{dataclasses}.\pyinline{dataclass}}$}
 \end{tabular}
 
-\caption{Predefined modules and the values of their members}
+\caption{Predefined environments $\mathcal{E}(\mathcal{A})$}
 \label{fig:predefined-values}
 \end{figure}

@@ -160,6 +160,7 @@
 \newcommand*{\exMatch}[2]{\pyinline{match}\;#1\mathord{:}\;#2}
 \newcommand*{\exPass}{\pyinline{pass}}
 \newcommand*{\exReturn}[1]{\pyinline{return}\;#1}
+\newcommand*{\exPrint}[1]{\pyinline{print}(#1)}
 \newcommand*{\exReturnNone}{\pyinline{return}}
 \newcommand*{\exSeq}[2]{#1\,#2}
 
@@ -282,6 +283,7 @@
 \newcommand{\assigns}[1]{\mathsf{assigns}(#1)}
 \newcommand*{\Returns}{\mathsf{Returns}}
 \newcommand{\returns}[1]{\mathsf{returns}(#1)}
+\newcommand{\outcome}[2]{(#1, #2)}
 
 % Metafunctions: syntactic analyses
 \newcommand*{\assignsS}{\mathrm{assigns}}
@@ -306,6 +308,12 @@
 % Metafunctions: modules
 \newcommand*{\containing}{\mathrm{containing}}
 \newcommand*{\uniqueTo}{\mathrm{unique\text{-}to}}
+\newcommand*{\loads}{\mathrm{loads}}
+\newcommand*{\importLoads}{\mathrm{import\text{-}loads}}
+\newcommand*{\submodLoads}{\mathrm{submod\text{-}loads}}
+\newcommand*{\importEnv}[1]{\mathrm{import\text{-}env}_{#1}}
+\newcommand*{\submodEnv}[1]{\mathrm{submodules\text{-}env}_{#1}}
+\newcommand*{\member}[1]{\mathrm{member}_{#1}}
 \newcommand*{\nameOf}{\mathrm{name}}
 % Gap between table rows; \\[1mm] only deepens the last cell and is lost when another cell is taller
 \newcommand*{\rowgap}{\noalign{\vskip 1mm}}
@@ -320,8 +328,8 @@
 \newcommand*{\update}{\mathrm{update}}
 
 % Metafunctions: equality and membership
-\newcommand*{\contains}[1]{\mathrm{contains}_{#1}}
-\newcommand*{\containsElems}[1]{\mathrm{contains\text{-}elems}_{#1}}
+\newcommand*{\inOp}[1]{\mathrm{in}_{#1}}
+\newcommand*{\inElems}[1]{\mathrm{in\text{-}elems}_{#1}}
 \newcommand*{\eqElems}[1]{\mathrm{eq\text{-}elems}_{#1}}
 \newcommand*{\eqOp}[1]{\mathrm{eq}_{#1}}
 \newcommand*{\matchOp}[1]{\mathrm{match}_{#1}}
@@ -338,8 +346,8 @@
 \newcommand*{\matchOk}[1]{\mathsf{match}(#1)}
 \newcommand*{\noMatch}{\mathsf{no}\text{-}\mathsf{match}}
 \newcommand*{\notmatches}{\not\rightsquigarrow}
-\newcommand*{\prefixOf}{\preceq}
-\newcommand*{\properPrefixOf}{\prec}
+\newcommand*{\contains}{\preceq}
+\newcommand*{\strictlyContains}{\prec}
 
 % Change markup (a local copy of the shared change-tracking definitions; changebar loaded in the
 % preamble).
@@ -372,6 +380,20 @@
   \setlength{\abovedisplayskip}{\dimexpr\abovedisplayskip - \baselineskip\relax}%
   \setlength{\abovedisplayshortskip}{\dimexpr\abovedisplayshortskip - \baselineskip\relax}%
   \begin{align*}\input{spec/functions/#1}\end{align*}\endgroup}
+
+% Several functions defined together, each aligned separately
+\makeatletter
+\newcommand*{\funccasesgroup}[1]{%
+  \begingroup\lineskiplimit=-\baselineskip
+  \setlength{\abovedisplayskip}{\dimexpr\abovedisplayskip - \baselineskip\relax}%
+  \setlength{\abovedisplayshortskip}{\dimexpr\abovedisplayshortskip - \baselineskip\relax}%
+  \def\fc@body{}\def\fc@sep{}%
+  \@for\fc@name:=#1\do{%
+    \edef\fc@body{\unexpanded\expandafter{\fc@body}\unexpanded\expandafter{\fc@sep}%
+      \noexpand\begin{aligned}\noexpand\input{spec/functions/\fc@name}\noexpand\end{aligned}}%
+    \def\fc@sep{\clausegap}}%
+  \begin{gather*}\fc@body\end{gather*}\endgroup}
+\makeatother
 
 % Production symbol of the grammar figures: two colons raised so that their centre is that of the equals
 % sign, closed up by kerns that a document may set before loading this file, since the colon's side bearings

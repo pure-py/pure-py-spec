@@ -83,12 +83,10 @@
 \and
 \inferrule*[lab={\ruleName{val-prim}}]
 {
-  \mathcal{P}(q) = (\Gamma, \rho) \\
-  \rho(x) = \primVal{\primFn} \\
-  \Gamma(x) = \theta
+  \mathcal{E}(\mathcal{A})(q)(x) = \primVal{\primFn}
 }
 {
-  \vdash \primVal{\primFn} : \theta
+  \vdash \primVal{\primFn} : \mathcal{P}(q)(x)
 }
 \and
 \inferrule*[lab={\ruleName{val-opaque}}]
