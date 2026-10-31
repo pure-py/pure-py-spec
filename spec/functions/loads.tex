@@ -1,9 +1,10 @@
-\loads(q) &= \varepsilon \quad \text{if } q \in \dom(\mathcal{P}) \\*
-\loads(q) &= \loads(q, \seq{\iota}) \cons q \quad \text{where } \mathcal{M}(q) = \seq{\iota}\;t \clausegap
+\setPadWidth{\loads(q, \seq{\iota}) \cons q}%
+\loads(q) &= \padded{\varepsilon} \quad \text{if } q \in \dom(\mathcal{P}) \\*
+\loads(q) &= \padded{\loads(q, \seq{\iota}) \cons q} \quad \text{where } \mathcal{M}(q) = \seq{\iota}\;t \clausegap
 \loads(q_1 \cons \cdots \cons q_n) &= \loads(q_1) \concat \cdots \concat \loads(q_n) \clausegap
 \loads(q, \varepsilon) &= \varepsilon \\*
 \loads(q, \exImport{x_1.\cdots.x_n} \cons \seq{\iota}) &= \loads(x_1 \cons x_1.x_2 \cons \cdots \cons x_1.\cdots.x_n) \concat \loads(q, \seq{\iota}) \\*
 \loads(q, \exFromImport{q'}{x_1, \ldots, x_n} \cons \seq{\iota}) &= \loads(\uniqueTo(q', q) \cons q') \\*
 &\qquad {}\concat \loads(q', x_1) \concat \cdots \concat \loads(q', x_n) \concat \loads(q, \seq{\iota}) \clausegap
-\loads(q, x) &= \loads(q.x) \quad \text{if } q.x \in \dom(\mathcal{M}) \text{ and } x \notin \declaresS(\mathcal{M}(q)) \\*
-\loads(q, x) &= \varepsilon \quad \text{(otherwise)}
+\loads(q, x) &= \padded{\loads(q.x)} \quad \text{if } q.x \in \dom(\mathcal{M}) \text{ and } x \notin \declaresS(\mathcal{M}(q)) \\*
+\loads(q, x) &= \padded{\varepsilon} \quad \text{(otherwise)}
