@@ -1,6 +1,6 @@
 \inferrule*[lab={\ruleName{eval-program}}]
 {
-  \added{\loadOrder(\mathcal{M}), \mathcal{E}(\mathcal{A}) \Rightarrow_{\mathsf{mod}} \outcome{\seq{v}}{\assigns{\rho}}} \\
+  \added{\loads(\varepsilon, \pymath{\_\_main\_\_}), \mathcal{E}(\mathcal{A}) \Rightarrow_{\mathsf{mod}} \outcome{\seq{v}}{\assigns{\rho}}} \\
   \deleted{\pymath{\_\_main\_\_} \Rightarrow_{\mathsf{mod}} \val{\rho}}
 }
 {

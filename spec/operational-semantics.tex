@@ -178,7 +178,7 @@ which the kind is reported is not prescribed.
 \begin{AddedBlock}
 \speconly{Module and program evaluation are defined in \figref{eval-modules}.}\paperonly{Module and program evaluation
 are defined in full in \specfigref{eval-modules}.} A program runs each module body once, after its imports have loaded,
-in \emph{load order}\speconly{ (\specref{aux:load-order})}. Load order is fixed by the imports alone, since imports
+in \emph{load order}\speconly{ (\specref{aux:loads})}. Load order is fixed by the imports alone, since imports
 precede statements and so cannot depend on the outcome of a statement. Module evaluation
 $q, \mathcal{L} \Rightarrow_{\mathsf{mod}} o$ runs the body of module $q$ given the \emph{loaded module environments}
 $\mathcal{L}$, a finite map from module names to the environments of the modules loaded so far. The body runs in the

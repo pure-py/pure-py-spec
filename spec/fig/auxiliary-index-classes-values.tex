@@ -2,8 +2,7 @@
 \auxgroup{Functions on classes and modules}
 \auxrow{$\submods(q)$}{context}{stub for each submodule of $q$}{aux:submods}
 \auxrow{$\uniqueTo(q', q)$}{sequence of module names}{\replaced{modules which strictly contain $q'$ but do not contain $q$}{proper prefixes of $q'$ not prefixes of $q$}, shortest first}{aux:unique-to}
-\auxrow{\added{$\loads(q)$}}{\added{sequence of module names}}{\added{modules loaded by $q$, with duplicates}}{aux:loads}
-\auxrow{\added{$\loadOrder(\mathcal{M})$}}{\added{sequence of module names}}{\added{modules of the program in load order}}{aux:load-order}
+\auxrow{\added{$\loads(\seq{q}, \seq{q}')$}}{\added{sequence of module names}}{\added{modules $\seq{q}$ extended by modules loaded by $\seq{q}'$, in load order}}{aux:loads}
 \auxrow{\added{$\importEnv{\mathcal{L}}(\seq{\iota})$}}{\added{environment}}{\added{environment bound by imports $\seq{\iota}$ given loaded module environments $\mathcal{L}$}}{aux:import-env}
 \auxrow{$\ownFields(\phi)$, $\ownFields(\chi)$}{sequence of bindings}{fields declared by field list $\phi$ or class definition $\chi$, with their type expressions}{aux:own-fields}
 \auxrow{$\typeParams{\Sigma}(C)$}{sequence of type parameters}{type parameters of class $C$}{aux:type-params}
