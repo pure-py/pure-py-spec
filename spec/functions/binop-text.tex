@@ -1,3 +1,4 @@
-\replaced{Implementation of the most specific overload of $\odot$ with bounds $(\tau_1, \tau_2)$ such that $v$
-and $v'$ are values of types $\tau_1$ and $\tau_2$, or $\aborts{\errExcluded}$ if there is none.}{Meaning of a strict
-binary operator.}
+\replaced{Implementation of the most specific run-time overload of $\odot$ with bounds $(\tau_1, \tau_2)$ such that
+$\Sigma \vdash \typeOf(v) \subty \tau_1$ and $\Sigma \vdash \typeOf(v') \subty \tau_2$, or $\aborts{\errExcluded}$ if
+there is none. Run-time overloads are ordered by componentwise subtyping on their bounds, following
+$\resolveOp{\Sigma}$ (\S\ref{aux:resolve-op}).}{Meaning of a strict binary operator. }
