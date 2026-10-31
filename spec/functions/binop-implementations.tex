@@ -1,0 +1,20 @@
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.13\textwidth}>{\raggedright\arraybackslash}p{0.25\textwidth}>{\raggedright\arraybackslash}p{0.50\textwidth}}
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}$\odot$ & $(\tau_1, \tau_2)$ & $\hat{\odot}(v, v')$ \\
+\pyinline{==} & $(\sigma_1, \sigma_2)$ & $\val{\pyinline{False}}$ if $v$ and $v'$ are both \pyinline{nan}; $\eqOp{\Sigma}(v, v')$ otherwise \\
+\pyinline{!=} & $(\sigma_1, \sigma_2)$ & $\val{\pyinline{True}}$ if $v$ and $v'$ are both \pyinline{nan} or $\eqOp{\Sigma}(v, v') = \val{\pyinline{False}}$; $\val{\pyinline{False}}$ if $\eqOp{\Sigma}(v, v') = \val{\pyinline{True}}$; $\eqOp{\Sigma}(v, v')$ otherwise \\
+\pyinline{in} & $(\sigma_1, \tyList{\tau})$, $(\sigma_1, \tyTuple{\seq{\tau}})$, $(\tyStr, \tyStr)$, $(\tyStr, \tyDict{\tau})$ & $\inOp{\Sigma}(v, v')$ \\
+\pyinline{not in} & as for \pyinline{in} & $\val{\pyinline{True}}$ if $\inOp{\Sigma}(v, v') = \val{\pyinline{False}}$; $\val{\pyinline{False}}$ if $\inOp{\Sigma}(v, v') = \val{\pyinline{True}}$; $\inOp{\Sigma}(v, v')$ otherwise \\
+\pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & $(\tyFloat, \tyFloat)$ & \todo{Numeric order, as in Python} \\
+\pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & $(\tyStr, \tyStr)$ & $\val{\pyinline{True}}$ if $v < v'$, $v \leq v'$, $v > v'$ or $v \geq v'$ respectively in the lexicographic order on code points; $\val{\pyinline{False}}$ otherwise \\
+\pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{//}\quad\pyinline{\%} & $(\tyInt, \tyInt)$ & \todo{Integer arithmetic, as in Python; $\aborts{\errZeroDiv}$ where the divisor is zero} \\
+\pyinline{**} & $(\tyInt, \tyLiteral{n})$ & \todo{Integer power, as in Python, giving a float if $n$ is negative} \\
+\pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{/}\quad\pyinline{//}\quad\pyinline{\%}\quad\pyinline{**} & $(\tyFloat, \tyFloat)$ & \todo{Float arithmetic, as in Python, with precision left to the implementation; $\aborts{\errZeroDiv}$ where the divisor is zero, and $\aborts{\errOverflow}$ where Python raises the exception of that name, such as for an integer too large to convert to a float} \\
+\pyinline{+} & $(\tyStr, \tyStr)$ & $\val{v \concat v'}$ \\
+\pyinline{+} & $(\tyList{\sigma}, \tyList{\tau})$ & $\val{\exList{\seq{v} \concat \seq{v}'}}$ where $v = \exList{\seq{v}}$ and $v' = \exList{\seq{v}'}$ \\
+\pyinline{+} & $(\tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}})$ & $\val{\exTuple{\seq{v} \concat \seq{v}'}}$ where $v = \exTuple{\seq{v}}$ and $v' = \exTuple{\seq{v}'}$ \\
+\pyinline{*} & $(\tyStr, \tyInt)$ & $\val{v^{v'}}$ \\
+\pyinline{*} & $(\tyInt, \tyStr)$ & $\val{v'^{v}}$ \\
+\pyinline{*} & $(\tyList{\tau}, \tyInt)$ & $\val{\exList{\seq{v}^{v'}}}$ where $v = \exList{\seq{v}}$ \\
+\pyinline{*} & $(\tyInt, \tyList{\tau})$ & $\val{\exList{\seq{v}^{v}}}$ where $v' = \exList{\seq{v}}$
+\end{tabular}

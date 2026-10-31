@@ -1,1 +1,6 @@
-Meaning of a strict binary operator.
+\replaced{Meaning of a strict binary operator: the implementation of the first overload of $\odot$ in the table below
+with bounds $(\tau_1, \tau_2)$ such that $\vdash v : \tau_1$ and $\vdash v' : \tau_2$ (\figref{well-formed-value}) for
+some instance of the bounds, and $\aborts{\errExcluded}$ if there is no such overload. The overloads and their bounds are
+those of \figref{operator-overloads}. Following Python, two integers give an integer, because the integer overloads
+precede the float overloads. A Boolean does not match the bounds of an arithmetic or ordering overload, since
+\pyinline{bool} is not a subtype of \pyinline{int}.}{Meaning of a strict binary operator.}
