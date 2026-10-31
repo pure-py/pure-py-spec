@@ -25,7 +25,7 @@ to sequential composition of static outcomes:
 \replaced{\outcome{\seq{v}}{\assigns{\rho}} \override \outcome{\seq{v}'}{\omega}}{\assigns{\rho} \override o } & = \replaced{\outcome{\seq{v} \concat \seq{v}'}{\omega}}{o } \quad (\text{otherwise})
 \end{defalign}
 
-\noindent with $\replaced{\outcome{\varepsilon}{\assigns{\varnothing}}}{\assigns{\varnothing} }$ as left and right unit, and \replaced{outcomes of the form $\outcome{\seq{v}}{\returns{v}}$ or $\outcome{\seq{v}}{\aborts{\kappa}}$}{$\returns{v}$ and $\aborts{\kappa}$ } as left zeros.
+\noindent with \replaced{outcomes of the form $\outcome{\seq{v}}{\returns{v}}$ or $\outcome{\seq{v}}{\aborts{\kappa}}$}{$\returns{v}$ and $\aborts{\kappa}$ } as left zeros, and $\replaced{\outcome{\varepsilon}{\assigns{\varnothing}}}{\assigns{\varnothing} }$ as left and right unit.
 \end{specdefinition}
 
 \input{spec/fig/eval-values}
