@@ -133,7 +133,7 @@ directories, each named by its path, so the domain is prefix-closed by construct
 the statement sequence of its \filename{.py} file, or of its \filename{\_\_init\_\_.py} for a directory, preceded by the
 $\pymath{\_\_name\_\_}$ assignment; a directory without an \filename{\_\_init\_\_.py} (a namespace package,
 PEP 420, \url{https://peps.python.org/pep-0420/}) contributes that assignment alone.} The maps
-$\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all definitions that follow.\added{ Following \pyinline{sys.argv} in Python, a run of the program takes a sequence of strings $\mathcal{A}$, the command-line arguments, beginning with the file name of the main module, which determine the environments $\mathcal{E}(\mathcal{A})$ of the predefined modules (Definition~\ref{def:predefined-environments}).}
+$\mathcal{M}$ and $\mathcal{P}$ are fixed and ambient in all definitions that follow.\added{ A third map $\mathcal{E}(\mathcal{A})$ takes each predefined module to its environment for a run with command-line arguments $\mathcal{A}$ (Definition~\ref{def:predefined-environments}). Following \pyinline{sys.argv} in Python, $\mathcal{A}$ is a sequence of strings beginning with the file name of the main module.}
 
 \begin{definition}[Predefined \replaced{signatures}{contexts and environments }]
 \label{def:predefined}
