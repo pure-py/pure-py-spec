@@ -16,26 +16,26 @@
  & & $\quad \primFn(v, v') = \aborts{\errExcluded}$ & if $v$ number or Boolean, \\
  & & & and $v'$ integer, Boolean or \pyinline{None} \\
  & & $\quad \primFn(\seq{v}) = \aborts{\errType}$ & otherwise \\
- & \pyinline{None} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{None}}$} \\
- & \pyinline{object} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{object}}$} \\
- & \pyinline{bool} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{bool}}$} \\
- & \pyinline{int} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{int}}$} \\
- & \pyinline{float} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{float}}$} \\
- & \pyinline{str} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{str}}$} \\
- & \pyinline{list} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{list}}$} \\
- & \pyinline{dict} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{dict}}$} \\
- & \pyinline{tuple} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{builtins}.\pyinline{tuple}}$} \\
+ & \pyinline{None} & \multicolumn{2}{l}{$\predefVal{\pyinline{builtins}.\pyinline{None}}$} \\
+ & \pyinline{object} & \multicolumn{2}{l}{$\predefVal{\pyinline{builtins}.\pyinline{object}}$} \\
+ & \pyinline{bool} & \multicolumn{2}{l}{$\predefVal{\pyinline{builtins}.\pyinline{bool}}$} \\
+ & \pyinline{int} & \multicolumn{2}{l}{$\predefVal{\pyinline{builtins}.\pyinline{int}}$} \\
+ & \pyinline{float} & \multicolumn{2}{l}{$\predefVal{\pyinline{builtins}.\pyinline{float}}$} \\
+ & \pyinline{str} & \multicolumn{2}{l}{$\predefVal{\pyinline{builtins}.\pyinline{str}}$} \\
+ & \pyinline{list} & \multicolumn{2}{l}{$\predefVal{\pyinline{builtins}.\pyinline{list}}$} \\
+ & \pyinline{dict} & \multicolumn{2}{l}{$\predefVal{\pyinline{builtins}.\pyinline{dict}}$} \\
+ & \pyinline{tuple} & \multicolumn{2}{l}{$\predefVal{\pyinline{builtins}.\pyinline{tuple}}$} \\
 \pyinline{sys} & \pyinline{argv} & \multicolumn{2}{l}{$\exList{w_1, \ldots, w_n}$ where $\mathcal{A} = w_1 \cons \cdots \cons w_n$} \\
  & \pyinline{exit} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
  & & $\quad \primFn(n) = \aborts{\errExit{n}}$ & if $n$ integer \\
  & & $\quad \primFn() = \aborts{\errExcluded}$ & \\
  & & $\quad \primFn(v) = \aborts{\errExcluded}$ & if $v$ not an integer \\
  & & $\quad \primFn(\seq{v}) = \aborts{\errType}$ & otherwise \\
-\pyinline{typing} & \pyinline{Callable} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{typing}.\pyinline{Callable}}$} \\
- & \pyinline{Literal} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{typing}.\pyinline{Literal}}$} \\
- & \pyinline{Never} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{typing}.\pyinline{Never}}$} \\
- & \pyinline{Sized} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{typing}.\pyinline{Sized}}$} \\
-\pyinline{dataclasses} & \pyinline{dataclass} & \multicolumn{2}{l}{$\opaqueVal{\pyinline{dataclasses}.\pyinline{dataclass}}$}
+\pyinline{typing} & \pyinline{Callable} & \multicolumn{2}{l}{$\predefVal{\pyinline{typing}.\pyinline{Callable}}$} \\
+ & \pyinline{Literal} & \multicolumn{2}{l}{$\predefVal{\pyinline{typing}.\pyinline{Literal}}$} \\
+ & \pyinline{Never} & \multicolumn{2}{l}{$\predefVal{\pyinline{typing}.\pyinline{Never}}$} \\
+ & \pyinline{Sized} & \multicolumn{2}{l}{$\predefVal{\pyinline{typing}.\pyinline{Sized}}$} \\
+\pyinline{dataclasses} & \pyinline{dataclass} & \multicolumn{2}{l}{$\predefVal{\pyinline{dataclasses}.\pyinline{dataclass}}$}
 \end{tabular}
 
 \caption{Predefined environments $\mathcal{E}(\mathcal{A})$}
