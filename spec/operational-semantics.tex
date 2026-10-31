@@ -182,7 +182,7 @@ in \emph{load order}\speconly{ (\specref{aux:load-order})}. Load order is fixed 
 precede statements and so cannot depend on the outcome of a statement. Module evaluation
 $q, \mathcal{L} \Rightarrow_{\mathsf{mod}} o$ runs the body of module $q$ given the \emph{loaded module environments}
 $\mathcal{L}$, a finite map from module names to the environments of the modules loaded so far. The body runs in the
-environment corresponding to the context in which the body is checked\speconly{ (\ruleName{eval-module})}.\speconly{
+environment corresponding to the context in which the body was checked\speconly{ (\ruleName{eval-module})}.\speconly{
 Import bindings combine by context extension (Definition~\ref{def:context-extension}), which is extended to
 environments by the same equations, but with values in place of context entries and environments in place of
 contexts.}
