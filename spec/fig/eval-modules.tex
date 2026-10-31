@@ -222,7 +222,7 @@
 \inferrule*[lab={\ruleName{eval-module}}]
 {
   \mathcal{M}(q) = \seq{\iota}\;t \\
-  q, \mathcal{L}(\pyinline{builtins}) \mathbin{\override} \importEnv(\seq{\iota}, \mathcal{L}) \mathbin{\override} \scopeS(\declaresS(\seq{\iota}), t), t \Rightarrow o
+  q, \mathcal{L}(\pyinline{builtins}) \mathbin{\override} \importEnv{\mathcal{L}}(\seq{\iota}) \mathbin{\override} \scopeS(\declaresS(\seq{\iota}), t), t \Rightarrow o
 }
 {
   q, \mathcal{L} \Rightarrow_{\mathsf{mod}} o

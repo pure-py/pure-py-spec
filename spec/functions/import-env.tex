@@ -1,8 +1,8 @@
-\importEnv(\varepsilon, \mathcal{L}) &= \varnothing \\*
-\importEnv(\exImport{(x \cons \seq{x})} \cons \seq{\iota}, \mathcal{L}) &= \set{\bind{x}{\modLoaded{x}{\submodEnv(x, \seq{x}, \mathcal{L})}}} \extend \importEnv(\seq{\iota}, \mathcal{L}) \\*
-\importEnv(\exFromImport{q}{x_1, \ldots, x_{n+1}} \cons \seq{\iota}, \mathcal{L}) &= \set{\bind{x_1}{\member(\mathcal{L}(q), x_1, \mathcal{L})}, \ldots, \bind{x_{n+1}}{\member(\mathcal{L}(q), x_{n+1}, \mathcal{L})}} \\*
-&\qquad {}\extend \importEnv(\seq{\iota}, \mathcal{L}) \clausegap
-\submodEnv(q, \varepsilon, \mathcal{L}) &= \mathcal{L}(q) \\*
-\submodEnv(q, x \cons \seq{x}, \mathcal{L}) &= \mathcal{L}(q) \extend \set{\bind{x}{\modLoaded{q.x}{\submodEnv(q.x, \seq{x}, \mathcal{L})}}} \clausegap
-\member(\rho, x, \mathcal{L}) &= \modLoaded{q}{\mathcal{L}(q)} \quad \text{if } \rho(x) = \modStub{q} \\*
-\member(\rho, x, \mathcal{L}) &= \rho(x) \quad \text{(otherwise)}
+\importEnv{\mathcal{L}}(\varepsilon) &= \varnothing \\*
+\importEnv{\mathcal{L}}(\exImport{(x \cons \seq{x})} \cons \seq{\iota}) &= \set{\bind{x}{\modLoaded{x}{\submodEnv{\mathcal{L}}(x, \seq{x})}}} \extend \importEnv{\mathcal{L}}(\seq{\iota}) \\*
+\importEnv{\mathcal{L}}(\exFromImport{q}{x_1, \ldots, x_{n+1}} \cons \seq{\iota}) &= \set{\bind{x_1}{\member{\mathcal{L}}(\mathcal{L}(q), x_1)}, \ldots, \bind{x_{n+1}}{\member{\mathcal{L}}(\mathcal{L}(q), x_{n+1})}} \\*
+&\qquad {}\extend \importEnv{\mathcal{L}}(\seq{\iota}) \clausegap
+\submodEnv{\mathcal{L}}(q, \varepsilon) &= \mathcal{L}(q) \\*
+\submodEnv{\mathcal{L}}(q, x \cons \seq{x}) &= \mathcal{L}(q) \extend \set{\bind{x}{\modLoaded{q.x}{\submodEnv{\mathcal{L}}(q.x, \seq{x})}}} \clausegap
+\member{\mathcal{L}}(\rho, x) &= \modLoaded{q}{\mathcal{L}(q)} \quad \text{if } \rho(x) = \modStub{q} \\*
+\member{\mathcal{L}}(\rho, x) &= \rho(x) \quad \text{(otherwise)}
