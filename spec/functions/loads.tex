@@ -1,4 +1,7 @@
 \setPadWidth{\loads(\importLoads(\seq{q}, q, \seq{\iota}) \cons q, \seq{q}')}%
 \loads(\seq{q}, \varepsilon) &= \seq{q} \\*
 \loads(\seq{q}, q \cons \seq{q}') &= \padded{\loads(\seq{q}, \seq{q}')} \quad \text{if } q \in \set{\seq{q}} \cup \dom(\mathcal{P}) \\*
-\loads(\seq{q}, q \cons \seq{q}') &= \padded{\loads(\importLoads(\seq{q}, q, \seq{\iota}) \cons q, \seq{q}')} \quad \text{if } q \notin \set{\seq{q}} \text{ and } \mathcal{M}(q) = \seq{\iota}\;t
+\loads(\seq{q}, q \cons \seq{q}') &= \padded{\loads(\importLoads(\seq{q}, q, \seq{\iota}) \cons q, \seq{q}')} \quad \text{if } q \notin \set{\seq{q}} \text{ and } \mathcal{M}(q) = \seq{\iota}\;t \clausegap
+\submodLoads(\seq{q}, q, \varepsilon) &= \seq{q} \\*
+\submodLoads(\seq{q}, q, x \cons \seq{x}) &= \padded{\submodLoads(\loads(\seq{q}, q.x), q, \seq{x})} \quad \text{if } q.x \in \dom(\mathcal{M}) \text{ and } x \notin \declaresS(\mathcal{M}(q)) \\*
+\submodLoads(\seq{q}, q, x \cons \seq{x}) &= \padded{\submodLoads(\seq{q}, q, \seq{x})} \quad \text{(otherwise)}

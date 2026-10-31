@@ -1,4 +1,0 @@
-\setPadWidth{\submodLoads(\loads(\seq{q}, q.x), q, \seq{x})}%
-\submodLoads(\seq{q}, q, \varepsilon) &= \seq{q} \\*
-\submodLoads(\seq{q}, q, x \cons \seq{x}) &= \padded{\submodLoads(\loads(\seq{q}, q.x), q, \seq{x})} \quad \text{if } q.x \in \dom(\mathcal{M}) \text{ and } x \notin \declaresS(\mathcal{M}(q)) \\*
-\submodLoads(\seq{q}, q, x \cons \seq{x}) &= \padded{\submodLoads(\seq{q}, q, \seq{x})} \quad \text{(otherwise)}
