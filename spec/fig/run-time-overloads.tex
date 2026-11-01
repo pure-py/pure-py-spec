@@ -1,3 +1,7 @@
+\begin{figure}
+\begin{AddedBlock}
+\small
+\centering
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.28\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}$\odot$ & $(\tau_1, \tau_2)$ & $\hat{\odot}(v, v')$ \\
@@ -18,3 +22,7 @@
 \pyinline{*} & $(\tyList{\tyObject}, \tyInt)$ & $\val{\exList{\seq{v}^n}}$ where $v = \exList{\seq{v}}$ and $n = \max(v', 0)$ \\
 \pyinline{*} & $(\tyInt, \tyList{\tyObject})$ & $\val{\exList{\seq{v}^n}}$ where $v' = \exList{\seq{v}}$ and $n = \max(v, 0)$
 \end{tabular}
+\end{AddedBlock}
+\caption{\added{Run-time overloads}}
+\label{fig:run-time-overloads}
+\end{figure}
