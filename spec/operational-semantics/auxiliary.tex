@@ -12,8 +12,8 @@ The implementation of an operator is selected at run time by the run-time types 
 run-time overloads of \figref{run-time-overloads}.
 \begin{specdefinition}{Run-time overload}
 A \emph{run-time overload} pairs operand bounds $(\tau_1, \tau_2)$ with an implementation, and applies at operand types
-$(\sigma_1, \sigma_2)$ with $\Sigma \vdash \sigma_1 \subty \tau_1$ and $\Sigma \vdash \sigma_2 \subty \tau_2$; a
-run-time overload of a unary operator pairs an operand bound $\tau$ with an implementation in the same way.
+$(\sigma_1, \sigma_2)$ with $\Sigma \vdash \sigma_1 \subty \tau_1$ and $\Sigma \vdash \sigma_2 \subty \tau_2$.
+Run-time overloads of unary operators pair an operand bound $\tau$ with an implementation in the same way.
 \end{specdefinition}
 \noindent The function $\typeOf(v)$ (\S\ref{aux:type-of}) gives the type at which a value is resolved:
 the literal type of a literal, \pyinline{float} for a float literal, and \pyinline{object} for the elements of a list,
