@@ -14,14 +14,14 @@ run-time overloads of \figref{run-time-overloads}.
 A \emph{run-time overload} of a binary operator $\odot$ pairs operand bounds $(\tau_1, \tau_2)$ with a definition
 of $\hat{\odot}(v, v')$, and applies at operand types
 $(\sigma_1, \sigma_2)$ with $\Sigma \vdash \sigma_1 \subty \tau_1$ and $\Sigma \vdash \sigma_2 \subty \tau_2$.
+Run-time overloads are ordered by componentwise subtyping in $\Sigma$ on their bounds.
 Run-time overloads of a unary operator $\ominus$ pair an operand bound $\tau$ with a definition of $\hat{\ominus}(v)$ in
 the same way.
 \end{specdefinition}
 \noindent The function $\typeOf(v)$ (\S\ref{aux:type-of}) gives the run-time type of a value.
 The result $\hat{\odot}(v, v')$ is given by the definition of the most
 specific run-time overload of $\odot$ at $(\typeOf(v), \typeOf(v'))$, and is $\aborts{\errExcluded}$ if no run-time
-overload of $\odot$ applies (\S\ref{aux:binop}). The result $\hat{\ominus}(v)$ is given in the same way
-(\S\ref{aux:unop}). Overload resolution (\secref{well-formedness-operators}) therefore fixes the types of operator
+overload of $\odot$ applies. The result $\hat{\ominus}(v)$ is given in the same way. Overload resolution (\secref{well-formedness-operators}) therefore fixes the types of operator
 applications but not the run-time overloads. With \pyinline{x: float = 1}, the expression
 \pyinline{x + 1} has type \pyinline{float} and evaluates to \pyinline{2} by the run-time overload at
 $(\tyInt, \tyInt)$.
