@@ -59,6 +59,9 @@ def main() -> None:
         if target not in graph:
             return "passed"
         rule = graph[target]
+        assert rule.description or not rule.recipe or target.startswith("."), (
+            f"{target} has no description"
+        )
         details: list[str] = []
         checks: list[str] = []
         if any(outcome != "passed" for outcome in [run(p) for p in rule.prerequisites]):
