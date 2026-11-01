@@ -11,9 +11,9 @@
 \pyinline{not in} & $(\tyObject, \tyObject)$ & $\val{\pyinline{True}}$ if $\inOp{\Sigma}(v, v') = \val{\pyinline{False}}$; $\val{\pyinline{False}}$ if $\inOp{\Sigma}(v, v') = \val{\pyinline{True}}$; $\inOp{\Sigma}(v, v')$ otherwise \\
 \pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & $(\tyFloat, \tyFloat)$ & \todo{Numeric order, as in Python} \\
 \pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & $(\tyStr, \tyStr)$ & $\val{\pyinline{True}}$ if $v < v'$, $v \leq v'$, $v > v'$ or $v \geq v'$ respectively in the lexicographic order on code points; $\val{\pyinline{False}}$ otherwise \\
-\pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{//}\quad\pyinline{\%} & $(\tyInt, \tyInt)$ & \todo{Integer arithmetic, as in Python; $\aborts{\errZeroDiv}$ where the divisor is zero} \\
+\pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{//}\quad\pyinline{\%} & $(\tyInt, \tyInt)$ & \todo{Integer arithmetic, as in Python; $\aborts{\errZeroDiv}$ if the divisor is zero} \\
 \pyinline{**} & $(\tyInt, \tyInt)$ & \todo{Integer power, as in Python, giving a float if $v'$ is negative} \\
-\pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{/}\quad\pyinline{//}\quad\pyinline{\%}\quad\pyinline{**} & $(\tyFloat, \tyFloat)$ & \todo{Float arithmetic, as in Python, with precision left to the implementation; $\aborts{\errZeroDiv}$ where the divisor is zero, and $\aborts{\errOverflow}$ where Python raises the exception of that name, such as for an integer too large to convert to a float} \\
+\pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{/}\quad\pyinline{//}\quad\pyinline{\%}\quad\pyinline{**} & $(\tyFloat, \tyFloat)$ & \todo{Float arithmetic, as in Python, with precision left to the implementation; $\aborts{\errZeroDiv}$ if the divisor is zero, and $\aborts{\errOverflow}$ if Python raises the exception of that name, such as for an integer too large to convert to a float} \\
 \pyinline{+} & $(\tyStr, \tyStr)$ & $\val{v \concat v'}$ \\
 \pyinline{+} & $(\tyList{\tyObject}, \tyList{\tyObject})$ & $\val{\exList{\seq{v} \concat \seq{v}'}}$ if $v = \exList{\seq{v}}$ and $v' = \exList{\seq{v}'}$ \\
 \pyinline{+} & $(\tyTuple{\tyObject^m}, \tyTuple{\tyObject^n})$ & $\val{\exTuple{v_1, \ldots, v_m, u_1, \ldots, u_n}}$ if $v = \exTuple{v_1, \ldots, v_m}$ and $v' = \exTuple{u_1, \ldots, u_n}$ \\
