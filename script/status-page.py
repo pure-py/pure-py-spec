@@ -29,6 +29,7 @@ img { width: 44em; max-width: 100%; }
 table { border-collapse: collapse; }
 th, td { text-align: left; padding: 0.3em 0.6em; border-bottom: 1px solid #ccc; white-space: nowrap; }
 td.title { white-space: normal; }
+table.integrity td:first-child { width: 4em; }
 """
 
 
@@ -93,7 +94,7 @@ def integrity(report: str) -> str:
         body = "".join(
             "<tr>" + "".join(f"<td>{cell(c)}</td>" for c in row) + "</tr>\n" for row in rows[1:]
         )
-        return f"<table>\n<tr>{headings}</tr>\n{body}</table>"
+        return f'<table class="integrity">\n<tr>{headings}</tr>\n{body}</table>'
 
     return "\n".join(f"<h3>{html.escape(rule)}</h3>\n{table(rows)}" for rule, rows in rules if rows)
 
