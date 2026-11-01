@@ -44,8 +44,8 @@ make wheel
 
 An implementation runs the suite with the `purepy-conformance` command of the installed package, providing a type
 checker and interpreter (default `python3`), each as a command taking the path of a module. The type checker
-checks every test. The interpreter runs every well-formed test and must give the recorded Python outcome. A run with
-undefined behaviour in PurePy may instead report undefined behaviour, by exit status 4.
+checks every test. The interpreter runs every well-formed test and must give the recorded Python outcome; reporting
+undefined behaviour, by exit status 4, is also accepted when the run has undefined behaviour in PurePy.
 
 ```bash
 purepy-conformance --type-checker "purepy --check" purepy
