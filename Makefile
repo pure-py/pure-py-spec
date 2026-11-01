@@ -73,16 +73,24 @@ bibtex $(1)
 $(PDFLATEX) -jobname=$(1) "\def\anonmode{}\input{$(2)}"
 $(PDFLATEX) -jobname=$(1) "\def\anonmode{}\input{$(2)}"
 $(call check-log,$(1))
-rm -f $(BUILD_AUX)
 endef
 
 # Anonymised paper built, references resolved
 paper-anon.pdf: $(TEXFILES)
 	$(call anon,paper-anon,paper.tex)
+	sed -n 's/^\\newlabel{references}{{[^}]*}{\([0-9]*\)}.*/\1/p' paper-anon.aux > paper-anon.references
+	rm -f $(BUILD_AUX)
+
+PAGE_LIMIT := 25
+# Anonymised paper within the page limit, references excluded
+check-page-limit: paper-anon.pdf
+	@page=$$(cat paper-anon.references); echo "report: references begin on page $$page, limit $(PAGE_LIMIT) pages"; \
+		test "$$page" -le $(PAGE_LIMIT)
 
 # Anonymised specification built, references resolved
 spec-anon.pdf: $(TEXFILES)
 	$(call anon,spec-anon,PurePy-spec.tex)
+	rm -f $(BUILD_AUX)
 
 # Specification consistent with the conformance suite
 check-consistency:
@@ -139,7 +147,7 @@ check-archived-theories: .check-submission
 check-archived-suite: check-archived-theories
 	$(MAKE) -C .check-submission/mechanisation check-conformance
 
-check-submission: paper-submission check-anonymised check-archived-suite
+check-submission: paper-submission check-page-limit check-anonymised check-archived-suite
 
 # arXiv runs pdflatex without bibtex, so include the .bbl.
 paper-arXiv.zip: paper.pdf
@@ -148,8 +156,8 @@ paper-arXiv.zip: paper.pdf
 
 clean:
 	rm -rf .check-submission
-	rm -f $(AUX) *.pdf *.zip *.tsv $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(EVALUATION_FIGURE)
+	rm -f $(AUX) *.pdf *.zip *.tsv *.references $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(EVALUATION_FIGURE)
 	rm -rf $(dir $(SPEC_LABELS))
 
-.PHONY: default all paper-submission check-anonymised check-archived-theories check-archived-suite check-submission clean \
+.PHONY: default all paper-submission check-page-limit check-anonymised check-archived-theories check-archived-suite check-submission clean \
 	check-consistency check-suite wheel dependencies.svg integrity.txt status.html
