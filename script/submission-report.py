@@ -1,48 +1,66 @@
 #!/usr/bin/env python3
-"""Report on a make target, run prerequisite by prerequisite: a tab-separated line per target that has a
-comment above its rule, giving its name, the comment, whether it passed, failed or wasn't run because a
-prerequisite failed, and the detail its recipe printed on lines starting "report:"; a report line with a tab
-separates the label and outcome of a check within the target, giving a line of its own with no target.
-Written to standard output, with the make output on standard error. Further arguments are passed to make.
-Exits with failure if any target failed."""
+"""Report on a make target, run prerequisite by prerequisite: a tab-separated line per target described by
+a double-hash comment on its rule, giving its name, the description, whether it passed, failed or wasn't
+run because a prerequisite failed, and the detail its recipe printed on lines starting "report:"; a report
+line with a tab separates the label and outcome of a check within the target, giving a line of its own with
+no target. Written to standard output, with the make output on standard error. Further arguments are passed
+to make. Exits with failure if any target failed. With --check instead of a target, checks that every
+target with a recipe is described, except the special and internal ones starting with a dot."""
 
 import os
 import pathlib
 import re
 import subprocess
 import sys
+from dataclasses import dataclass
 from functools import cache
 
-RULE = re.compile(r"^(?P<target>[^\s:#=$]+):(?!=)\s*(?P<prerequisites>.*)$")
+RULE = re.compile(
+    r"^(?P<target>[^\s:#=$%]+):(?!=)\s*(?P<prerequisites>[^#]*?)\s*(?:##\s*(?P<description>.*?)\s*)?$"
+)
 
 
-def rules(makefile: str) -> dict[str, tuple[str, list[str]]]:
-    """Comment above the rule, if any, and prerequisites of each target with a rule of its own"""
-    result: dict[str, tuple[str, list[str]]] = {}
-    previous = ""
-    for line in makefile.splitlines():
+@dataclass(frozen=True)
+class Rule:
+    description: str
+    prerequisites: list[str]
+    recipe: bool
+
+
+def rules(makefile: str) -> dict[str, Rule]:
+    lines = makefile.splitlines()
+    result: dict[str, Rule] = {}
+    for i, line in enumerate(lines):
         if match := RULE.match(line):
-            comment = previous[1:].strip() if previous.startswith("#") else ""
             prerequisites = [p for p in match["prerequisites"].split() if not p.startswith("$")]
-            result[match["target"]] = (comment, prerequisites)
-        previous = line
+            recipe = i + 1 < len(lines) and lines[i + 1].startswith("\t")
+            result[match["target"]] = Rule(match["description"] or "", prerequisites, recipe)
     return result
 
 
 def main() -> None:
     root, *options = sys.argv[1:]
     graph = rules(pathlib.Path("Makefile").read_text())
+    if root == "--check":
+        undescribed = [
+            t
+            for t, rule in graph.items()
+            if rule.recipe and not rule.description and not t.startswith(".")
+        ]
+        for target in undescribed:
+            print(f"{target}: no description")
+        sys.exit(bool(undescribed))
     report: list[str] = []
 
     @cache
     def run(target: str) -> str:
-        """Outcome of a target, after those of its prerequisites, reported if the target has a comment"""
+        """Outcome of a target, after those of its prerequisites, reported if the target is described"""
         if target not in graph:
             return "passed"
-        comment, prerequisites = graph[target]
+        rule = graph[target]
         details: list[str] = []
         checks: list[str] = []
-        if any(run(p) != "passed" for p in prerequisites):
+        if any(run(p) != "passed" for p in rule.prerequisites):
             outcome = "not run"
         else:
             made = subprocess.run(
@@ -61,8 +79,8 @@ def main() -> None:
             ]
             details = [line for line in lines if "\t" not in line]
             checks = [line for line in lines if "\t" in line]
-        if comment:
-            report.append(f"{target}\t{comment}\t{outcome}\t{'; '.join(details)}")
+        if rule.description:
+            report.append(f"{target}\t{rule.description}\t{outcome}\t{'; '.join(details)}")
             report.extend(f"\t{check}\t" for check in checks)
         return outcome
 
