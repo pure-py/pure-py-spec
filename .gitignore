@@ -1,4 +1,3 @@
-# LaTeX build artifacts
 *.aux
 *.bbl
 *.blg
@@ -15,24 +14,19 @@
 *.toc
 *.zip
 
-# Python build and environment artifacts
 .venv/
 __pycache__/
 .mypy_cache/
 dist/
 
-# Local tool settings
 .claude/settings.local.json
 
-# macOS
 .DS_Store
 
-# Generated version macros
 tex/python-version.tex
 tex/mypy-version.tex
 tex/anon-name.tex
 
-# Outputs of the status page and submission check targets
 dependencies.svg
 integrity.txt
 status.html
