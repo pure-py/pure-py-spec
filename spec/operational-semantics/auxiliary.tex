@@ -9,7 +9,8 @@ The operators and the other auxiliary functions the evaluation rules use are def
 \input{spec/fig/run-time-overloads}
 
 The implementation of an operator is selected at run time by the run-time types of its operands, using the
-run-time overloads of \figref{run-time-overloads}.
+run-time overloads of \figref{run-time-overloads}. The function $\typeOf(v)$ (\S\ref{aux:type-of}) gives the run-time
+type of a value.
 \begin{specdefinition}{Run-time overload}
 A \emph{run-time overload} of a binary operator $\odot$ pairs operand bounds $(\tau_1, \tau_2)$ with a definition
 of $\hat{\odot}(v, v')$, and applies at operand types
@@ -18,18 +19,17 @@ Run-time overloads are ordered by componentwise subtyping in $\Sigma$ on their b
 Run-time overloads of a unary operator $\ominus$ pair an operand bound $\tau$ with a definition of $\hat{\ominus}(v)$ in
 the same way.
 \end{specdefinition}
-\noindent The function $\typeOf(v)$ (\S\ref{aux:type-of}) gives the run-time type of a value.
-The result $\hat{\odot}(v, v')$ is given by the most
-specific run-time overload of $\odot$ at $(\typeOf(v), \typeOf(v'))$, and is $\aborts{\errExcluded}$ if no run-time
-overload of $\odot$ applies. The result $\hat{\ominus}(v)$ is given in the same way. Given $\exAssign{x\exAnnot{\tyFloat}}{1}$,
-the expression $\exBinOp{x}{\pyinline{+}}{1}$ has type $\tyFloat$ but evaluates to $2$ via the run-time overload at
-$(\tyInt, \tyInt)$.
-
 \begin{lemma}[Most specific run-time overload]
 \label{lem:most-specific-run-time-overload}
 If some run-time overload of $\odot$ applies at $(\typeOf(v), \typeOf(v'))$, then there is a most specific such
 overload, and similarly for $\ominus$ at $\typeOf(v)$.
 \end{lemma}
+
+\noindent The result $\hat{\odot}(v, v')$ is given by the most specific run-time overload of $\odot$ at
+$(\typeOf(v), \typeOf(v'))$, and is $\aborts{\errExcluded}$ if no run-time overload of $\odot$ applies. The result
+$\hat{\ominus}(v)$ is given in the same way. Given $\exAssign{x\exAnnot{\tyFloat}}{1}$, the expression
+$\exBinOp{x}{\pyinline{+}}{1}$ has type $\tyFloat$ but evaluates to $2$ via the run-time overload at
+$(\tyInt, \tyInt)$.
 
 \begin{lemma}[Soundness of overload resolution]
 \label{lem:overload-resolution-soundness}
