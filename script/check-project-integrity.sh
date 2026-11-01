@@ -70,8 +70,6 @@ ON_BOARD=$(echo "$ALL_ITEMS" | jq -cs 'add | map(.content.number)')
 CLOSED_MILESTONES=$(gh api "repos/$ORG/$REPO/milestones?state=closed" --jq '[.[].title]')
 ACTIVE_STATUSES=$(jq -cn --arg s "$ACTIVE" '$s | split(",") | map(ltrimstr(" ") | rtrimstr(" "))')
 
-# Rule, its tab-separated column headings, the items, the jq filter selecting failures and the jq format of a
-# tab-separated row; headings printed before the first failure only
 check() {
   local rule="$1"
   local headings="$2"
