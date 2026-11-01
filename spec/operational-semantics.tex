@@ -178,7 +178,7 @@ after which nothing more is printed. $\errExit{n}$ is a run that exited with sta
 An implementation \emph{conforms} to the semantics if, for every well-formed program $\mathcal{M}$, arguments $\mathcal{A}$
 and program result $(\seq{v}, \kappa)$ with $\mathcal{M}, \mathcal{A} \Rightarrow \seq{v}, \kappa$ and
 $\kappa \neq \errUndef$, a run of the implementation on $\mathcal{M}$ with arguments $\mathcal{A}$ writes the values
-$\seq{v}$ in order, each as by Python's \pyinline{str} followed by a newline, and ends with termination kind $\kappa$.
+$\seq{v}$ in order, each as by Python's \pyinline{str} followed by a newline, and reportstermination kind $\kappa$.
 \end{specdefinition}
 
 \noindent The form in which an implementation reports the termination kind is not prescribed.
