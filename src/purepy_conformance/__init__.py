@@ -161,8 +161,8 @@ class Runner(Results):
     def run_interpreter(
         self, path: pathlib.Path, outcome: PythonOutcome, undefined: bool
     ) -> list[str]:
-        """Run the interpreter on a test. The run must have the recorded Python outcome, or report undefined
-        behaviour if the run has undefined behaviour in PurePy."""
+        """Run the interpreter on a test. The run must have the recorded Python outcome, except that a run with
+        undefined behaviour in PurePy may instead report undefined behaviour."""
         if self.interpreter is None:
             return []
         succeeds = outcome == PythonOutcome.SUCCEEDS
