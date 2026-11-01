@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
-"""HTML status page of the organisation, with the dependency diagram and the open pull requests of the
-repositories cloned under a directory, written to standard output"""
+"""HTML status page of the organisation, with the dependency diagram, the open pull requests of the
+repositories cloned under a directory and the output of the project integrity check, written to standard
+output"""
 
 import datetime
 import html
 import json
 import pathlib
+import re
 import subprocess
 import sys
 from typing import Any
 
 ORG = "pure-py"
+INTEGRITY_REPO = "pure-py-spec"  # Repository checked by the project integrity script
+ISSUE = re.compile(r"#(\d+)")
 FIELDS = "number,title,url,author,isDraft,updatedAt,reviewDecision,statusCheckRollup"
 FAILED = {"FAILURE", "ERROR", "TIMED_OUT", "CANCELLED", "ACTION_REQUIRED"}
 REVIEW = {
@@ -62,7 +66,33 @@ def row(repo: str, pr: dict[str, Any]) -> str:
     return "<tr>" + "".join(f"<td>{cell}</td>" for cell in cells) + "</tr>\n"
 
 
-def page(repos: list[str]) -> str:
+def integrity(report: str) -> str:
+    """Section listing the failures of each rule of the project integrity report, or that all rules passed"""
+    rules: list[tuple[str, list[str]]] = []
+    for line in report.splitlines():
+        if line.startswith("=== "):
+            rules.append((line.strip("= "), []))
+        elif line.startswith("  FAIL: "):
+            rules[-1][1].append(line.removeprefix("  FAIL: "))
+    if not any(failures for _, failures in rules):
+        return "<p>All rules passed.</p>"
+
+    def item(failure: str) -> str:
+        link = rf'<a href="https://github.com/{ORG}/{INTEGRITY_REPO}/issues/\1">#\1</a>'
+        return f"<li>{ISSUE.sub(link, html.escape(failure))}</li>"
+
+    return (
+        "<ul>\n"
+        + "".join(
+            f"<li>{html.escape(rule)}<ul>{''.join(map(item, failures))}</ul></li>\n"
+            for rule, failures in rules
+            if failures
+        )
+        + "</ul>"
+    )
+
+
+def page(repos: list[str], report: str) -> str:
     prs = [(repo, pr) for repo in repos for pr in pull_requests(repo)]
     updated = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d %H:%M")
 
@@ -88,15 +118,17 @@ def page(repos: list[str]) -> str:
 {table(draft=False)}
 <h2>Draft pull requests</h2>
 {table(draft=True)}
+<h2>Project integrity</h2>
+{integrity(report)}
 </body>
 </html>
 """
 
 
 def main() -> None:
-    (root,) = map(pathlib.Path, sys.argv[1:])
+    root, report = map(pathlib.Path, sys.argv[1:])
     repos = sorted(path.name for path in root.iterdir() if (path / ".git").exists())
-    sys.stdout.write(page(repos))
+    sys.stdout.write(page(repos, report.read_text()))
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 name: Status page
 
-# Dependency diagram and open pull requests of the organisation's repositories, published to GitHub Pages
+# Dependency diagram, open pull requests and project integrity of the organisation's repositories, published to
+# GitHub Pages
 on:
   workflow_dispatch:
   schedule:
@@ -39,10 +40,19 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: python3 script/dependency-diagram.py repos | d2 --pad 16 - dependencies.svg
 
+      - name: Check issues and project board
+        id: integrity
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_PAT }}
+        run: |
+          script/check-project-integrity.sh pure-py pure-py-spec 1 "In progress,Awaiting Review" > integrity.txt 2>&1 && passed=true || passed=false
+          cat integrity.txt
+          echo "passed=$passed" >> "$GITHUB_OUTPUT"
+
       - name: Build page
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 script/status-page.py repos > status.html
+        run: python3 script/status-page.py repos integrity.txt > status.html
 
       # Committed only when something other than the update time changes
       - name: Publish to GitHub Pages
@@ -55,3 +65,7 @@ jobs:
           cd pages
           git add -A
           git diff --quiet --cached -I '<time>' || { git commit -m "Status page"; git push origin gh-pages; }
+
+      - name: Fail on integrity findings
+        if: steps.integrity.outputs.passed != 'true'
+        run: exit 1

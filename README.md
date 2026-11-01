@@ -23,7 +23,7 @@ semantics.
 - `graduality.tex`, `graduality/`: draft notes on gradual typing, built as a separate document and not part of the 1.0 specification or paper
 - `src/purepy_conformance/`: the conformance suite, as package data, and its runner, the `purepy-conformance` command
 - `test/`: consistency of the specification with the conformance suite
-- `script/`: project board integrity check, run daily by CI
+- `script/`: status page, including the project board integrity check, run hourly by CI
 
 Each section has separate prose in the two documents, and material shared by both lives under `spec/` and is
 input by each. Within a shared source, `\paperonly{...}` and `\speconly{...}` restrict a phrase to one document.

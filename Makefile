@@ -97,8 +97,11 @@ wheel: check-consistency check-suite
 dependencies.svg:
 	uv run --locked python script/dependency-diagram.py .. | d2 --pad 16 - $@
 
-status.html: dependencies.svg
-	uv run --locked python script/status-page.py .. > $@
+integrity.txt:
+	-script/check-project-integrity.sh pure-py pure-py-spec 1 "In progress,Awaiting Review" > $@
+
+status.html: dependencies.svg integrity.txt
+	uv run --locked python script/status-page.py .. integrity.txt > $@
 
 # tracks: tag of same version
 PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
@@ -124,4 +127,4 @@ clean:
 	rm -f $(AUX) *.pdf *.zip $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(EVALUATION_FIGURE)
 	rm -rf $(dir $(SPEC_LABELS))
 
-.PHONY: default all paper-submission clean check-consistency check-suite wheel dependencies.svg status.html
+.PHONY: default all paper-submission clean check-consistency check-suite wheel dependencies.svg integrity.txt status.html
