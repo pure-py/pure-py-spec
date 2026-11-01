@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-"""HTML status page of the organisation, with the dependency diagram, the open pull requests of the
-repositories cloned under a directory, the output of the project integrity check and the report of the latest
-submission run, written to standard output"""
+"""Status page of the organisation, from a directory of repository clones and the output file of the project
+integrity check, written to standard output"""
 
 import datetime
 import html
