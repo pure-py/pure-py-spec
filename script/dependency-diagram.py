@@ -56,7 +56,8 @@ def latest_release(repo: str) -> str | None:
 
 
 def use(pyproject: pathlib.Path, url: str) -> str:
-    """Use of the package at a URL in a project file: at run time or only in development"""
+    """Label for a pinned package: "runs with" when among the project's dependencies, "tests against" when
+    only in a dependency group"""
     project = tomllib.loads(pyproject.read_text()).get("project", {})
     return (
         "runs with"
