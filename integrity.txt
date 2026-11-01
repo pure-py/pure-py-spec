@@ -14,17 +14,16 @@ Issue	Title
 Issue	Title	Milestone
 #105	`__all__` for wildcard imports	pure-py-spec 1.1
 #126	Relative imports	pure-py-spec 1.1
-#130	Correctness properties of well-formedness	PLDI 2027
 #196	Tighter rule attribution	PLDI 2027
 #222	Iterator functions	pure-py-spec 1.1
-#236	`|`, `&`, `-` and `^` for sets and dicts	pure-py-spec 1.1
 
 === Active issues have a milestone ===
 Issue	Title	Status
 #14	Syntactic extensions	In progress
+#311	Chained `and` and `or`	In progress
 
 === Closed milestones contain only Done or Rejected issues ===
 
 === Sub-issues of closed issues are closed ===
 
-12 issue(s) found.
+11 issue(s) found.
