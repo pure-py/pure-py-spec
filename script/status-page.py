@@ -69,7 +69,6 @@ def row(repo: str, pr: dict[str, Any]) -> str:
 
 
 def integrity(report: str) -> str:
-    """Project integrity section"""
     rules: list[tuple[str, list[list[str]]]] = []
     for line in report.splitlines():
         if line.startswith("=== "):
