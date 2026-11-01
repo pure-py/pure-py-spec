@@ -17,7 +17,7 @@ $(\sigma_1, \sigma_2)$ with $\Sigma \vdash \sigma_1 \subty \tau_1$ and $\Sigma \
 Run-time overloads of a unary operator $\ominus$ pair an operand bound $\tau$ with a definition of $\hat{\ominus}(v)$ in
 the same way.
 \end{specdefinition}
-\noindent The function $\typeOf(v)$ (\S\ref{aux:type-of}) gives the run-time type of a value, determined by its outermost form.
+\noindent The function $\typeOf(v)$ (\S\ref{aux:type-of}) gives the run-time type of a value.
 The result $\hat{\odot}(v, v')$ is given by the definition of the most
 specific run-time overload of $\odot$ at $(\typeOf(v), \typeOf(v'))$, and is $\aborts{\errExcluded}$ if no run-time
 overload of $\odot$ applies (\S\ref{aux:binop}). The result $\hat{\ominus}(v)$ is given in the same way
