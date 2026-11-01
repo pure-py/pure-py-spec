@@ -158,9 +158,7 @@ class Runner(Results):
             return [f"check: rejected: {(proc.stdout + proc.stderr).strip().split(chr(10), 1)[0]}"]
         return []
 
-    def run_interpreter(
-        self, path: pathlib.Path, outcome: PythonOutcome, undefined: bool
-    ) -> list[str]:
+    def interpret(self, path: pathlib.Path, outcome: PythonOutcome, undefined: bool) -> list[str]:
         if self.interpreter is None:
             return []
         succeeds = outcome == PythonOutcome.SUCCEEDS
@@ -207,12 +205,12 @@ class Runner(Results):
         if self.python_mode:
             return [
                 *(self.type_check_accepts(test) if well_formed else []),
-                *self.run_interpreter(path, python_outcome, False),
+                *self.interpret(path, python_outcome, False),
             ]
         undefined = purepy == PurePyOutcome.UNDEFINED
         return [
             *self.type_check(path, exit, error_expected),
-            *(self.run_interpreter(path, python_outcome, undefined) if well_formed else []),
+            *(self.interpret(path, python_outcome, undefined) if well_formed else []),
         ]
 
     def run_suite(self, suite: pathlib.Path, jobs: int | None) -> None:
