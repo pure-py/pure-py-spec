@@ -2,6 +2,7 @@ import argparse
 import concurrent.futures
 import contextlib
 import importlib.resources
+import os
 import pathlib
 import shlex
 import shutil
@@ -87,12 +88,15 @@ class Results:
         self.failures.append(msg)
 
     def record(self, label: object, failures: list[str]) -> None:
+        """Print the outcome, and a line for a report when the REPORT environment variable is set"""
         if failures:
             self.failed.append(f"{label} ({'; '.join(failures)})")
             print(f"  {RED}✗{RESET} {self.failed[-1]}")
         else:
             self.passed += 1
             print(f"  {GREEN}✓{RESET} {label}")
+        if os.environ.get("REPORT"):
+            print(f"report: {label}\t{'failed' if failures else 'passed'}")
 
     def summary(self) -> None:
         total = self.passed + len(self.failed)

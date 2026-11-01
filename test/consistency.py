@@ -68,7 +68,7 @@ def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
 
 
 def check_lint(r: Results) -> None:
-    with r.test("this script passes mypy and ruff"):
+    with r.test("consistency script and runner pass mypy and ruff"):
         sources = [str(TEST / "consistency.py"), inspect.getfile(purepy_conformance)]
         for tool in (
             ["mypy", "--strict", "--python-version", PYTHON_VERSION],
@@ -82,17 +82,12 @@ def check_lint(r: Results) -> None:
 
 
 def main() -> None:
-    """Run the checks named on the command line, or all of them"""
     consistency = Results()
+    check_python_version(consistency)
+    check_unique_rule_names(consistency)
     with suite() as suite_dir:
-        checks = {
-            "python-version": lambda: check_python_version(consistency),
-            "rule-names": lambda: check_unique_rule_names(consistency),
-            "rule-attribution": lambda: check_rule_attribution(consistency, suite_dir),
-            "lint": lambda: check_lint(consistency),
-        }
-        for name in sys.argv[1:] or list(checks):
-            checks[name]()
+        check_rule_attribution(consistency, suite_dir)
+        check_lint(consistency)
     consistency.summary()
     sys.exit(1 if consistency.failed else 0)
 

@@ -84,23 +84,9 @@ paper-anon.pdf: $(TEXFILES)
 spec-anon.pdf: $(TEXFILES)
 	$(call anon,spec-anon,PurePy-spec.tex)
 
-# Package requires pinned Python version
-check-python-version:
-	uv run --locked python test/consistency.py python-version
-
-# Rule names unique across specification and paper
-check-rule-names:
-	uv run --locked python test/consistency.py rule-names
-
-# Specification rule cited by every suite test except those rejected by the parser
-check-rule-attribution:
-	uv run --locked python test/consistency.py rule-attribution
-
-# Consistency script and runner pass mypy and ruff
-check-lint:
-	uv run --locked python test/consistency.py lint
-
-check-consistency: check-python-version check-rule-names check-rule-attribution check-lint
+# Specification consistent with the conformance suite
+check-consistency:
+	uv run --locked python test/consistency.py
 
 # Conformance suite against Python, with mypy as type checker
 check-suite:
@@ -166,4 +152,4 @@ clean:
 	rm -rf $(dir $(SPEC_LABELS))
 
 .PHONY: default all paper-submission check-anonymised check-archived-theories check-archived-suite check-submission clean \
-	check-consistency check-python-version check-rule-names check-rule-attribution check-lint check-suite wheel dependencies.svg integrity.txt status.html
+	check-consistency check-suite wheel dependencies.svg integrity.txt status.html

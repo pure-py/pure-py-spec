@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Report on a make target, run prerequisite by prerequisite: a tab-separated line per target that has a
 comment above its rule, giving its name, the comment, whether it passed, failed or wasn't run because a
-prerequisite failed, and the detail its recipe printed on lines starting "report:", written to standard
-output, with the make output on standard error. Further arguments are passed to make. Exits with failure if
-any target failed."""
+prerequisite failed, and the detail its recipe printed on lines starting "report:"; a report line with a tab
+separates the label and outcome of a check within the target, giving a line of its own with no target.
+Written to standard output, with the make output on standard error. Further arguments are passed to make.
+Exits with failure if any target failed."""
 
+import os
 import pathlib
 import re
 import subprocess
@@ -39,21 +41,29 @@ def main() -> None:
             return "passed"
         comment, prerequisites = graph[target]
         details: list[str] = []
+        checks: list[str] = []
         if any(run(p) != "passed" for p in prerequisites):
             outcome = "not run"
         else:
             made = subprocess.run(
-                ["make", target, *options], capture_output=True, text=True, check=False
+                ["make", target, *options],
+                capture_output=True,
+                text=True,
+                check=False,
+                env={**os.environ, "REPORT": "1"},
             )
             sys.stderr.write(made.stdout + made.stderr)
             outcome = "passed" if made.returncode == 0 else "failed"
-            details = [
+            lines = [
                 line.removeprefix("report: ")
                 for line in made.stdout.splitlines()
                 if line.startswith("report: ")
             ]
+            details = [line for line in lines if "\t" not in line]
+            checks = [line for line in lines if "\t" in line]
         if comment:
             report.append(f"{target}\t{comment}\t{outcome}\t{'; '.join(details)}")
+            report.extend(f"\t{check}\t" for check in checks)
         return outcome
 
     outcome = run(root)
