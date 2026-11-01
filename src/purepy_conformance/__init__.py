@@ -197,7 +197,7 @@ class Runner(Results):
             return ["run: output before the exception mismatch"]
         return []
 
-    def runs(self, purepy: PurePyOutcome) -> bool:
+    def should_run(self, purepy: PurePyOutcome) -> bool:
         if self.interpreter is None:
             return False
         return self.python_mode or purepy in (PurePyOutcome.AGREES, PurePyOutcome.UNDEFINED)
@@ -210,7 +210,9 @@ class Runner(Results):
         exit, error_checked, python_outcome = expectation(PythonOutcome(dirs[0]), purepy)
         path = test / MAIN if test.is_dir() else test
         undefined = purepy == PurePyOutcome.UNDEFINED and not self.python_mode
-        ran = self.run_interpreter(path, python_outcome, undefined) if self.runs(purepy) else []
+        ran = (
+            self.run_interpreter(path, python_outcome, undefined) if self.should_run(purepy) else []
+        )
         if self.python_mode:
             return [*(self.accepts(test) if exit == Exit.OK else []), *ran]
         return [*self.check(path, exit, error_checked), *ran]
