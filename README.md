@@ -42,11 +42,10 @@ specification, run the suite against Python with mypy as type checker, and build
 make wheel
 ```
 
-An implementation runs the suite with the `purepy-conformance` command of the installed package, giving the
-command which type-checks the module at the path appended to it and, optionally, the command which runs it. The
-type checker checks every test; the interpreter runs each test on which PurePy agrees with Python, which must
-have the outcome of Python, and with `--run-undefined` also each test undefined in PurePy. CPython (the default
-`python3`) is one such interpreter.
+An implementation runs the suite with the `purepy-conformance` command of the installed package, giving its type
+checker and its interpreter (default `python3`), each as a command taking the path of a module. The type checker
+checks every test. The interpreter runs every well-formed test and must give Python's outcome, except that on a
+test undefined in PurePy it may instead exit with status 4 to report undefined behaviour.
 
 ```bash
 purepy-conformance --type-checker "purepy --check" purepy
