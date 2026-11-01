@@ -75,28 +75,28 @@ $(PDFLATEX) -jobname=$(1) "\def\anonmode{}\input{$(2)}"
 $(call check-log,$(1))
 endef
 
-## The anonymised paper builds, with its references resolved
+## Anonymised paper builds, references resolved
 paper-anon.pdf: $(TEXFILES)
 	$(call anon,paper-anon,paper.tex)
 	sed -n 's/^\\newlabel{references}{{[^}]*}{\([0-9]*\)}.*/\1/p' paper-anon.aux > paper-anon.references
 	rm -f $(BUILD_AUX)
 
 PAGE_LIMIT := 25
-## The anonymised paper is within the page limit, excluding references
+## Anonymised paper within page limit, references excluded
 check-page-limit: paper-anon.pdf
 	@page=$$(cat paper-anon.references); echo "report: references begin on page $$page, limit $(PAGE_LIMIT) pages"; \
 		test "$$page" -le $(PAGE_LIMIT)
 
-## The anonymised specification builds, with its references resolved
+## Anonymised specification builds, references resolved
 spec-anon.pdf: $(TEXFILES)
 	$(call anon,spec-anon,PurePy-spec.tex)
 	rm -f $(BUILD_AUX)
 
-## The specification is consistent with the conformance suite
+## Specification consistent with conformance suite
 check-consistency:
 	uv run --locked python test/consistency.py
 
-## Python passes the conformance suite, with mypy as type checker
+## Python passes conformance suite, with mypy as type checker
 check-suite:
 	uv run --locked purepy-conformance --python \
 		--type-checker "mypy --python-version $$(cat .python-version) --config-file $(CURDIR)/test/mypy.ini --no-error-summary"
@@ -122,7 +122,7 @@ PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
 # Release of the mechanisation conforming to this specification
 PUREPY_RELEASE := v$(shell uv version --short --color never)
 
-## The archive holds the anonymised specification, the mechanisation release of the same version and the suite wheel
+## Archive holds anonymised specification, mechanisation release of same version and suite wheel
 supplementary.zip: spec-anon.pdf
 	rm -f $@ && rm -rf .submission
 	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
@@ -138,15 +138,15 @@ paper-submission: check-consistency paper-anon.pdf supplementary.zip
 .check-submission: supplementary.zip
 	rm -rf $@ && unzip -q $< -d $@
 
-## The archive contains no project names, in file names or contents
+## Archive contains no project names, in file names or contents
 check-anonymised: supplementary.zip
 	@! { unzip -l $<; unzip -p $<; } | grep -qiE 'pure-?py' || { echo "$<: project names found"; exit 1; }
 
-## The archived mechanisation builds: proofs checked, type checker generated
+## Archived mechanisation builds: proofs checked, type checker generated
 check-archived-theories: .check-submission
 	$(MAKE) -C $</mechanisation build ISABELLE=$(ISABELLE)
 
-## The archived type checker passes the archived suite
+## Archived type checker passes archived suite
 check-archived-suite: check-archived-theories
 	$(MAKE) -C .check-submission/mechanisation check-conformance
 
@@ -164,11 +164,11 @@ clean:
 	rm -f $(AUX) *.pdf *.zip *.tsv *.references $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(EVALUATION_FIGURE)
 	rm -rf $(dir $(SPEC_LABELS))
 
-## Every target with a recipe has a description
+## Every target with a recipe is described
 check-targets:
 	script/submission-report.py --check
 
-## List targets with their descriptions
+## List targets with descriptions
 help:
 	@awk '/^## / { d = substr($$0, 4); next } d && /^[a-zA-Z0-9_.-]+:/ { t = $$0; sub(/:.*/, "", t); printf "%-24s %s\n", t, d } { d = "" }' $(MAKEFILE_LIST)
 
