@@ -159,7 +159,9 @@ class Runner(Results):
             return [f"check: rejected: {(proc.stdout + proc.stderr).strip().split(chr(10), 1)[0]}"]
         return []
 
-    def run_python(self, path: pathlib.Path, outcome: PythonOutcome, undefined: bool) -> list[str]:
+    def run_interpreter(
+        self, path: pathlib.Path, outcome: PythonOutcome, undefined: bool
+    ) -> list[str]:
         """Failures of a run, which must have Python's outcome, or, for a test undefined in PurePy, may instead
         abort with undefined behaviour"""
         assert self.interpreter is not None
@@ -210,7 +212,7 @@ class Runner(Results):
         exit, error_checked, python_outcome = expectation(PythonOutcome(dirs[0]), purepy)
         path = test / MAIN if test.is_dir() else test
         undefined = purepy == PurePyOutcome.UNDEFINED and not self.python_mode
-        ran = self.run_python(path, python_outcome, undefined) if self.runs(purepy) else []
+        ran = self.run_interpreter(path, python_outcome, undefined) if self.runs(purepy) else []
         if self.python_mode:
             return [*(self.accepts(test) if exit == Exit.OK else []), *ran]
         return [*self.check(path, exit, error_checked), *ran]
