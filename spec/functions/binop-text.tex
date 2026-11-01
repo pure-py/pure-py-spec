@@ -1,4 +1,13 @@
-\replaced{Implementation of the most specific run-time overload of $\odot$ at $\typeOf(v)$ and $\typeOf(v')$, or
-$\aborts{\errExcluded}$ if no run-time overload of $\odot$ applies (\figref{run-time-overloads}). Run-time overloads apply at subtypes of their bounds and are ordered by
-componentwise subtyping on them, following $\resolveOp{\Sigma}$ (\S\ref{aux:resolve-op}).}{Meaning of
-a strict binary operator. }
+\replaced{Implementation of the most specific run-time overload of $\odot$ at the types $\typeOf(v)$ and $\typeOf(v')$.
+The run-time overloads of $\odot$ at $(\sigma_1, \sigma_2)$ are those of \figref{run-time-overloads} with bounds
+$(\tau_1, \tau_2)$ such that $\Sigma \vdash \sigma_1 \subty \tau_1$ and $\Sigma \vdash \sigma_2 \subty \tau_2$, ordered by
+componentwise subtyping in $\Sigma$ on their bounds. The most specific run-time overload is the least element under this
+order, which exists when some run-time overload applies (Lemma~\ref{lem:most-specific-run-time-overload}); the function
+aborts with $\errExcluded$ when no run-time overload applies.}{Meaning of a strict binary operator. }
+\begin{AddedBlock}
+\begin{lemma}[Most specific run-time overload]
+\label{lem:most-specific-run-time-overload}
+If some run-time overload of $\odot$ applies at $(\typeOf(v), \typeOf(v'))$, then the run-time overloads of $\odot$ at
+$(\typeOf(v), \typeOf(v'))$ have a least element.
+\end{lemma}
+\end{AddedBlock}
