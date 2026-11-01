@@ -1,0 +1,30 @@
+Checking project integrity for pure-py/pure-py-spec (project 1)...
+
+=== Every open issue is on the project board ===
+Issue	Title
+#56	Default arguments
+#57	*args and **kwargs
+#233	Protocols
+#234	`@overload`
+#297	Hashable
+
+=== Every open issue has a Status ===
+
+=== Milestoned issues are not Proposed ===
+Issue	Title	Milestone
+#105	`__all__` for wildcard imports	pure-py-spec 1.1
+#126	Relative imports	pure-py-spec 1.1
+#130	Correctness properties of well-formedness	PLDI 2027
+#196	Tighter rule attribution	PLDI 2027
+#222	Iterator functions	pure-py-spec 1.1
+#236	`|`, `&`, `-` and `^` for sets and dicts	pure-py-spec 1.1
+
+=== Active issues have a milestone ===
+Issue	Title	Status
+#14	Syntactic extensions	In progress
+
+=== Closed milestones contain only Done or Rejected issues ===
+
+=== Sub-issues of closed issues are closed ===
+
+12 issue(s) found.
