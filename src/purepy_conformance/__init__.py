@@ -52,12 +52,12 @@ class Exit(IntEnum):
 
 class Expectation(NamedTuple):
     exit: Exit
-    error_checked: bool  # type checker output contains .error.expected
+    error_expected: bool  # type checker output contains .error.expected
     python: PythonOutcome
 
 
 # Type checker verdict for each PurePy outcome
-TYPE_CHECKER: dict[PurePyOutcome, tuple[Exit, bool]] = {
+TYPE_CHECKER_VERDICT: dict[PurePyOutcome, tuple[Exit, bool]] = {
     PurePyOutcome.PARSER_REJECTS: (Exit.NOT_ALLOWED, True),
     PurePyOutcome.TYPING_REJECTS: (Exit.ILL_FORMED, True),
     PurePyOutcome.UNDEFINED: (Exit.OK, False),
@@ -66,8 +66,8 @@ TYPE_CHECKER: dict[PurePyOutcome, tuple[Exit, bool]] = {
 
 
 def expectation(python: PythonOutcome, purepy: PurePyOutcome) -> Expectation:
-    exit, error_checked = TYPE_CHECKER[purepy]
-    return Expectation(exit, error_checked, python)
+    exit, error_expected = TYPE_CHECKER_VERDICT[purepy]
+    return Expectation(exit, error_expected, python)
 
 
 def run(cmd: list[str], cwd: pathlib.Path | None = None) -> "subprocess.CompletedProcess[str]":
@@ -120,18 +120,18 @@ class Runner(Results):
         self.type_checked = 0
         self.run_only = 0
 
-    def check(self, path: pathlib.Path, exit: Exit, error_checked: bool) -> list[str]:
+    def type_check(self, path: pathlib.Path, exit: Exit, error_expected: bool) -> list[str]:
         """Each test is checked in a separate directory, so other tests can't interfere. Single-module tests
         are copied to a new directory before running."""
-        with tempfile.TemporaryDirectory() as alone:
-            checked = path if path.name == MAIN else pathlib.Path(shutil.copy(path, alone))
+        with tempfile.TemporaryDirectory() as tmp:
+            checked = path if path.name == MAIN else pathlib.Path(shutil.copy(path, tmp))
             proc = run([*self.type_checker, str(checked)])
         output = proc.stdout + proc.stderr
         error = path.with_suffix(ERROR_EXPECTED)
         if proc.returncode != exit:
             first = output.strip().split("\n", 1)[0].replace(f"{checked.parent}/", "")
             return [f"check: exit {proc.returncode}, expected {int(exit)}: {first}"]
-        if not error_checked:
+        if not error_expected:
             return []
         if not error.exists():
             return [f"check: missing {error.name}"]
@@ -140,12 +140,12 @@ class Runner(Results):
             return [f"check: expected {error.read_text().strip()!r}, got: {got}"]
         return []
 
-    def accepts(self, test: pathlib.Path) -> list[str]:
+    def type_check_accepts(self, test: pathlib.Path) -> list[str]:
         """Failures of the type checker to accept a test, a module or the directory of a program, or to
         reject it if the test is filed under a reported mypy bug. The test is copied to a new directory and
         checked from there, so that its modules resolve and nothing is written into the suite."""
-        with tempfile.TemporaryDirectory() as alone:
-            copy = pathlib.Path(alone) / test.name
+        with tempfile.TemporaryDirectory() as tmp:
+            copy = pathlib.Path(tmp) / test.name
             if test.is_dir():
                 shutil.copytree(test, copy)
                 proc = run([*self.type_checker, MAIN], cwd=copy)
@@ -166,19 +166,19 @@ class Runner(Results):
         behaviour in PurePy may instead report undefined behaviour."""
         if self.interpreter is None:
             return []
-        accepts = outcome == PythonOutcome.SUCCEEDS
+        succeeds = outcome == PythonOutcome.SUCCEEDS
         expected = path.with_suffix(EXPECTED)
         exception = path.with_suffix(EXCEPTION_EXPECTED)
         if expected.exists() == exception.exists():
             return [f"run: needs exactly one of {expected.name} and {exception.name}"]
-        if accepts != expected.exists():
+        if succeeds != expected.exists():
             return [f"run: misfiled, has {expected.name if expected.exists() else exception.name}"]
         args_path = path.with_suffix(ARGS)
         args = args_path.read_text().splitlines() if args_path.exists() else []
         proc = run([*self.interpreter, path.name, *args], cwd=path.parent)
         if undefined and proc.returncode == Exit.UNDEFINED:
             return []
-        if accepts:
+        if succeeds:
             status_path = path.with_suffix(STATUS_EXPECTED)
             status = int(status_path.read_text()) if status_path.exists() else 0
             if proc.returncode != status:
@@ -203,17 +203,17 @@ class Runner(Results):
         /<test>.py, or .../<test>/main.py for a program of several modules."""
         dirs = test.relative_to(suite).parts[:-1]
         purepy = PurePyOutcome(dirs[1])
-        exit, error_checked, python_outcome = expectation(PythonOutcome(dirs[0]), purepy)
+        exit, error_expected, python_outcome = expectation(PythonOutcome(dirs[0]), purepy)
         path = test / MAIN if test.is_dir() else test
         well_formed = exit == Exit.OK
         if self.python_mode:
             return [
-                *(self.accepts(test) if well_formed else []),
+                *(self.type_check_accepts(test) if well_formed else []),
                 *self.run_interpreter(path, python_outcome, False),
             ]
         undefined = purepy == PurePyOutcome.UNDEFINED
         return [
-            *self.check(path, exit, error_checked),
+            *self.type_check(path, exit, error_expected),
             *(self.run_interpreter(path, python_outcome, undefined) if well_formed else []),
         ]
 
@@ -221,7 +221,7 @@ class Runner(Results):
         """Tests run in parallel on jobs threads (default: one per core), reported in order."""
         found = list(tests(suite))
         self.type_checked = sum(
-            1 for test in found if not self.python_mode or well_formed(suite, test)
+            1 for test in found if not self.python_mode or is_well_formed(suite, test)
         )
         self.run_only = len(found) - self.type_checked
         with concurrent.futures.ThreadPoolExecutor(jobs) as pool:
@@ -235,8 +235,8 @@ class Runner(Results):
                 self.record(test.relative_to(suite), failures)
 
 
-def well_formed(suite: pathlib.Path, test: pathlib.Path) -> bool:
-    return TYPE_CHECKER[PurePyOutcome(test.relative_to(suite).parts[1])][0] == Exit.OK
+def is_well_formed(suite: pathlib.Path, test: pathlib.Path) -> bool:
+    return TYPE_CHECKER_VERDICT[PurePyOutcome(test.relative_to(suite).parts[1])][0] == Exit.OK
 
 
 def tests(suite: pathlib.Path) -> Iterator[pathlib.Path]:
@@ -279,17 +279,19 @@ def main(argv: Sequence[str] | None = None) -> None:
         "--jobs", type=int, help="number of tests run in parallel (default: number of cores)"
     )
     args = parser.parse_args(argv)
-    r = Runner(
+    runner = Runner(
         shlex.split(args.type_checker),
         None if args.no_run else shlex.split(args.interpreter),
         args.python_mode,
     )
     with suite() as path:
-        r.run_suite(path, args.jobs)
-    r.summary()
+        runner.run_suite(path, args.jobs)
+    runner.summary()
     if args.python_mode:
-        print(f"Python mode: {r.type_checked} tests type-checked and run, {r.run_only} run only")
-    sys.exit(0 if not r.failed else 1)
+        print(
+            f"Python mode: {runner.type_checked} tests type-checked and run, {runner.run_only} run only"
+        )
+    sys.exit(0 if not runner.failed else 1)
 
 
 if __name__ == "__main__":
