@@ -47,6 +47,7 @@ class Exit(IntEnum):
     OK = 0
     NOT_ALLOWED = 1
     ILL_FORMED = 3
+    UNDEFINED = 4  # Interpreter: run aborted with undefined behaviour
 
 
 class Expectation(NamedTuple):
@@ -111,13 +112,11 @@ class Runner(Results):
         type_checker: list[str],
         interpreter: list[str] | None,
         python: bool,
-        run_undefined: bool = False,
     ) -> None:
         super().__init__()
         self.type_checker = type_checker
         self.interpreter = interpreter  # None: tests not run
         self.python = python  # Implementation under test is Python itself
-        self.run_undefined = run_undefined  # Interpreter also run on tests undefined in PurePy
         self.type_checked = 0
         self.run_only = 0
 
@@ -160,7 +159,9 @@ class Runner(Results):
             return [f"check: rejected: {(proc.stdout + proc.stderr).strip().split(chr(10), 1)[0]}"]
         return []
 
-    def run_python(self, path: pathlib.Path, outcome: PythonOutcome) -> list[str]:
+    def run_python(self, path: pathlib.Path, outcome: PythonOutcome, undefined: bool) -> list[str]:
+        """Failures of a run, which must have Python's outcome, or, for a test undefined in PurePy, may instead
+        abort with undefined behaviour"""
         assert self.interpreter is not None
         accepts = outcome == PythonOutcome.SUCCEEDS
         expected = path.with_suffix(EXPECTED)
@@ -172,6 +173,8 @@ class Runner(Results):
         args_path = path.with_suffix(ARGS)
         args = args_path.read_text().splitlines() if args_path.exists() else []
         proc = run([*self.interpreter, path.name, *args], cwd=path.parent)
+        if undefined and proc.returncode == Exit.UNDEFINED:
+            return []
         if accepts:
             status_path = path.with_suffix(STATUS_EXPECTED)
             status = int(status_path.read_text()) if status_path.exists() else 0
@@ -194,15 +197,10 @@ class Runner(Results):
 
     def runs(self, purepy: PurePyOutcome) -> bool:
         """Whether the interpreter runs a test of the PurePy outcome: Python itself runs every test, and an
-        implementation of PurePy runs a test it agrees with Python on, and an undefined test only if asked,
-        since any behaviour conforms there"""
+        implementation of PurePy every well-formed test"""
         if self.interpreter is None:
             return False
-        return (
-            self.python
-            or purepy == PurePyOutcome.AGREES
-            or (purepy == PurePyOutcome.UNDEFINED and self.run_undefined)
-        )
+        return self.python or purepy in (PurePyOutcome.AGREES, PurePyOutcome.UNDEFINED)
 
     def run_test(self, suite: pathlib.Path, test: pathlib.Path) -> list[str]:
         """Failures of a test at a path below suite: <Python outcome>/<PurePy outcome>[/<subset>]/...
@@ -211,7 +209,8 @@ class Runner(Results):
         purepy = PurePyOutcome(dirs[1])
         exit, error_checked, python = expectation(PythonOutcome(dirs[0]), purepy)
         path = test / MAIN if test.is_dir() else test
-        ran = self.run_python(path, python) if self.runs(purepy) else []
+        undefined = purepy == PurePyOutcome.UNDEFINED and not self.python
+        ran = self.run_python(path, python, undefined) if self.runs(purepy) else []
         if self.python:
             return [*(self.accepts(test) if exit == Exit.OK else []), *ran]
         return [*self.check(path, exit, error_checked), *ran]
@@ -272,11 +271,6 @@ def main(argv: Sequence[str] | None = None) -> None:
         help="test Python itself: run every test, and type-check only the tests well-formed in PurePy, which must be accepted",
     )
     parser.add_argument(
-        "--run-undefined",
-        action="store_true",
-        help="also run the tests for which PurePy semantics is undefined",
-    )
-    parser.add_argument(
         "--jobs", type=int, help="number of tests run in parallel (default: number of cores)"
     )
     args = parser.parse_args(argv)
@@ -284,7 +278,6 @@ def main(argv: Sequence[str] | None = None) -> None:
         shlex.split(args.type_checker),
         None if args.no_run else shlex.split(args.interpreter),
         args.python,
-        args.run_undefined,
     )
     with suite() as path:
         r.run_suite(path, args.jobs)
