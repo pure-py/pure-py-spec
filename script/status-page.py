@@ -67,29 +67,29 @@ def row(repo: str, pr: dict[str, Any]) -> str:
 
 
 def integrity(report: str) -> str:
-    """Section listing the failures of each rule of the project integrity report, or that all rules passed"""
-    rules: list[tuple[str, list[str]]] = []
+    """Subsection per failing rule of the project integrity report, with a table of its failures, or a line
+    saying that all rules passed"""
+    rules: list[tuple[str, list[list[str]]]] = []
     for line in report.splitlines():
         if line.startswith("=== "):
             rules.append((line.strip("= "), []))
-        elif line.startswith("  FAIL: "):
-            rules[-1][1].append(line.removeprefix("  FAIL: "))
-    if not any(failures for _, failures in rules):
+        elif "\t" in line:
+            rules[-1][1].append(line.split("\t"))
+    if not any(rows for _, rows in rules):
         return "<p>All rules passed.</p>"
 
-    def item(failure: str) -> str:
+    def cell(text: str) -> str:
         link = rf'<a href="https://github.com/{ORG}/{INTEGRITY_REPO}/issues/\1">#\1</a>'
-        return f"<li>{ISSUE.sub(link, html.escape(failure))}</li>"
+        return ISSUE.sub(link, html.escape(text))
 
-    return (
-        "<ul>\n"
-        + "".join(
-            f"<li>{html.escape(rule)}<ul>{''.join(map(item, failures))}</ul></li>\n"
-            for rule, failures in rules
-            if failures
+    def table(rows: list[list[str]]) -> str:
+        headings = "".join(f"<th>{html.escape(h)}</th>" for h in rows[0])
+        body = "".join(
+            "<tr>" + "".join(f"<td>{cell(c)}</td>" for c in row) + "</tr>\n" for row in rows[1:]
         )
-        + "</ul>"
-    )
+        return f"<table>\n<tr>{headings}</tr>\n{body}</table>"
+
+    return "\n".join(f"<h3>{html.escape(rule)}</h3>\n{table(rows)}" for rule, rows in rules if rows)
 
 
 def page(repos: list[str], report: str) -> str:
