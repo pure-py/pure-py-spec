@@ -16,7 +16,7 @@
 \pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{/}\quad\pyinline{//}\quad\pyinline{\%}\quad\pyinline{**} & $(\tyFloat, \tyFloat)$ & \todo{Float arithmetic, as in Python, with precision left to the implementation; $\aborts{\errZeroDiv}$ if the divisor is zero, and $\aborts{\errOverflow}$ if Python raises the exception of that name, such as for an integer too large to convert to a float} \\
 \pyinline{+} & $(\tyStr, \tyStr)$ & $\val{v \concat v'}$ \\
 \pyinline{+} & $(\tyList{\tyObject}, \tyList{\tyObject})$ & $\val{\exList{\seq{v} \concat \seq{v}'}}$ if $v = \exList{\seq{v}}$ and $v' = \exList{\seq{v}'}$ \\
-\pyinline{+} & $(\tyTuple{\tyObject^m}, \tyTuple{\tyObject^n})$ & $\val{\exTuple{v_1, \ldots, v_m, u_1, \ldots, u_n}}$ if $v = \exTuple{v_1, \ldots, v_m}$ and $v' = \exTuple{u_1, \ldots, u_n}$ \\
+\pyinline{+} & $(\tyTuple{\tyObject^m}, \tyTuple{\tyObject^n})$ & $\val{\exTuple{\seq{v} \concat \seq{v}'}}$ if $v = \exTuple{v_1, \ldots, v_m}$ and $v' = \exTuple{v'_1, \ldots, v'_n}$ \\
 \pyinline{*} & $(\tyStr, \tyInt)$ & $\val{v^n}$ where $n = \max(v', 0)$ \\
 \pyinline{*} & $(\tyInt, \tyStr)$ & $\val{v'^n}$ where $n = \max(v, 0)$ \\
 \pyinline{*} & $(\tyList{\tyObject}, \tyInt)$ & $\val{\exList{\seq{v}^n}}$ if $v = \exList{\seq{v}}$, where $n = \max(v', 0)$ \\
