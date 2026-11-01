@@ -10,8 +10,8 @@ well-formed at its signature.
 \label{thm:loaded}
 If $\vdash_{\mathsf{mod}} q : \Gamma$ then every type in a context entry of $\Gamma$ is well-formed in the
 context in which $q$ is checked.
-If $\mathcal{P}(q) = (\rho, \Gamma)$ then $\vdash \rho : \Gamma$.
-If $\vdash_{\mathsf{mod}} q : \Gamma$ and $q \Rightarrow_{\mathsf{mod}} \val{\rho}$ then $\vdash \rho : \Gamma$.
+If $\mathcal{E}(\mathcal{A})(q) = \rho$ then $\vdash \rho : \mathcal{P}(q)$, for every $\mathcal{A}$.
+If $\vdash_{\mathsf{mod}} q : \Gamma$ and the program rules give module $q$ the environment $\rho$, then $\vdash \rho : \Gamma$.
 \end{theorem}
 
 \begin{lemma}[Variables are bound at run time]
@@ -21,5 +21,5 @@ If $\vdash \rho : \Gamma$ and $\Sigma; \Gamma \vdash x \synth \tau$ then $\rho(x
 
 \noindent The \ruleName{var} rule requires $x$ to be definitely assigned, and no value other than $\Unbound$ is
 well-formed at $\Unbound$ or $\DU{\tau}$, so a well-formed program never aborts with $\errName$ (\ruleName{eval-var-unbound}), where Python raises
-\pyinline{UnboundLocalError}. \todo{Unproven.}
+\pyinline{UnboundLocalError}.
 

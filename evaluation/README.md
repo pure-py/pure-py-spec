@@ -52,7 +52,7 @@ the model, never test outcomes; repair stops at acceptance or the budget. Python
 answers get no feedback. Every raw answer, extracted source, verdict, rejection
 and token count is kept, and reports distinguish initial from repaired results.
 
-## Output Format
+## Output format
 
 Prompts and the extraction protocol are versioned as `tagged-code-v1`. A Python
 answer must contain one `<python>...</python>` pair and a PurePy answer one
@@ -69,7 +69,7 @@ API error, a truncated response or a format failure. Unknown verdicts never
 count as failures or as checker rejections: reports show them separately and
 leave a gap unknown when either condition has unevaluated answers.
 
-## Data And Results
+## Data and results
 
 HumanEval+ and MBPP+ come from the pinned EvalPlus releases listed in
 `benchmarks/`, verified by SHA-256, and are graded by the pinned `evalplus`
@@ -140,23 +140,18 @@ which `make paper.pdf` in the repository root regenerates with this command from
 `figures/humaneval-qwen2.5-coder-0.5b.json`. That file is an archived original
 HumanEval smoke run, kept for reproducibility; it is not a HumanEval+ result.
 
-## CI And Harbor
+## CI and Harbor
 
-The evaluation job of the workflow `.github/workflows/paper.yml` runs in this directory on macOS
-and Linux whenever evaluation code changes: unit tests, a one-problem smoke run
-of every benchmark, the Harbor import and the compilation of the generated figure. It checks that the
-pipeline works, not what the model answers: wrong code and checker rejections
-are ordinary outcomes, while API errors, an unavailable checker or grader, and a
-broken sandbox fail the job. Reports are uploaded even when the job fails.
+The evaluation job of `.github/workflows/paper.yml` checks on macOS and Linux that the pipeline runs; wrong answers
+from the model don't fail the job.
 
-Harbor records each run as trials, one per problem and condition, and shows them
-in its viewer:
+Import a run into the Harbor viewer:
 
 ```bash
 bash scripts/harbor-import.sh --file results/RUN/MODEL.json
 ```
 
-See `harbor/README.md` for the viewer, the rewards and the Slurm job for GPU runs.
+See `harbor/README.md` for the viewer and GPU runs.
 
 ## Validate
 

@@ -19,6 +19,8 @@ EXPECTED = ".expected"
 EXCEPTION_EXPECTED = f".exception{EXPECTED}"
 ERROR_EXPECTED = f".error{EXPECTED}"
 STATUS_EXPECTED = f".status{EXPECTED}"
+OUTPUT_EXPECTED = f".output{EXPECTED}"
+ARGS = ".args"  # command-line arguments, one per line
 
 HELPERS = "helpers"
 MAIN = "main.py"
@@ -160,7 +162,9 @@ class Runner(Results):
             return [f"run: needs exactly one of {expected.name} and {exception.name}"]
         if accepts != expected.exists():
             return [f"run: misfiled, has {expected.name if expected.exists() else exception.name}"]
-        proc = run([self.interpreter, path.name], cwd=path.parent)
+        args_path = path.with_suffix(ARGS)
+        args = args_path.read_text().splitlines() if args_path.exists() else []
+        proc = run([self.interpreter, path.name, *args], cwd=path.parent)
         if accepts:
             status_path = path.with_suffix(STATUS_EXPECTED)
             status = int(status_path.read_text()) if status_path.exists() else 0
@@ -176,6 +180,9 @@ class Runner(Results):
             return [f"run: expected {name} but script succeeded"]
         if name not in proc.stderr:
             return [f"run: expected {name}, got: {proc.stderr.strip()}"]
+        output = path.with_suffix(OUTPUT_EXPECTED)
+        if proc.stdout != (output.read_text() if output.exists() else ""):
+            return ["run: output before the exception mismatch"]
         return []
 
     def run_test(self, suite: pathlib.Path, test: pathlib.Path) -> list[str]:

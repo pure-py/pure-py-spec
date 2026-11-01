@@ -8,7 +8,7 @@
 Import inside function body or branch, or after a statement & Dependencies of module known only as its statements run & Syntactic & Module body is an import prefix followed by a top-level statement \\\rowgap
 Wildcard import \pyinline{from q import *} & Introduces names of \pyinline{q} implicitly & Syntactic & Not in grammar \\\rowgap
 Submodule importing itself from parent, \pyinline{from a import b} in module \pyinline{a.b} & Parent may still be loading & Static & From-imported submodule is a dependency, so the import is a cycle \\\rowgap
-Import of contained module, \pyinline{import x.y} in module \pyinline{x} & Binding for head denotes still-loading module & Static & Containing modules of a plain import are checked, importing module included \\\rowgap
+Import of contained module, \pyinline{import x.y} in module \pyinline{x} & Binding for head denotes still-loading module & Static & Modules which strictly contain the target of a plain import are checked, importing module included \\\rowgap
 Reference \pyinline{pkg.sub.y} after \pyinline{import pkg} alone & Resolves if any module has loaded \pyinline{pkg.sub}; \pyinline{AttributeError} otherwise & Static & Qualified names resolve through imports of referring module \\\rowgap
 Reference to module member assigned on some paths only & \pyinline{AttributeError} if path not taken & Static & Member must be definitely assigned \\\rowgap
 Module binding name of one of its submodules & Attribute set by assignment and by loading submodule; last wins & Static & Names bound by module disjoint from names of its submodules

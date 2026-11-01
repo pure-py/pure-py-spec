@@ -1,0 +1,35 @@
+\begin{figure}
+\small
+\centering
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.14\textwidth}>{\raggedright\arraybackslash}p{0.31\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}}
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}$\odot$ & $(\tau_1, \tau_2)$ & $\hat{\odot}(v, v')$ \\
+\pyinline{==} & $(\tyObject, \tyObject)$ & $\val{\pyinline{False}}$ if $v$ and $v'$ are both \pyinline{nan}; $\eqOp{\Sigma}(v, v')$ otherwise \\
+\pyinline{!=} & $(\tyObject, \tyObject)$ & $\val{\pyinline{True}}$ if $v$ and $v'$ are both \pyinline{nan} or $\eqOp{\Sigma}(v, v') = \val{\pyinline{False}}$; $\val{\pyinline{False}}$ if $\eqOp{\Sigma}(v, v') = \val{\pyinline{True}}$; $\eqOp{\Sigma}(v, v')$ otherwise \\
+\pyinline{in} & $(\tyObject, \tyObject)$ & $\inOp{\Sigma}(v, v')$ \\
+\pyinline{not in} & $(\tyObject, \tyObject)$ & $\val{\pyinline{True}}$ if $\inOp{\Sigma}(v, v') = \val{\pyinline{False}}$; $\val{\pyinline{False}}$ if $\inOp{\Sigma}(v, v') = \val{\pyinline{True}}$; $\inOp{\Sigma}(v, v')$ otherwise \\
+\pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & $(\tyFloat, \tyFloat)$ & \todo{Numeric order, as in Python} \\
+\pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & $(\tyStr, \tyStr)$ & $\val{\pyinline{True}}$ if $v < v'$, $v \leq v'$, $v > v'$ or $v \geq v'$ respectively in the lexicographic order on code points; $\val{\pyinline{False}}$ otherwise \\
+\pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{//}\quad\pyinline{\%} & $(\tyInt, \tyInt)$ & \todo{Integer arithmetic, as in Python; $\aborts{\errZeroDiv}$ if the divisor is zero} \\
+\pyinline{**} & $(\tyInt, \tyInt)$ & \todo{Integer power, as in Python, giving a float if $v'$ is negative} \\
+\pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{/}\quad\pyinline{//}\quad\pyinline{\%}\quad\pyinline{**} & $(\tyFloat, \tyFloat)$ & \todo{Float arithmetic, as in Python, with precision left to the implementation; $\aborts{\errZeroDiv}$ if the divisor is zero, and $\aborts{\errOverflow}$ if Python raises the exception of that name, such as for an integer too large to convert to a float} \\
+\pyinline{+} & $(\tyStr, \tyStr)$ & $\val{v \concat v'}$ \\
+\pyinline{+} & $(\tyList{\tyObject}, \tyList{\tyObject})$ & $\val{\exList{\seq{v} \concat \seq{v}'}}$ if $v = \exList{\seq{v}}$ and $v' = \exList{\seq{v}'}$ \\
+\pyinline{+} & $(\tyTuple{\tyObject^m}, \tyTuple{\tyObject^n})$ & $\val{\exTuple{\seq{v} \concat \seq{v}'}}$ if $v = \exTuple{v_1, \ldots, v_m}$ and $v' = \exTuple{v'_1, \ldots, v'_n}$ \\
+\pyinline{*} & $(\tyStr, \tyInt)$ & $\val{\bigconcat{v^n}}$ where $n = \max(v', 0)$ \\
+\pyinline{*} & $(\tyInt, \tyStr)$ & $\val{\bigconcat{v'^n}}$ where $n = \max(v, 0)$ \\
+\pyinline{*} & $(\tyList{\tyObject}, \tyInt)$ & $\val{\exList{\bigconcat{\seq{v}^n}}}$ if $v = \exList{\seq{v}}$, where $n = \max(v', 0)$ \\
+\pyinline{*} & $(\tyInt, \tyList{\tyObject})$ & $\val{\exList{\bigconcat{\seq{v}^n}}}$ if $v' = \exList{\seq{v}}$, where $n = \max(v, 0)$
+\end{tabular}
+
+\vspace{3mm}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.14\textwidth}>{\raggedright\arraybackslash}p{0.31\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}}
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}$\ominus$ & $\tau$ & $\hat{\ominus}(v)$ \\
+\pyinline{not} & $\tyBool$ & $\val{\pyinline{False}}$ if $v = \pyinline{True}$; $\val{\pyinline{True}}$ otherwise \\
+\pyinline{+} & $\tyFloat$ & $\val{v}$ \\
+\pyinline{-} & $\tyFloat$ & $\val{-v}$
+\end{tabular}
+\caption{Run-time overloads of operators}
+\label{fig:run-time-overloads}
+\end{figure}

@@ -2,9 +2,9 @@
 \matchOp{\Sigma}(\rho, \patConstr{(x \cons \seq{x})}{a}, v) &{}= \errAttr \\*
 &\qquad \text{if } \resolve(\rho, x \cons \seq{x}) \text{ undefined and } \rho(x) \notin \set{\bot, \Unbound} \\*
 \matchOp{\Sigma}(\rho, \patConstr{q}{a}, v) &{}= \errExcluded \\*
-&\qquad \text{if } \resolve(\rho, q) \text{ of the form } \opaqueVal{\pyinline{builtins}.y} \\*
+&\qquad \text{if } \resolve(\rho, q) \text{ of the form } \predefVal{\pyinline{builtins}.y} \\*
 \matchOp{\Sigma}(\rho, \patConstr{q}{a}, v) &{}= \errType \\*
 &\qquad \text{if } \resolve(\rho, q) \text{ defined and not of the form} \\*
-&\qquad \Type{C} \text{ or } \opaqueVal{\pyinline{builtins}.y} \\*
+&\qquad \Type{C} \text{ or } \predefVal{\pyinline{builtins}.y} \\*
 \matchOp{\Sigma}(\rho, \patConstr{q}{a}, \exObj{D}{\bind{\seq{z}}{\seq{v}}}) &{}= \matchFields{\Sigma}(\rho, C, a, \bind{\seq{z}}{\seq{v}}) \\*
 &\qquad \text{if } \resolve(\rho, q) = \Type{C} \text{ and } C \in \ancestors{\Sigma}(D)

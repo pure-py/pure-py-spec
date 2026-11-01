@@ -2,9 +2,10 @@
 from typing import Callable
 
 def hello() -> None:
-    print("hi")
+    pass
 
 def run(f: Callable[[], None]) -> None:
     f()
 
 run(hello)
+print("done")

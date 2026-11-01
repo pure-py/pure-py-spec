@@ -50,6 +50,11 @@ runs the tests:
 purepy-conformance --type-checker "purepy --check" python3
 ```
 
+The files beside a test give its expectations: `.expected` holds the output of a test that succeeds, `.status.expected`
+its exit status when non-zero, `.exception.expected` the exception raised by a test that raises, `.output.expected`
+the output before the exception, `.error.expected` the diagnostic of a test the type checker rejects, and `.args`
+the command-line arguments of a run, one per line.
+
 ## Development
 
 Synchronise the project environment and install the development dependencies:

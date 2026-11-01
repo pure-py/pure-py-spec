@@ -1,3 +1,3 @@
-# rule: eval-module-fail
+# rule: eval-program-abort
 import a
 print(1)
