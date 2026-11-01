@@ -198,8 +198,9 @@ class Runner(Results):
         return []
 
     def run_test(self, suite: pathlib.Path, test: pathlib.Path) -> list[str]:
-        """Failures of a test at a path below suite: <Python outcome>/<PurePy outcome>[/<subset>]/...
-        /<test>.py, or .../<test>/main.py for a program of several modules."""
+        """Run a test and return its failures. Within the suite, a test's path starts with its Python outcome
+        and its PurePy outcome, as in python-succeeds/agrees/.../name.py, or .../name/main.py for a program of
+        several modules."""
         dirs = test.relative_to(suite).parts[:-1]
         purepy = PurePyOutcome(dirs[1])
         exit, error_expected, python_outcome = expectation(PythonOutcome(dirs[0]), purepy)
