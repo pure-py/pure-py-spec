@@ -61,7 +61,7 @@ def main() -> None:
         rule = graph[target]
         details: list[str] = []
         checks: list[str] = []
-        if any(run(p) != "passed" for p in rule.prerequisites):
+        if any(outcome != "passed" for outcome in [run(p) for p in rule.prerequisites]):
             outcome = "not run"
         else:
             made = subprocess.run(
@@ -80,6 +80,13 @@ def main() -> None:
             ]
             details = [line for line in lines if "\t" not in line]
             checks = [line for line in lines if "\t" in line]
+            if outcome == "failed" and not details:
+                output = [
+                    line
+                    for line in made.stderr.splitlines()
+                    if line and not line.startswith("make")
+                ]
+                details = output[-1:]
         if rule.description:
             report.append(f"{target}\t{rule.description}\t{outcome}\t{'; '.join(details)}")
             report.extend(f"\t{check}\t" for check in checks)
