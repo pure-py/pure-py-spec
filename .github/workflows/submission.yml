@@ -19,9 +19,7 @@ jobs:
       - name: Set up uv
         uses: astral-sh/setup-uv@v10.2.0
 
-      # Falls back to main when the mechanisation has no release at the specification's version, so that the
-      # archive step reports the missing release
-      - name: Read Isabelle version of the mechanisation release
+      - name: Read Isabelle version of the mechanisation release, or of main without one
         id: read
         run: |
           repo=https://raw.githubusercontent.com/pure-py/isabelle-purepy
