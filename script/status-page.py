@@ -15,7 +15,7 @@ ORG = "pure-py"
 SPEC_REPO = "pure-py-spec"
 SUBMISSION_WORKFLOW = "submission.yml"
 SUBMISSION_REPORT = "submission-report"
-SUBMISSION = pathlib.Path(".submission").read_text().strip()  # Venue of the submission
+VENUE = pathlib.Path(".venue").read_text().strip()
 ISSUE = re.compile(r"#(\d+)")
 FIELDS = "number,title,url,author,isDraft,updatedAt,reviewDecision,statusCheckRollup"
 FAILED = {"FAILURE", "ERROR", "TIMED_OUT", "CANCELLED", "ACTION_REQUIRED"}
@@ -159,7 +159,7 @@ def page(repos: list[str], report: str) -> str:
 {table(draft=True)}
 <h2>Project integrity</h2>
 {integrity(report)}
-<h2>{SUBMISSION} submission</h2>
+<h2>{VENUE} submission</h2>
 {submission()}
 </body>
 </html>
