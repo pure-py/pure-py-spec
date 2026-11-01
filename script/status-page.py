@@ -15,6 +15,7 @@ ORG = "pure-py"
 SPEC_REPO = "pure-py-spec"
 SUBMISSION_WORKFLOW = "submission.yml"
 SUBMISSION_REPORT = "submission-report"
+SUBMISSION_TARGET = "paper-submission"
 ISSUE = re.compile(r"#(\d+)")
 FIELDS = "number,title,url,author,isDraft,updatedAt,reviewDecision,statusCheckRollup"
 FAILED = {"FAILURE", "ERROR", "TIMED_OUT", "CANCELLED", "ACTION_REQUIRED"}
@@ -99,6 +100,15 @@ def integrity(report: str) -> str:
     return "\n".join(f"<h3>{html.escape(rule)}</h3>\n{table(rows)}" for rule, rows in rules if rows)
 
 
+def description(target: str) -> str:
+    """Double-hash comment above the target's rule in the Makefile"""
+    lines = pathlib.Path("Makefile").read_text().splitlines()
+    above = next(
+        (lines[i - 1] for i, line in enumerate(lines) if line.startswith(f"{target}:")), ""
+    )
+    return above.removeprefix("## ") if above.startswith("## ") else ""
+
+
 def submission() -> str:
     """Submission section, from latest completed run on main"""
     listing = subprocess.run(
@@ -165,7 +175,7 @@ def page(repos: list[str], report: str) -> str:
 {table(draft=True)}
 <h2>Project integrity</h2>
 {integrity(report)}
-<h2>Submission</h2>
+<h2>{html.escape(description(SUBMISSION_TARGET) or "Submission")}</h2>
 {submission()}
 </body>
 </html>
