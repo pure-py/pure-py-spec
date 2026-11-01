@@ -12,10 +12,10 @@ ANON_SLUG="$(tr '[:upper:]' '[:lower:]' <<< "$ANON_NAME")"
 
 anonymise() {
   for f in $(grep -rl "$REPO" .); do
-    sed -e "s/$REPO/$NAME/g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+    sed -e "s/$REPO/$NAME/g" "$f" > "$f.tmp" && cat "$f.tmp" > "$f" && rm "$f.tmp"
   done
   for f in $(grep -rlE 'pure-py|PurePy|purepy' .); do
-    sed -e "s/pure-py/$ANON_SLUG/g" -e "s/PurePy/$ANON_NAME/g" -e "s/purepy/$ANON_SLUG/g" "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+    sed -e "s/pure-py/$ANON_SLUG/g" -e "s/PurePy/$ANON_NAME/g" -e "s/purepy/$ANON_SLUG/g" "$f" > "$f.tmp" && cat "$f.tmp" > "$f" && rm "$f.tmp"
   done
   for f in $(find . -depth -name '*purepy*'); do
     mv "$f" "${f%purepy*}$ANON_SLUG${f##*purepy}"

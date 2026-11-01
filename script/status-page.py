@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """HTML status page of the organisation, with the dependency diagram, the open pull requests of the
-repositories cloned under a directory and the output of the project integrity check, written to standard
-output"""
+repositories cloned under a directory, the output of the project integrity check and the report of the latest
+submission run, written to standard output"""
 
 import datetime
 import html
@@ -10,10 +10,13 @@ import pathlib
 import re
 import subprocess
 import sys
+import tempfile
 from typing import Any
 
 ORG = "pure-py"
-INTEGRITY_REPO = "pure-py-spec"  # Repository checked by the project integrity script
+SPEC_REPO = "pure-py-spec"
+SUBMISSION_WORKFLOW = "submission.yml"
+SUBMISSION_REPORT = "submission-report"
 ISSUE = re.compile(r"#(\d+)")
 FIELDS = "number,title,url,author,isDraft,updatedAt,reviewDecision,statusCheckRollup"
 FAILED = {"FAILURE", "ERROR", "TIMED_OUT", "CANCELLED", "ACTION_REQUIRED"}
@@ -80,7 +83,7 @@ def integrity(report: str) -> str:
         return "<p>All rules passed.</p>"
 
     def cell(text: str) -> str:
-        link = rf'<a href="https://github.com/{ORG}/{INTEGRITY_REPO}/issues/\1">#\1</a>'
+        link = rf'<a href="https://github.com/{ORG}/{SPEC_REPO}/issues/\1">#\1</a>'
         return ISSUE.sub(link, html.escape(text))
 
     def table(rows: list[list[str]]) -> str:
@@ -91,6 +94,47 @@ def integrity(report: str) -> str:
         return f"<table>\n<tr>{headings}</tr>\n{body}</table>"
 
     return "\n".join(f"<h3>{html.escape(rule)}</h3>\n{table(rows)}" for rule, rows in rules if rows)
+
+
+def submission() -> str:
+    """Section with the latest completed run of the submission workflow on main and its report, or that
+    there is none"""
+    listing = subprocess.run(
+        ["gh", "run", "list", "--repo", f"{ORG}/{SPEC_REPO}", "--workflow", SUBMISSION_WORKFLOW]
+        + ["--branch", "main", "--status", "completed", "--limit", "1"]
+        + ["--json", "databaseId,conclusion,createdAt,url,headSha"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    runs: list[dict[str, Any]] = json.loads(listing.stdout) if listing.returncode == 0 else []
+    if not runs:
+        return "<p>No run yet.</p>"
+    run = runs[0]
+    with tempfile.TemporaryDirectory() as directory:
+        subprocess.run(
+            ["gh", "run", "download", str(run["databaseId"]), "--repo", f"{ORG}/{SPEC_REPO}"]
+            + ["--name", SUBMISSION_REPORT, "--dir", directory],
+            capture_output=True,
+            check=False,
+        )
+        report = pathlib.Path(directory, "submission.tsv")
+        rows = (
+            [line.split("\t") for line in report.read_text().splitlines()]
+            if report.exists()
+            else []
+        )
+    when = run["createdAt"][:16].replace("T", " ")
+    heading = (
+        f'<p>Run of <a href="{run["url"]}">{when}</a> UTC on commit {run["headSha"][:7]}: '
+        f"{html.escape(run['conclusion'])}.</p>"
+    )
+    body = "".join(
+        "<tr>" + "".join(f"<td>{html.escape(c)}</td>" for c in row) + "</tr>\n" for row in rows
+    )
+    return (
+        f"{heading}\n<table>\n<tr><th>Target</th><th>Check</th><th>Result</th></tr>\n{body}</table>"
+    )
 
 
 def page(repos: list[str], report: str) -> str:
@@ -121,6 +165,8 @@ def page(repos: list[str], report: str) -> str:
 {table(draft=True)}
 <h2>Project integrity</h2>
 {integrity(report)}
+<h2>Submission</h2>
+{submission()}
 </body>
 </html>
 """

@@ -32,7 +32,9 @@ tex/python-version.tex
 tex/mypy-version.tex
 tex/anon-name.tex
 
-# Generated status page
+# Generated status page and submission report
 dependencies.svg
 integrity.txt
 status.html
+submission.tsv
+.check-submission/

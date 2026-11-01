@@ -6,6 +6,7 @@ ANON_NAME_TEX := tex/anon-name.tex
 SPEC_LABELS := xref/PurePy-spec.aux
 TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX)
 PDFLATEX := pdflatex -interaction=nonstopmode -halt-on-error
+ISABELLE ?= isabelle
 BUILD_AUX := *.aux *.blg *.cb *.cb2 *.cut *.fdb_latexmk *.fls *.loc *.log *.out *.soc *.toc
 AUX := $(BUILD_AUX) *.bbl
 
@@ -75,9 +76,11 @@ $(call check-log,$(1))
 rm -f $(BUILD_AUX)
 endef
 
+# Anonymised paper
 paper-anon.pdf: $(TEXFILES)
 	$(call anon,paper-anon,paper.tex)
 
+# Anonymised specification
 spec-anon.pdf: $(TEXFILES)
 	$(call anon,spec-anon,PurePy-spec.tex)
 
@@ -108,6 +111,7 @@ PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
 # Release of the mechanisation conforming to this specification
 PUREPY_RELEASE := v$(shell uv version --short --color never)
 
+# Anonymised specification and mechanisation at the release of the specification's version, with the suite
 supplementary.zip: spec-anon.pdf
 	rm -f $@ && rm -rf .submission
 	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
@@ -118,13 +122,32 @@ supplementary.zip: spec-anon.pdf
 
 paper-submission: check-consistency paper-anon.pdf supplementary.zip
 
+.check-submission: supplementary.zip
+	rm -rf $@ && unzip -q $< -d $@
+
+# No project names in the archive
+check-anonymised: supplementary.zip
+	@! { unzip -l $<; unzip -p $<; } | grep -qiE 'pure-?py' || { echo "$<: project names found"; exit 1; }
+
+# Theories of the archived mechanisation, with its type checker generated
+check-archived-theories: .check-submission
+	$(MAKE) -C $</mechanisation build ISABELLE=$(ISABELLE)
+
+# Archived type checker against the archived conformance suite
+check-archived-suite: check-archived-theories
+	$(MAKE) -C .check-submission/mechanisation check-conformance
+
+check-submission: paper-submission check-anonymised check-archived-suite
+
 # arXiv runs pdflatex without bibtex, so include the .bbl.
 paper-arXiv.zip: paper.pdf
 	rm -f $@
 	zip -q -9 $@ paper.tex paper.bbl $(sort $(INPUTS) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX)) $(EVALUATION_FIGURE)
 
 clean:
-	rm -f $(AUX) *.pdf *.zip $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(EVALUATION_FIGURE)
+	rm -rf .check-submission
+	rm -f $(AUX) *.pdf *.zip *.tsv $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(EVALUATION_FIGURE)
 	rm -rf $(dir $(SPEC_LABELS))
 
-.PHONY: default all paper-submission clean check-consistency check-suite wheel dependencies.svg integrity.txt status.html
+.PHONY: default all paper-submission check-anonymised check-archived-theories check-archived-suite check-submission clean \
+	check-consistency check-suite wheel dependencies.svg integrity.txt status.html
