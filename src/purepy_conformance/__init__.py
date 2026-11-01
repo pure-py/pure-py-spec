@@ -116,7 +116,7 @@ class Runner(Results):
         super().__init__()
         self.type_checker = type_checker
         self.interpreter = interpreter  # None: tests not run
-        self.python_mode = python_mode  # Implementation under test is Python itself
+        self.python_mode = python_mode  # Suite checked against Python and mypy
         self.type_checked = 0
         self.run_only = 0
 
@@ -198,8 +198,8 @@ class Runner(Results):
         return []
 
     def runs(self, purepy: PurePyOutcome) -> bool:
-        """Whether the interpreter runs a test of the PurePy outcome: Python itself runs every test, and an
-        implementation of PurePy every well-formed test"""
+        """Whether the interpreter runs a test of the PurePy outcome: every test in Python mode, and every
+        well-formed test otherwise"""
         if self.interpreter is None:
             return False
         return self.python_mode or purepy in (PurePyOutcome.AGREES, PurePyOutcome.UNDEFINED)
@@ -272,7 +272,8 @@ def main(argv: Sequence[str] | None = None) -> None:
     parser.add_argument(
         "--python-mode",
         action="store_true",
-        help="test Python itself: run every test, and type-check only the tests well-formed in PurePy, which must be accepted",
+        help="check the suite against Python and mypy: each test, whether or not it is well-formed in PurePy, "
+        "has its recorded Python outcome, and mypy accepts each test which is well-formed in PurePy",
     )
     parser.add_argument(
         "--jobs", type=int, help="number of tests run in parallel (default: number of cores)"
