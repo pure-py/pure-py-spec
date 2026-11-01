@@ -42,8 +42,8 @@ specification, run the suite against Python with mypy as type checker, and build
 make wheel
 ```
 
-An implementation runs the suite with the `purepy-conformance` command of the installed package, giving its type
-checker and its interpreter (default `python3`), each as a command taking the path of a module. The type checker
+An implementation runs the suite with the `purepy-conformance` command of the installed package, providing a type
+checker and interpreter (default `python3`), each as a command taking the path of a module. The type checker
 checks every test. The interpreter runs every well-formed test, which must have the recorded Python outcome. A run with
 undefined behaviour in PurePy may instead report undefined behaviour, by exit status 4.
 
