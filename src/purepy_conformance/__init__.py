@@ -164,7 +164,8 @@ class Runner(Results):
     ) -> list[str]:
         """Run the interpreter on a test, which must have the recorded Python outcome. A run with undefined
         behaviour in PurePy may instead report undefined behaviour."""
-        assert self.interpreter is not None
+        if self.interpreter is None:
+            return []
         accepts = outcome == PythonOutcome.SUCCEEDS
         expected = path.with_suffix(EXPECTED)
         exception = path.with_suffix(EXCEPTION_EXPECTED)
@@ -197,11 +198,6 @@ class Runner(Results):
             return ["run: output before the exception mismatch"]
         return []
 
-    def should_run(self, purepy: PurePyOutcome) -> bool:
-        if self.interpreter is None:
-            return False
-        return self.python_mode or purepy in (PurePyOutcome.AGREES, PurePyOutcome.UNDEFINED)
-
     def run_test(self, suite: pathlib.Path, test: pathlib.Path) -> list[str]:
         """Failures of a test at a path below suite: <Python outcome>/<PurePy outcome>[/<subset>]/...
         /<test>.py, or .../<test>/main.py for a program of several modules."""
@@ -209,13 +205,17 @@ class Runner(Results):
         purepy = PurePyOutcome(dirs[1])
         exit, error_checked, python_outcome = expectation(PythonOutcome(dirs[0]), purepy)
         path = test / MAIN if test.is_dir() else test
-        undefined = purepy == PurePyOutcome.UNDEFINED and not self.python_mode
-        ran = (
-            self.run_interpreter(path, python_outcome, undefined) if self.should_run(purepy) else []
-        )
+        well_formed = exit == Exit.OK
         if self.python_mode:
-            return [*(self.accepts(test) if exit == Exit.OK else []), *ran]
-        return [*self.check(path, exit, error_checked), *ran]
+            return [
+                *(self.accepts(test) if well_formed else []),
+                *self.run_interpreter(path, python_outcome, False),
+            ]
+        undefined = purepy == PurePyOutcome.UNDEFINED
+        return [
+            *self.check(path, exit, error_checked),
+            *(self.run_interpreter(path, python_outcome, undefined) if well_formed else []),
+        ]
 
     def run_suite(self, suite: pathlib.Path, jobs: int | None) -> None:
         """Tests run in parallel on jobs threads (default: one per core), reported in order."""
