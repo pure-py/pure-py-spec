@@ -141,9 +141,8 @@ class Runner(Results):
         return []
 
     def type_check_accepts(self, test: pathlib.Path) -> list[str]:
-        """Failures of the type checker to accept a test, a module or the directory of a program, or to
-        reject it if the test is filed under a reported mypy bug. The test is copied to a new directory and
-        checked from there, so that its modules resolve and nothing is written into the suite."""
+        """Type-check a copy of a test in a temporary directory, so that the type checker writes nothing into
+        the suite. The test must be accepted unless it is filed as a reported mypy bug."""
         with tempfile.TemporaryDirectory() as tmp:
             copy = pathlib.Path(tmp) / test.name
             if test.is_dir():
