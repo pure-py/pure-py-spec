@@ -13,8 +13,8 @@
 \pyinline{+} & $(\tyStr, \tyStr)$ & $\val{v \concat v'}$ \\
 \pyinline{+} & $(\tyList{\tyObject}, \tyList{\tyObject})$ & $\val{\exList{\seq{v} \concat \seq{v}'}}$ where $v = \exList{\seq{v}}$ and $v' = \exList{\seq{v}'}$ \\
 \pyinline{+} & $(\tyTuple{\tyObject, \ldots, \tyObject},$\newline$\phantom{(}\tyTuple{\tyObject, \ldots, \tyObject})$ & $\val{\exTuple{\seq{v} \concat \seq{v}'}}$ where $v = \exTuple{\seq{v}}$ and $v' = \exTuple{\seq{v}'}$ \\
-\pyinline{*} & $(\tyStr, \tyInt)$ & $\val{w}$, for $w$ the concatenation of $v'$ copies of $v$, or of none if $v' \leq 0$ \\
-\pyinline{*} & $(\tyInt, \tyStr)$ & $\val{w}$, for $w$ the concatenation of $v$ copies of $v'$, or of none if $v \leq 0$ \\
-\pyinline{*} & $(\tyList{\tyObject}, \tyInt)$ & $\val{\exList{\seq{u}}}$, for $\seq{u}$ the concatenation of $v'$ copies of $\seq{v}$, or of none if $v' \leq 0$, where $v = \exList{\seq{v}}$ \\
-\pyinline{*} & $(\tyInt, \tyList{\tyObject})$ & $\val{\exList{\seq{u}}}$, for $\seq{u}$ the concatenation of $v$ copies of $\seq{v}$, or of none if $v \leq 0$, where $v' = \exList{\seq{v}}$
+\pyinline{*} & $(\tyStr, \tyInt)$ & $\val{v^n}$ where $n = \max(v', 0)$ \\
+\pyinline{*} & $(\tyInt, \tyStr)$ & $\val{v'^n}$ where $n = \max(v, 0)$ \\
+\pyinline{*} & $(\tyList{\tyObject}, \tyInt)$ & $\val{\exList{\seq{v}^n}}$ where $v = \exList{\seq{v}}$ and $n = \max(v', 0)$ \\
+\pyinline{*} & $(\tyInt, \tyList{\tyObject})$ & $\val{\exList{\seq{v}^n}}$ where $v' = \exList{\seq{v}}$ and $n = \max(v, 0)$
 \end{tabular}
