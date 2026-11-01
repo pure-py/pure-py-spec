@@ -105,7 +105,7 @@ check-suite:
 wheel: check-targets check-consistency check-suite
 	rm -rf dist && uv build --wheel
 
-## Dependency diagram of the organisation's repositories, from clones alongside this one
+## Dependency diagram of the organisation's repositories, from clones alongside this repository
 dependencies.svg:
 	uv run --locked python script/dependency-diagram.py .. | d2 --pad 16 - $@
 
@@ -122,7 +122,7 @@ PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
 # Release of the mechanisation conforming to this specification
 PUREPY_RELEASE := v$(shell uv version --short --color never)
 
-## Archive: anonymised specification, mechanisation at the specification's release, suite wheel
+## Archive of the anonymised specification, the mechanisation release of the same version and the suite wheel
 supplementary.zip: spec-anon.pdf
 	rm -f $@ && rm -rf .submission
 	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
@@ -164,7 +164,7 @@ clean:
 	rm -f $(AUX) *.pdf *.zip *.tsv *.references $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(EVALUATION_FIGURE)
 	rm -rf $(dir $(SPEC_LABELS))
 
-## Every make target with a recipe described
+## Description on every target with a recipe
 check-targets:
 	script/submission-report.py --check
 
