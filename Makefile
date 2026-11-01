@@ -127,7 +127,7 @@ paper-submission: check-consistency paper-anon.pdf supplementary.zip
 .check-submission: supplementary.zip
 	rm -rf $@ && unzip -q $< -d $@
 
-# Archive free of project names, in file names and contents
+# Archive free of project names (file names and contents)
 check-anonymised: supplementary.zip
 	@! { unzip -l $<; unzip -p $<; } | grep -qiE 'pure-?py' || { echo "$<: project names found"; exit 1; }
 
