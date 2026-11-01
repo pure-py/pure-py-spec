@@ -15,6 +15,7 @@ ORG = "pure-py"
 SPEC_REPO = "pure-py-spec"
 SUBMISSION_WORKFLOW = "submission.yml"
 SUBMISSION_REPORT = "submission-report"
+SUBMISSION = pathlib.Path(".submission").read_text().strip()  # Venue of the submission
 ISSUE = re.compile(r"#(\d+)")
 FIELDS = "number,title,url,author,isDraft,updatedAt,reviewDecision,statusCheckRollup"
 FAILED = {"FAILURE", "ERROR", "TIMED_OUT", "CANCELLED", "ACTION_REQUIRED"}
@@ -93,7 +94,7 @@ def integrity(report: str) -> str:
 
 
 def submission() -> str:
-    """Submission section, from the latest completed run on main"""
+    """Submission section, from latest completed run on main"""
     listing = subprocess.run(
         ["gh", "run", "list", "--repo", f"{ORG}/{SPEC_REPO}", "--workflow", SUBMISSION_WORKFLOW]
         + ["--branch", "main", "--status", "completed", "--limit", "1"]
@@ -158,7 +159,7 @@ def page(repos: list[str], report: str) -> str:
 {table(draft=True)}
 <h2>Project integrity</h2>
 {integrity(report)}
-<h2>Submission</h2>
+<h2>{SUBMISSION} submission</h2>
 {submission()}
 </body>
 </html>
