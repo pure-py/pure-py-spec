@@ -27,7 +27,8 @@ body { font-family: system-ui, sans-serif; max-width: 70em; margin: 2em auto; pa
 img { width: 36em; max-width: 100%; }
 table { border-collapse: collapse; }
 th, td { text-align: left; padding: 0.3em 0.8em; border-bottom: 1px solid #ccc; white-space: nowrap; }
-td:nth-child(2) { white-space: normal; }
+th:nth-child(2), td:nth-child(2) { width: 1%; }
+td:nth-child(3) { white-space: normal; }
 """
 
 
@@ -54,10 +55,10 @@ def checks(pr: dict[str, Any]) -> str:
 
 
 def row(repo: str, pr: dict[str, Any]) -> str:
-    title = html.escape(f"#{pr['number']} {pr['title']}")
     cells = [
         repo,
-        f'<a href="{pr["url"]}">{title}</a>',
+        f'<a href="{pr["url"]}">#{pr["number"]}</a>',
+        f'<a href="{pr["url"]}">{html.escape(pr["title"])}</a>',
         html.escape(pr["author"]["login"]),
         REVIEW.get(pr["reviewDecision"], "none"),
         checks(pr),
@@ -99,7 +100,7 @@ def page(repos: list[str], report: str) -> str:
     def table(draft: bool) -> str:
         rows = "".join(row(repo, pr) for repo, pr in prs if pr["isDraft"] == draft)
         return f"""<table>
-<tr><th>Repository</th><th>Pull request</th><th>Author</th><th>Review</th><th>Checks</th><th>Updated</th></tr>
+<tr><th>Repository</th><th>#</th><th>Title</th><th>Author</th><th>Review</th><th>Checks</th><th>Updated</th></tr>
 {rows}</table>"""
 
     return f"""<!doctype html>
