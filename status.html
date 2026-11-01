@@ -5,34 +5,34 @@
 <title>PurePy status</title>
 <style>
 body { font-family: system-ui, sans-serif; max-width: 70em; margin: 2em auto; padding: 0 1em; }
-img { width: 36em; max-width: 100%; }
+img { width: 44em; max-width: 100%; }
 table { border-collapse: collapse; }
-th, td { text-align: left; padding: 0.3em 0.8em; border-bottom: 1px solid #ccc; white-space: nowrap; }
-th:nth-child(2), td:nth-child(2) { width: 1%; }
-td:nth-child(3) { white-space: normal; }
+th, td { text-align: left; padding: 0.3em 0.6em; border-bottom: 1px solid #ccc; white-space: nowrap; }
+td.title { white-space: normal; }
+table.integrity td:first-child { width: 4em; }
 </style>
 </head>
 <body>
 <h1>PurePy status</h1>
-<p>Updated <time>2026-11-01 13:07</time> UTC.</p>
+<p>Updated <time>2026-11-01 13:22</time> UTC.</p>
 <h2>Dependencies</h2>
 <img src="dependencies.svg" alt="Dependencies between repositories">
 <h2>Open pull requests</h2>
 <table>
 <tr><th>Repository</th><th>#</th><th>Title</th><th>Author</th><th>Review</th><th>Checks</th><th>Updated</th></tr>
-<tr><td>isabelle-python-codegen</td><td><a href="https://github.com/pure-py/isabelle-python-codegen/pull/4">#4</a></td><td><a href="https://github.com/pure-py/isabelle-python-codegen/pull/4">Test oracle approach which directly compares Isabelle (SML backend) to its extracted Python</a></td><td>dorchard</td><td>none</td><td>failing</td><td>2026-10-23</td></tr>
-<tr><td>pure-py-spec</td><td><a href="https://github.com/pure-py/pure-py-spec/pull/305">#305</a></td><td><a href="https://github.com/pure-py/pure-py-spec/pull/305">change conformance suite to run reference interpreter</a></td><td>nikolaushuber</td><td>none</td><td>running</td><td>2026-11-01</td></tr>
+<tr><td>isabelle-python-codegen</td><td><a href="https://github.com/pure-py/isabelle-python-codegen/pull/4">#4</a></td><td class="title"><a href="https://github.com/pure-py/isabelle-python-codegen/pull/4" class="title">Test oracle approach which directly compares Isabelle (SML backend) to its extracted Python</a></td><td>dorchard</td><td>none</td><td>failing</td><td>2026-10-23</td></tr>
+<tr><td>pure-py-spec</td><td><a href="https://github.com/pure-py/pure-py-spec/pull/305">#305</a></td><td class="title"><a href="https://github.com/pure-py/pure-py-spec/pull/305" class="title">change conformance suite to run reference interpreter</a></td><td>nikolaushuber</td><td>none</td><td>running</td><td>2026-11-01</td></tr>
 </table>
 <h2>Draft pull requests</h2>
 <table>
 <tr><th>Repository</th><th>#</th><th>Title</th><th>Author</th><th>Review</th><th>Checks</th><th>Updated</th></tr>
-<tr><td>isabelle-python-codegen</td><td><a href="https://github.com/pure-py/isabelle-python-codegen/pull/6">#6</a></td><td><a href="https://github.com/pure-py/isabelle-python-codegen/pull/6">Fixes for oracle</a></td><td>dorchard</td><td>none</td><td>none</td><td>2026-10-23</td></tr>
-<tr><td>pure-py-spec</td><td><a href="https://github.com/pure-py/pure-py-spec/pull/129">#129</a></td><td><a href="https://github.com/pure-py/pure-py-spec/pull/129">WIP grammar definition in Ott</a></td><td>nikolaushuber</td><td>none</td><td>passing</td><td>2026-10-26</td></tr>
-<tr><td>pure-py.github.io</td><td><a href="https://github.com/pure-py/pure-py.github.io/pull/20">#20</a></td><td><a href="https://github.com/pure-py/pure-py.github.io/pull/20">Integrate playground</a></td><td>jacobpake</td><td>approved</td><td>passing</td><td>2026-10-30</td></tr>
+<tr><td>isabelle-python-codegen</td><td><a href="https://github.com/pure-py/isabelle-python-codegen/pull/6">#6</a></td><td class="title"><a href="https://github.com/pure-py/isabelle-python-codegen/pull/6" class="title">Fixes for oracle</a></td><td>dorchard</td><td>none</td><td>none</td><td>2026-10-23</td></tr>
+<tr><td>pure-py-spec</td><td><a href="https://github.com/pure-py/pure-py-spec/pull/129">#129</a></td><td class="title"><a href="https://github.com/pure-py/pure-py-spec/pull/129" class="title">WIP grammar definition in Ott</a></td><td>nikolaushuber</td><td>none</td><td>passing</td><td>2026-10-26</td></tr>
+<tr><td>pure-py.github.io</td><td><a href="https://github.com/pure-py/pure-py.github.io/pull/20">#20</a></td><td class="title"><a href="https://github.com/pure-py/pure-py.github.io/pull/20" class="title">Integrate playground</a></td><td>jacobpake</td><td>approved</td><td>passing</td><td>2026-10-30</td></tr>
 </table>
 <h2>Project integrity</h2>
 <h3>Every open issue is on the project board</h3>
-<table>
+<table class="integrity">
 <tr><th>Issue</th><th>Title</th></tr>
 <tr><td><a href="https://github.com/pure-py/pure-py-spec/issues/56">#56</a></td><td>Default arguments</td></tr>
 <tr><td><a href="https://github.com/pure-py/pure-py-spec/issues/57">#57</a></td><td>*args and **kwargs</td></tr>
@@ -41,7 +41,7 @@ td:nth-child(3) { white-space: normal; }
 <tr><td><a href="https://github.com/pure-py/pure-py-spec/issues/297">#297</a></td><td>Hashable</td></tr>
 </table>
 <h3>Milestoned issues are not Proposed</h3>
-<table>
+<table class="integrity">
 <tr><th>Issue</th><th>Title</th><th>Milestone</th></tr>
 <tr><td><a href="https://github.com/pure-py/pure-py-spec/issues/105">#105</a></td><td>`__all__` for wildcard imports</td><td>pure-py-spec 1.1</td></tr>
 <tr><td><a href="https://github.com/pure-py/pure-py-spec/issues/112">#112</a></td><td>Migrate spec sources to OTT</td><td>PLDI 2027</td></tr>
@@ -57,7 +57,7 @@ td:nth-child(3) { white-space: normal; }
 <tr><td><a href="https://github.com/pure-py/pure-py-spec/issues/278">#278</a></td><td>RQ: Familiarity of Python syntax</td><td>PLDI 2027</td></tr>
 </table>
 <h3>Active issues have a milestone</h3>
-<table>
+<table class="integrity">
 <tr><th>Issue</th><th>Title</th><th>Status</th></tr>
 <tr><td><a href="https://github.com/pure-py/pure-py-spec/issues/14">#14</a></td><td>Syntactic extensions</td><td>In progress</td></tr>
 </table>
