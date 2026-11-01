@@ -28,9 +28,8 @@ $(\tyInt, \tyInt)$.
 
 \begin{lemma}[Most specific run-time overload]
 \label{lem:most-specific-run-time-overload}
-For all values $v$ and $v'$, the run-time overloads of $\odot$ at $(\typeOf(v), \typeOf(v'))$ have a least element if
-they are not empty, and similarly for $\ominus$ at $\typeOf(v)$, so $\hat{\odot}(v, v')$ and $\hat{\ominus}(v)$ are
-defined.
+If some run-time overload of $\odot$ applies at $(\typeOf(v), \typeOf(v'))$, then there is a most specific such
+overload, and similarly for $\ominus$ at $\typeOf(v)$.
 \end{lemma}
 
 \begin{lemma}[Soundness of overload resolution]
