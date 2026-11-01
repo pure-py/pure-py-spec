@@ -21,7 +21,7 @@ semantics.
 - `paper/`: sources of the paper's own prose
 - `tex/`: macros and bibliography shared by both documents
 - `graduality.tex`, `graduality/`: draft notes on gradual typing, built as a separate document and not part of the 1.0 specification or paper
-- `src/purepy_conformance/`: the conformance suite, as package data, and its runner, the `purepy-conformance` command
+- `src/purepy_conformance/`: the conformance suite, included in the package, and its runner, the `purepy-conformance` command
 - `test/`: consistency of the specification with the conformance suite
 - `script/`: status page, including the project board integrity check, run hourly by CI
 
