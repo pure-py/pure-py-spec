@@ -76,15 +76,15 @@ $(call check-log,$(1))
 rm -f $(BUILD_AUX)
 endef
 
-# Anonymised paper
+# Paper builds anonymised, with references resolved
 paper-anon.pdf: $(TEXFILES)
 	$(call anon,paper-anon,paper.tex)
 
-# Anonymised specification
+# Specification builds anonymised, with references resolved
 spec-anon.pdf: $(TEXFILES)
 	$(call anon,spec-anon,PurePy-spec.tex)
 
-# Specification against the conformance suite
+# Suite tests each cite a rule of the specification, rule names unique, Python version agreed, runner linted
 check-consistency:
 	uv run --locked python test/consistency.py
 
@@ -111,7 +111,7 @@ PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
 # Release of the mechanisation conforming to this specification
 PUREPY_RELEASE := v$(shell uv version --short --color never)
 
-# Anonymised specification and mechanisation at the release of the specification's version, with the suite
+# Archive built: anonymised specification, mechanisation release at the specification's version, suite wheel
 supplementary.zip: spec-anon.pdf
 	rm -f $@ && rm -rf .submission
 	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
@@ -125,15 +125,15 @@ paper-submission: check-consistency paper-anon.pdf supplementary.zip
 .check-submission: supplementary.zip
 	rm -rf $@ && unzip -q $< -d $@
 
-# No project names in the archive
+# Archive free of project names, in file names and contents
 check-anonymised: supplementary.zip
 	@! { unzip -l $<; unzip -p $<; } | grep -qiE 'pure-?py' || { echo "$<: project names found"; exit 1; }
 
-# Theories of the archived mechanisation, with its type checker generated
+# Archived proofs check and archived type checker generates
 check-archived-theories: .check-submission
 	$(MAKE) -C $</mechanisation build ISABELLE=$(ISABELLE)
 
-# Archived type checker against the archived conformance suite
+# Archived type checker passes archived suite
 check-archived-suite: check-archived-theories
 	$(MAKE) -C .check-submission/mechanisation check-conformance
 
