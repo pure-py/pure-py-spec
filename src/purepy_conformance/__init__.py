@@ -198,8 +198,6 @@ class Runner(Results):
         return []
 
     def runs(self, purepy: PurePyOutcome) -> bool:
-        """Whether the interpreter runs a test of the PurePy outcome: every test in Python mode, and every
-        well-formed test otherwise"""
         if self.interpreter is None:
             return False
         return self.python_mode or purepy in (PurePyOutcome.AGREES, PurePyOutcome.UNDEFINED)
