@@ -19,11 +19,16 @@ jobs:
       - name: Set up uv
         uses: astral-sh/setup-uv@v10.2.0
 
+      # Falls back to main when the mechanisation has no release at the specification's version, so that the
+      # archive step reports the missing release
       - name: Read Isabelle version of the mechanisation release
         id: read
         run: |
+          repo=https://raw.githubusercontent.com/pure-py/isabelle-purepy
           tag="v$(uv version --short --color never)"
-          echo "isabelle=$(curl -fsSL "https://raw.githubusercontent.com/pure-py/isabelle-purepy/$tag/.isabelle-version")" >> "$GITHUB_OUTPUT"
+          version=$(curl -fsSL "$repo/$tag/.isabelle-version" || curl -fsSL "$repo/main/.isabelle-version")
+          test -n "$version"
+          echo "isabelle=$version" >> "$GITHUB_OUTPUT"
 
   submission:
     needs: version
