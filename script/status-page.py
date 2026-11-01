@@ -69,8 +69,7 @@ def row(repo: str, pr: dict[str, Any]) -> str:
 
 
 def integrity(report: str) -> str:
-    """Subsection per failing rule of the project integrity report, with a table of its failures, or a line
-    saying that all rules passed"""
+    """Project integrity section"""
     rules: list[tuple[str, list[list[str]]]] = []
     for line in report.splitlines():
         if line.startswith("=== "):
@@ -95,8 +94,7 @@ def integrity(report: str) -> str:
 
 
 def submission() -> str:
-    """Section with the latest completed run of the submission workflow on main and its report, or that
-    there is none"""
+    """Submission section, from the latest completed run on main"""
     listing = subprocess.run(
         ["gh", "run", "list", "--repo", f"{ORG}/{SPEC_REPO}", "--workflow", SUBMISSION_WORKFLOW]
         + ["--branch", "main", "--status", "completed", "--limit", "1"]
