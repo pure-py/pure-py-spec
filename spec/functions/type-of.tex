@@ -1,6 +1,6 @@
 \typeOf(n) &= \tyFloat && \quad \text{if } n \text{ a float literal} \\*
 \typeOf(\ell) &= \tyLiteral{\ell} && \quad \text{(otherwise)} \clausegap
 \typeOf(\exList{\seq{v}}) &= \tyList{\tyObject} \\*
-\typeOf(\exTuple{v_1, \ldots, v_n}) &= \tyTuple{\tyObject, \ldots, \tyObject} && \quad \text{with } n \text{ components} \\*
+\typeOf(\exTuple{v_1, \ldots, v_n}) &= \tyTuple{\tyObject^n} \\*
 \typeOf(\exDict{\delta}) &= \tyDict{\tyObject} \\*
 \typeOf(v) &= \tyObject && \quad \text{(otherwise)}
