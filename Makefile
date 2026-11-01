@@ -6,6 +6,7 @@ ANON_NAME_TEX := tex/anon-name.tex
 SPEC_LABELS := xref/PurePy-spec.aux
 TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX)
 PDFLATEX := pdflatex -interaction=nonstopmode -halt-on-error
+ISABELLE ?= isabelle
 BUILD_AUX := *.aux *.blg *.cb *.cb2 *.cut *.fdb_latexmk *.fls *.loc *.log *.out *.soc *.toc
 AUX := $(BUILD_AUX) *.bbl
 
@@ -61,8 +62,8 @@ $(SPEC_LABELS): PurePy-spec.pdf
 
 paper.pdf paper-anon.pdf: $(SPEC_LABELS)
 
-# Draft notes on gradual typing, not part of the 1.0 specification or paper.
 GRADUALITY_INPUTS := $(wildcard graduality/*.tex graduality/*/*.tex)
+## Draft notes on gradual typing, outside the 1.0 specification and paper
 graduality.pdf: $(GRADUALITY_INPUTS)
 
 # Anonymised build of source $(2) under job name $(1).
@@ -72,39 +73,56 @@ bibtex $(1)
 $(PDFLATEX) -jobname=$(1) "\def\anonmode{}\input{$(2)}"
 $(PDFLATEX) -jobname=$(1) "\def\anonmode{}\input{$(2)}"
 $(call check-log,$(1))
-rm -f $(BUILD_AUX)
 endef
 
+## Anonymised paper builds, with no undefined cross-references or citations
 paper-anon.pdf: $(TEXFILES)
 	$(call anon,paper-anon,paper.tex)
+	sed -n 's/^\\newlabel{references}{{[^}]*}{\([0-9]*\)}.*/\1/p' paper-anon.aux > paper-anon.references
+	rm -f $(BUILD_AUX)
 
+PAGE_LIMIT := 25
+## Anonymised paper within page limit, references excluded
+check-page-limit: paper-anon.pdf
+	@page=$$(cat paper-anon.references); echo "report: references begin on page $$page, limit $(PAGE_LIMIT) pages"; \
+		test "$$page" -le $(PAGE_LIMIT)
+
+## Anonymised specification builds, with no undefined cross-references or citations
 spec-anon.pdf: $(TEXFILES)
 	$(call anon,spec-anon,PurePy-spec.tex)
+	rm -f $(BUILD_AUX)
 
-# Specification against the conformance suite
+## Specification consistent with conformance suite
 check-consistency:
 	uv run --locked python test/consistency.py
 
-# Conformance suite against Python, with mypy as type checker
+## Python passes conformance suite, with mypy as type checker
 check-suite:
 	uv run --locked purepy-conformance --python \
 		--type-checker "mypy --python-version $$(cat .python-version) --config-file $(CURDIR)/test/mypy.ini --no-error-summary"
 
-# Wheel of the conformance suite and runner
-wheel: check-consistency check-suite
+## Wheel of the conformance suite and runner
+wheel: check-targets check-consistency check-suite
 	rm -rf dist && uv build --wheel
 
+## Dependency diagram of the organisation's repositories, from clones alongside this repository
 dependencies.svg:
 	uv run --locked python script/dependency-diagram.py .. | d2 --pad 16 - $@
 
-status.html: dependencies.svg
-	uv run --locked python script/status-page.py .. > $@
+## Project integrity report
+integrity.txt:
+	-script/check-project-integrity.sh pure-py pure-py-spec 1 "In progress,Awaiting Review" > $@
+
+## Status page
+status.html: dependencies.svg integrity.txt
+	uv run --locked python script/status-page.py .. integrity.txt > $@
 
 # tracks: tag of same version
 PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
 # Release of the mechanisation conforming to this specification
 PUREPY_RELEASE := v$(shell uv version --short --color never)
 
+## Archive holds anonymised specification, mechanisation release at specification's version, and suite wheel
 supplementary.zip: spec-anon.pdf
 	rm -f $@ && rm -rf .submission
 	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
@@ -112,16 +130,48 @@ supplementary.zip: spec-anon.pdf
 	./anonymise-mechanisation.sh .submission/src .submission
 	cd .submission && zip -q -9 -r ../$@ mechanisation
 	rm -rf .submission
+	@n=$$(git rev-list --count $(PUREPY_RELEASE)..HEAD -- src/purepy_conformance); \
+		echo "report: mechanisation $(PUREPY_RELEASE); suite $$n commit$$([ $$n -eq 1 ] || echo s) since $(PUREPY_RELEASE)"
 
+## PLDI 2027 submission
 paper-submission: check-consistency paper-anon.pdf supplementary.zip
 
+.check-submission: supplementary.zip
+	rm -rf $@ && unzip -q $< -d $@
+
+## Archive anonymised: no project names in file names or contents
+check-anonymised: supplementary.zip
+	@! { unzip -l $<; unzip -p $<; } | grep -qiE 'pure-?py' || { echo "$<: project names found"; exit 1; }
+
+## Archived mechanisation builds: proofs checked, type checker generated
+check-archived-theories: .check-submission
+	$(MAKE) -C $</mechanisation build ISABELLE=$(ISABELLE)
+
+## Type checker generated from archived mechanisation passes archived suite
+check-archived-suite: check-archived-theories
+	$(MAKE) -C .check-submission/mechanisation check-conformance
+
+check-submission: check-targets paper-submission check-page-limit check-anonymised check-archived-suite
+
 # arXiv runs pdflatex without bibtex, so include the .bbl.
+## Paper sources for arXiv
 paper-arXiv.zip: paper.pdf
 	rm -f $@
 	zip -q -9 $@ paper.tex paper.bbl $(sort $(INPUTS) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX)) $(EVALUATION_FIGURE)
 
+## Remove build products
 clean:
-	rm -f $(AUX) *.pdf *.zip $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(EVALUATION_FIGURE)
+	rm -rf .check-submission
+	rm -f $(AUX) *.pdf *.zip *.tsv *.references $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(EVALUATION_FIGURE)
 	rm -rf $(dir $(SPEC_LABELS))
 
-.PHONY: default all paper-submission clean check-consistency check-suite wheel dependencies.svg status.html
+## Every target with a recipe is described
+check-targets:
+	script/submission-report.py --check
+
+## List targets with descriptions
+help:
+	@awk '/^## / { d = substr($$0, 4); next } d && /^[a-zA-Z0-9_.-]+:/ { t = $$0; sub(/:.*/, "", t); printf "%-24s %s\n", t, d } { d = "" }' $(MAKEFILE_LIST)
+
+.PHONY: default all help check-targets paper-submission check-page-limit check-anonymised check-archived-theories check-archived-suite check-submission clean \
+	check-consistency check-suite wheel dependencies.svg integrity.txt status.html

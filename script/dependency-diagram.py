@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""D2 diagram of dependencies between repositories of the organisation, from a directory holding a clone of
-each, written to standard output"""
+"""D2 diagram of dependencies between the organisation's repositories"""
 
 import pathlib
 import re
 import subprocess
 import sys
+import tomllib
 from dataclasses import dataclass
 
 ORG = "pure-py"
@@ -54,24 +54,35 @@ def latest_release(repo: str) -> str | None:
     return view.stdout.strip() if view.returncode == 0 else None
 
 
-def edge(source: str, lines: list[str], index: int, match: re.Match[str]) -> Edge | None:
-    """Dependency at a URL match on a line, with the preceding line available for an annotation"""
+def dependency_kind(pyproject: pathlib.Path, url: str) -> str:
+    """Runtime or dev dependency, for a Python package taken from a release asset"""
+    project = tomllib.loads(pyproject.read_text()).get("project", {})
+    runtime = any(url in dep for dep in project.get("dependencies", []))
+    return "runtime dependency" if runtime else "dev dependency"
+
+
+def edge(
+    source: str, path: pathlib.Path, lines: list[str], index: int, match: re.Match[str]
+) -> Edge | None:
+    """Dependency denoted by a URL in a file, or none for a link to a repository, issue or pull request; a
+    "pin:" or "tracks:" comment on the same or preceding line labels it"""
     repo = match["repo"]
-    path = match["path"]
+    url_path = match["path"]
     if repo is None:
-        repo, _, rest = path.lstrip("/").partition("/")
-        path = "/" + rest
+        repo, _, rest = url_path.lstrip("/").partition("/")
+        url_path = "/" + rest
         if repo == "":
             repo = PAGES
     git = repo.endswith(".git")
     repo = repo.removesuffix(".git")
-    if repo == source or path.startswith(("/issues/", "/pull/")):
+    if repo == source or url_path.startswith(("/issues/", "/pull/")):
         return None
-    if release := RELEASE.match(path):
-        return Edge(
-            source, repo, f"release {release['version']}", pinned=True, version=release["version"]
-        )
-    if LATEST.match(path):
+    if release := RELEASE.match(url_path):
+        label = f"release {release['version']}"
+        if path.name == "pyproject.toml":
+            label = f"{dependency_kind(path, match[0])}, {label}"
+        return Edge(source, repo, label, pinned=True, version=release["version"])
+    if LATEST.match(url_path):
         return Edge(source, repo, "latest release", pinned=False)
     annotated = [ANNOTATION.search(line) for line in lines[max(index - 1, 0) : index + 1]]
     if annotation := next((a for a in reversed(annotated) if a), None):
@@ -85,12 +96,14 @@ def edge(source: str, lines: list[str], index: int, match: re.Match[str]) -> Edg
 
 def edges(repo: pathlib.Path) -> set[Edge]:
     def edges_of(path: pathlib.Path) -> set[Edge]:
+        if path.name == "uv.lock":  # Repeats the project file's pins
+            return set()
         try:
             lines = path.read_text().splitlines()
         except (UnicodeDecodeError, OSError):
             return set()
         found = (
-            edge(repo.name, lines, i, match)
+            edge(repo.name, path, lines, i, match)
             for i, line in enumerate(lines)
             for match in URL.finditer(line)
         )
@@ -122,16 +135,15 @@ classes: {{
   pinned: {{ style.stroke: "#333333" }}
   tracking: {{ style.stroke: "#333333"; style.stroke-dash: 4 }}
   behind: {{ style.stroke: "#b00020" }}
-  hidden: {{ style.opacity: 0; width: 1; height: 1; label: "" }}
 }}
 {nodes}{links}key: Key {{
   near: bottom-center
-  direction: right
-  style: {{ fill: "#ffffff"; stroke: "#cccccc"; border-radius: 8; font-size: 18; bold: true }}
-  x1 -> y1: Pin, moved by hand {{class: pinned}}
-  x2 -> y2: Follows target {{class: tracking}}
-  x3 -> y3: Pin behind latest release {{class: behind}}
-  x1.class: hidden; y1.class: hidden; x2.class: hidden; y2.class: hidden; x3.class: hidden; y3.class: hidden
+  grid-columns: 1
+  grid-gap: 4
+  style: {{ fill: "#ffffff"; stroke: "#cccccc"; border-radius: 8; font-size: 14; bold: true }}
+  pinned: "━━━▶  Pin, moved by hand" {{ shape: text; style.font-size: 13; style.font-color: "#333333" }}
+  tracking: "╌╌╌▶  Follows target" {{ shape: text; style.font-size: 13; style.font-color: "#333333" }}
+  behind: "━━━▶  Pin behind latest release" {{ shape: text; style.font-size: 13; style.font-color: "#b00020" }}
 }}
 """
 

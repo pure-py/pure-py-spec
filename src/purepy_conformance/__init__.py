@@ -2,6 +2,7 @@ import argparse
 import concurrent.futures
 import contextlib
 import importlib.resources
+import os
 import pathlib
 import shlex
 import shutil
@@ -95,6 +96,8 @@ class Results:
         else:
             self.passed += 1
             print(f"  {GREEN}✓{RESET} {label}")
+        if os.environ.get("REPORT"):
+            print(f"report: {label}\t{'failed' if failures else 'passed'}")
 
     def summary(self) -> None:
         total = self.passed + len(self.failed)

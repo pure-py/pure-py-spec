@@ -72,42 +72,46 @@ ACTIVE_STATUSES=$(jq -cn --arg s "$ACTIVE" '$s | split(",") | map(ltrimstr(" ") 
 
 check() {
   local rule="$1"
-  local items="$2"
-  local filter="$3"
-  local fmt="$4"
+  local headings="$2"
+  local items="$3"
+  local filter="$4"
+  local fmt="$5"
+  local found=0
 
   echo ""
   echo "=== $rule ==="
   while IFS= read -r line; do
     [ -z "$line" ] && continue
-    echo "  FAIL: $line"
+    [ "$found" -eq 0 ] && printf '%s\n' "$headings"
+    found=1
+    printf '%s\n' "$line"
     ERRORS=$((ERRORS + 1))
   done < <(echo "$items" | jq -r ".[] | $filter | $fmt")
 }
 
-check "Every open issue is on the project board" "$OPEN_ISSUES" \
+check "Every open issue is on the project board" $'Issue\tTitle' "$OPEN_ISSUES" \
   'select(.number as $n | '"$ON_BOARD"' | index($n) | not)' \
-  '"#\(.number) (\(.title)): not on project board"'
+  '"#\(.number)\t\(.title)"'
 
-check "Every open issue has a Status" "$ALL_ITEMS" \
+check "Every open issue has a Status" $'Issue\tTitle' "$ALL_ITEMS" \
   'select(.content.state == "OPEN" and .fieldValueByName == null)' \
-  '"#\(.content.number) (\(.content.title)): no Status"'
+  '"#\(.content.number)\t\(.content.title)"'
 
-check "Milestoned issues are not Proposed" "$ALL_ITEMS" \
+check "Milestoned issues are not Proposed" $'Issue\tTitle\tMilestone' "$ALL_ITEMS" \
   'select(.content.state == "OPEN" and .content.milestone != null and .fieldValueByName.name == "Proposed")' \
-  '"#\(.content.number) (\(.content.title)): Proposed but in milestone \(.content.milestone.title)"'
+  '"#\(.content.number)\t\(.content.title)\t\(.content.milestone.title)"'
 
-check "Active issues have a milestone" "$ALL_ITEMS" \
+check "Active issues have a milestone" $'Issue\tTitle\tStatus' "$ALL_ITEMS" \
   'select(.content.state == "OPEN" and .content.milestone == null and (.fieldValueByName.name as $s | '"$ACTIVE_STATUSES"' | index($s)))' \
-  '"#\(.content.number) (\(.content.title)): \(.fieldValueByName.name) but no milestone"'
+  '"#\(.content.number)\t\(.content.title)\t\(.fieldValueByName.name)"'
 
-check "Closed milestones contain only Done or Rejected issues" "$ALL_ITEMS" \
+check "Closed milestones contain only Done or Rejected issues" $'Issue\tTitle\tStatus\tMilestone' "$ALL_ITEMS" \
   'select(.content.milestone != null and (.content.milestone.title as $m | '"$CLOSED_MILESTONES"' | index($m)) and (.fieldValueByName.name != "Done" and .fieldValueByName.name != "Rejected"))' \
-  '"#\(.content.number) (\(.content.title)): \(.fieldValueByName.name // "no Status") in closed milestone \(.content.milestone.title)"'
+  '"#\(.content.number)\t\(.content.title)\t\(.fieldValueByName.name // "none")\t\(.content.milestone.title)"'
 
-check "Sub-issues of closed issues are closed" "$CLOSED_ISSUES" \
+check "Sub-issues of closed issues are closed" $'Issue\tTitle\tOpen sub-issues' "$CLOSED_ISSUES" \
   'select(any(.subIssues.nodes[]; .state == "OPEN"))' \
-  '"#\(.number) (\(.title)): open sub-issues \([.subIssues.nodes[] | select(.state == "OPEN") | "#\(.number)"] | join(", "))"'
+  '"#\(.number)\t\(.title)\t\([.subIssues.nodes[] | select(.state == "OPEN") | "#\(.number)"] | join(", "))"'
 
 echo ""
 if [ "$ERRORS" -eq 0 ]; then

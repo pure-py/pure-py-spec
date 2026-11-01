@@ -74,7 +74,7 @@ def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
 
 
 def check_lint(r: Results) -> None:
-    with r.test("this script passes mypy and ruff"):
+    with r.test("consistency script and runner pass mypy and ruff"):
         sources = [str(TEST / "consistency.py"), inspect.getfile(purepy_conformance)]
         for tool in (
             ["mypy", "--strict", "--python-version", PYTHON_VERSION],
