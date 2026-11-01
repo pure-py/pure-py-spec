@@ -30,6 +30,8 @@ img { width: 44em; max-width: 100%; }
 table { border-collapse: collapse; }
 th, td { text-align: left; padding: 0.3em 0.6em; border-bottom: 1px solid #ccc; white-space: nowrap; }
 td.title { white-space: normal; }
+table.key td { border: none; padding: 0.1em 0.5em; }
+table.key svg { vertical-align: middle; }
 table.integrity td:first-child { width: 4em; }
 """
 
@@ -108,6 +110,22 @@ def description(target: str) -> str:
     return above.removeprefix("## ")
 
 
+def arrow(colour: str, dashed: bool) -> str:
+    dash = ' stroke-dasharray="6 4"' if dashed else ""
+    return (
+        '<svg width="44" height="12">'
+        f'<line x1="0" y1="6" x2="32" y2="6" stroke="{colour}" stroke-width="2"{dash}/>'
+        f'<polygon points="32,1 44,6 32,11" fill="{colour}"/></svg>'
+    )
+
+
+KEY = [
+    (arrow("#333333", dashed=False), "Pin, moved by hand"),
+    (arrow("#333333", dashed=True), "Follows target"),
+    (arrow("#b00020", dashed=False), "Pin behind latest release"),
+]
+
+
 def submission() -> str:
     """Submission section, from latest completed run on main"""
     listing = subprocess.run(
@@ -168,6 +186,9 @@ def page(repos: list[str], report: str) -> str:
 <p>Updated <time>{updated}</time> UTC.</p>
 <h2>Dependencies</h2>
 <img src="dependencies.svg" alt="Dependencies between repositories">
+<table class="key">
+{"".join(f"<tr><td>{a}</td><td>{label}</td></tr>" for a, label in KEY)}
+</table>
 <h2>Open pull requests</h2>
 {table(draft=False)}
 <h2>Draft pull requests</h2>
