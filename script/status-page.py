@@ -30,7 +30,8 @@ img { width: 44em; max-width: 100%; }
 table { border-collapse: collapse; }
 th, td { text-align: left; padding: 0.3em 0.6em; border-bottom: 1px solid #ccc; white-space: nowrap; }
 td.title { white-space: normal; }
-table.key td { border: none; padding: 0.1em 0.5em; }
+table.key { font-size: 0.8em; }
+table.key td { border: none; padding: 0 0.5em; }
 table.key svg { vertical-align: middle; }
 table.integrity td:first-child { width: 4em; }
 """
@@ -113,9 +114,9 @@ def description(target: str) -> str:
 def arrow(colour: str, dashed: bool) -> str:
     dash = ' stroke-dasharray="6 4"' if dashed else ""
     return (
-        '<svg width="44" height="12">'
-        f'<line x1="0" y1="6" x2="32" y2="6" stroke="{colour}" stroke-width="2"{dash}/>'
-        f'<polygon points="32,1 44,6 32,11" fill="{colour}"/></svg>'
+        '<svg width="36" height="10">'
+        f'<line x1="0" y1="5" x2="26" y2="5" stroke="{colour}" stroke-width="1.5"{dash}/>'
+        f'<polygon points="26,1 36,5 26,9" fill="{colour}"/></svg>'
     )
 
 
