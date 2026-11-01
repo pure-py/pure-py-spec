@@ -3,5 +3,5 @@
 \elemTy{\Sigma}(\tyLiteral{w}) &{}= \tyStr \\*
 \elemTy{\Sigma}(\tyDict{\tau}) &{}= \tyStr \\*
 \elemTy{\Sigma}(\clsRange[]) &{}= \tyInt \\*
-\elemTy{\Sigma}(\tyTuple{\seq{\tau}}) &{}= \bigJoinTy{\Sigma}{\baseType(\tau_1), \ldots, \baseType(\tau_n)} \\*
+\elemTy{\Sigma}(\tyTuple{\seq{\tau}}) &{}= \bigJoinTy{\Sigma}{\added{(}\baseType(\tau_1), \ldots, \baseType(\tau_n)\added{)}} \\*
 \elemTy{\Sigma}(\tyUnion{\sigma}{\tau}) &{}= \joinTy{\Sigma}{\elemTy{\Sigma}(\sigma)}{\elemTy{\Sigma}(\tau)}
