@@ -124,7 +124,7 @@
 % General notation
 \newcommand*{\bind}[2]{#1\mathord{:}\,#2}
 \newcommand*{\concat}{\mathbin{{+}\mkern-3mu{+}}}
-\newcommand*{\bigconcat}{\mathop{\vcenter{\hbox{\large${+}\mkern-3.5mu{+}$}}}}
+\newcommand*{\bigconcat}[1]{\mathop{\vcenter{\hbox{\large${+}\mkern-3.5mu{+}$}}}(#1)}
 \newcommand*{\cons}{\cdot}
 \newcommand*{\dom}{\mathrm{dom}}
 \newcommand*{\seq}[1]{\smash[t]{\vec{#1}}}
@@ -232,8 +232,8 @@
 \newcommand*{\baseType}{\mathrm{base\text{-}type}}
 \newcommand*{\typeOf}{\mathrm{type\text{-}of}}
 \newcommand*{\bigdisjunion}{\biguplus}
-\newcommand*{\bigJoinTy}[2]{\textstyle\bigvee_{#1} #2}
-\newcommand*{\bigMeetTy}[2]{\textstyle\bigwedge_{#1} #2}
+\newcommand*{\bigJoinTy}[2]{{\textstyle\bigvee_{#1}}(#2)}
+\newcommand*{\bigMeetTy}[2]{{\textstyle\bigwedge_{#1}}(#2)}
 \newcommand*{\binding}{\mathrel{\dashv}}
 \newcommand*{\checks}{\mathrel{\triangleleft}}
 \newcommand*{\disjunion}{\uplus}
