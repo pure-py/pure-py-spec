@@ -111,12 +111,12 @@ class Runner(Results):
         self,
         type_checker: list[str],
         interpreter: list[str] | None,
-        python: bool,
+        python_mode: bool,
     ) -> None:
         super().__init__()
         self.type_checker = type_checker
         self.interpreter = interpreter  # None: tests not run
-        self.python = python  # Implementation under test is Python itself
+        self.python_mode = python_mode  # Implementation under test is Python itself
         self.type_checked = 0
         self.run_only = 0
 
@@ -200,25 +200,27 @@ class Runner(Results):
         implementation of PurePy every well-formed test"""
         if self.interpreter is None:
             return False
-        return self.python or purepy in (PurePyOutcome.AGREES, PurePyOutcome.UNDEFINED)
+        return self.python_mode or purepy in (PurePyOutcome.AGREES, PurePyOutcome.UNDEFINED)
 
     def run_test(self, suite: pathlib.Path, test: pathlib.Path) -> list[str]:
         """Failures of a test at a path below suite: <Python outcome>/<PurePy outcome>[/<subset>]/...
         /<test>.py, or .../<test>/main.py for a program of several modules."""
         dirs = test.relative_to(suite).parts[:-1]
         purepy = PurePyOutcome(dirs[1])
-        exit, error_checked, python = expectation(PythonOutcome(dirs[0]), purepy)
+        exit, error_checked, python_outcome = expectation(PythonOutcome(dirs[0]), purepy)
         path = test / MAIN if test.is_dir() else test
-        undefined = purepy == PurePyOutcome.UNDEFINED and not self.python
-        ran = self.run_python(path, python, undefined) if self.runs(purepy) else []
-        if self.python:
+        undefined = purepy == PurePyOutcome.UNDEFINED and not self.python_mode
+        ran = self.run_python(path, python_outcome, undefined) if self.runs(purepy) else []
+        if self.python_mode:
             return [*(self.accepts(test) if exit == Exit.OK else []), *ran]
         return [*self.check(path, exit, error_checked), *ran]
 
     def run_suite(self, suite: pathlib.Path, jobs: int | None) -> None:
         """Tests run in parallel on jobs threads (default: one per core), reported in order."""
         found = list(tests(suite))
-        self.type_checked = sum(1 for test in found if not self.python or well_formed(suite, test))
+        self.type_checked = sum(
+            1 for test in found if not self.python_mode or well_formed(suite, test)
+        )
         self.run_only = len(found) - self.type_checked
         with concurrent.futures.ThreadPoolExecutor(jobs) as pool:
             results = pool.map(lambda test: self.run_test(suite, test), found)
