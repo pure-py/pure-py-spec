@@ -34,8 +34,8 @@ they are not empty, and similarly for $\ominus$ at $\typeOf(v)$, so $\hat{\odot}
 defined.
 \end{lemma}
 
-\begin{lemma}[Run-time overload resolution is sound]
-\label{lem:run-time-overload-resolution}
+\begin{lemma}[Static overload resolution is sound]
+\label{lem:static-overload-resolution}
 If $\vdash v : \sigma_1$, $\vdash v' : \sigma_2$ and $\resolveOp{\Sigma}(\odot, \sigma_1, \sigma_2) = \tau$, then some
 run-time overload of $\odot$ applies at $(\typeOf(v), \typeOf(v'))$, and $\vdash v'' : \tau$ if
 $\hat{\odot}(v, v') = \val{v''}$; similarly for $\ominus$.
