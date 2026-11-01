@@ -268,7 +268,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         "--no-run", action="store_true", help="check the tests without running them"
     )
     parser.add_argument(
-        "--python",
+        "--python-mode",
         action="store_true",
         help="test Python itself: run every test, and type-check only the tests well-formed in PurePy, which must be accepted",
     )
@@ -279,12 +279,12 @@ def main(argv: Sequence[str] | None = None) -> None:
     r = Runner(
         shlex.split(args.type_checker),
         None if args.no_run else shlex.split(args.interpreter),
-        args.python,
+        args.python_mode,
     )
     with suite() as path:
         r.run_suite(path, args.jobs)
     r.summary()
-    if args.python:
+    if args.python_mode:
         print(f"Python mode: {r.type_checked} tests type-checked and run, {r.run_only} run only")
     sys.exit(0 if not r.failed else 1)
 

@@ -87,7 +87,7 @@ check-consistency:
 
 # Conformance suite against Python, with mypy as type checker
 check-suite:
-	uv run --locked purepy-conformance --python \
+	uv run --locked purepy-conformance --python-mode \
 		--type-checker "mypy --python-version $$(cat .python-version) --config-file $(CURDIR)/test/mypy.ini --no-error-summary"
 
 # Wheel of the conformance suite and runner
