@@ -2,7 +2,7 @@
 \begin{AddedBlock}
 \small
 \centering
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.28\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.14\textwidth}>{\raggedright\arraybackslash}p{0.31\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}$\odot$ & $(\tau_1, \tau_2)$ & $\hat{\odot}(v, v')$ \\
 \pyinline{==} & $(\tyObject, \tyObject)$ & $\val{\pyinline{False}}$ if $v$ and $v'$ are both \pyinline{nan}; $\eqOp{\Sigma}(v, v')$ otherwise \\
@@ -21,6 +21,15 @@
 \pyinline{*} & $(\tyInt, \tyStr)$ & $\val{v'^n}$ where $n = \max(v, 0)$ \\
 \pyinline{*} & $(\tyList{\tyObject}, \tyInt)$ & $\val{\exList{\seq{v}^n}}$ if $v = \exList{\seq{v}}$, where $n = \max(v', 0)$ \\
 \pyinline{*} & $(\tyInt, \tyList{\tyObject})$ & $\val{\exList{\seq{v}^n}}$ if $v' = \exList{\seq{v}}$, where $n = \max(v, 0)$
+\end{tabular}
+
+\vspace{3mm}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.14\textwidth}>{\raggedright\arraybackslash}p{0.31\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}}
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}$\ominus$ & $\tau$ & $\hat{\ominus}(v)$ \\
+\pyinline{not} & $\tyBool$ & $\val{\pyinline{False}}$ if $v = \pyinline{True}$; $\val{\pyinline{True}}$ otherwise \\
+\pyinline{+} & $\tyFloat$ & $\val{v}$ \\
+\pyinline{-} & $\tyFloat$ & $\val{-v}$
 \end{tabular}
 \end{AddedBlock}
 \caption{\added{Run-time overloads}}

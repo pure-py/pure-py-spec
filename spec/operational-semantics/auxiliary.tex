@@ -4,10 +4,33 @@ The operators and the other auxiliary functions the evaluation rules use are def
 \secref{auxiliary-values}, and module and class resolution in \secref{auxiliary-classes}.
 
 \begin{AddedBlock}
-\begin{lemma}[Binary operators are defined]
-\label{lem:binop-defined}
-For every binary operator $\odot$ and values $v$ and $v'$, the run-time overloads of $\odot$ at
-$(\typeOf(v), \typeOf(v'))$ have a least element if they are not empty, so $\hat{\odot}(v, v')$ is defined
-(\S\ref{aux:binop}).
+\subsubsection{Operators}\label{sec:run-time-overloads}
+
+\input{spec/fig/run-time-overloads}
+
+Following Python, the implementation of an operator is selected at run time from the operand values, not from their
+static types. A \emph{run-time overload} pairs bounds with an implementation (\figref{run-time-overloads}), and applies
+at subtypes of its bounds. The function $\typeOf(v)$ (\S\ref{aux:type-of}) gives the type at which a value is resolved:
+the literal type of a literal, \pyinline{float} for a float literal, and \pyinline{object} for the elements of a list,
+tuple or dictionary and for any other value. The meaning $\hat{\odot}(v, v')$ of a binary operator is the implementation
+of the most specific run-time overload of $\odot$ at $\typeOf(v)$ and $\typeOf(v')$, or $\aborts{\errExcluded}$ if no
+run-time overload of $\odot$ applies (\S\ref{aux:binop}), and the meaning $\hat{\ominus}(v)$ of a unary operator is
+defined in the same way (\S\ref{aux:unop}). Static resolution (\secref{well-formedness-operators}) therefore fixes the
+type of an operator application but not its implementation: with \pyinline{x: float = 1}, the expression
+\pyinline{x + 1} has type \pyinline{float}, but evaluates to \pyinline{2} by the run-time overload at
+$(\tyInt, \tyInt)$, as in Python.
+
+\begin{lemma}[Operators are defined]
+\label{lem:operators-defined}
+For all values $v$ and $v'$, the run-time overloads of $\odot$ at $(\typeOf(v), \typeOf(v'))$ have a least element if
+they are not empty, and similarly for $\ominus$ at $\typeOf(v)$, so $\hat{\odot}(v, v')$ and $\hat{\ominus}(v)$ are
+defined.
+\end{lemma}
+
+\begin{lemma}[Run-time resolution is sound]
+\label{lem:run-time-resolution}
+If $\vdash v : \sigma_1$, $\vdash v' : \sigma_2$ and $\resolveOp{\Sigma}(\odot, \sigma_1, \sigma_2) = \tau$, then some
+run-time overload of $\odot$ applies at $(\typeOf(v), \typeOf(v'))$, and $\vdash v'' : \tau$ if
+$\hat{\odot}(v, v') = \val{v''}$; similarly for $\ominus$. \todo{Unproven.}
 \end{lemma}
 \end{AddedBlock}
