@@ -33,7 +33,7 @@ overload, and similarly for $\ominus$ at $\typeOf(v)$.
 
 \begin{lemma}[Soundness of overload resolution]
 \label{lem:overload-resolution-soundness}
-If $v$ and $v'$ are values of types $\sigma_1$ and $\sigma_2$ and $\resolveOp{\Sigma}(\odot, \sigma_1, \sigma_2) = \tau$,
+If $\vdash v : \sigma_1$ and $\vdash v' : \sigma_2$ and $\resolveOp{\Sigma}(\odot, \sigma_1, \sigma_2) = \tau$,
 then some
 run-time overload of $\odot$ applies at $(\typeOf(v), \typeOf(v'))$, and $\vdash v'' : \tau$ if
 $\hat{\odot}(v, v') = \val{v''}$; similarly for $\ominus$.
