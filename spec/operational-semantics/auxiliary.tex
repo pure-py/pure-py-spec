@@ -8,7 +8,7 @@ The operators and the other auxiliary functions the evaluation rules use are def
 
 \input{spec/fig/run-time-overloads}
 
-Following Python, the implementation of an operator is selected at run time from the operand values, not from their
+The implementation of an operator is selected at run time from the operand values, not from their
 static types. A \emph{run-time overload} pairs bounds with an implementation (\figref{run-time-overloads}), and applies
 at subtypes of its bounds. The function $\typeOf(v)$ (\S\ref{aux:type-of}) gives the type at which a value is resolved:
 the literal type of a literal, \pyinline{float} for a float literal, and \pyinline{object} for the elements of a list,
