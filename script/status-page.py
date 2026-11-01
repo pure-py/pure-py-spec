@@ -25,11 +25,11 @@ REVIEW = {
 }
 STYLE = """
 body { font-family: system-ui, sans-serif; max-width: 70em; margin: 2em auto; padding: 0 1em; }
-img { width: 36em; max-width: 100%; }
+img { width: 44em; max-width: 100%; }
 table { border-collapse: collapse; }
-th, td { text-align: left; padding: 0.3em 0.8em; border-bottom: 1px solid #ccc; white-space: nowrap; }
-th:nth-child(2), td:nth-child(2) { width: 1%; }
-td:nth-child(3) { white-space: normal; }
+th, td { text-align: left; padding: 0.3em 0.6em; border-bottom: 1px solid #ccc; white-space: nowrap; }
+td.title { white-space: normal; }
+table.integrity td:first-child { width: 4em; }
 """
 
 
@@ -59,13 +59,20 @@ def row(repo: str, pr: dict[str, Any]) -> str:
     cells = [
         repo,
         f'<a href="{pr["url"]}">#{pr["number"]}</a>',
-        f'<a href="{pr["url"]}">{html.escape(pr["title"])}</a>',
+        f'<a href="{pr["url"]}" class="title">{html.escape(pr["title"])}</a>',
         html.escape(pr["author"]["login"]),
         REVIEW.get(pr["reviewDecision"], "none"),
         checks(pr),
         pr["updatedAt"][:10],
     ]
-    return "<tr>" + "".join(f"<td>{cell}</td>" for cell in cells) + "</tr>\n"
+    return (
+        "<tr>"
+        + "".join(
+            f'<td class="title">{c}</td>' if 'class="title"' in c else f"<td>{c}</td>"
+            for c in cells
+        )
+        + "</tr>\n"
+    )
 
 
 def integrity(report: str) -> str:
@@ -87,7 +94,7 @@ def integrity(report: str) -> str:
         body = "".join(
             "<tr>" + "".join(f"<td>{cell(c)}</td>" for c in row) + "</tr>\n" for row in rows[1:]
         )
-        return f"<table>\n<tr>{headings}</tr>\n{body}</table>"
+        return f'<table class="integrity">\n<tr>{headings}</tr>\n{body}</table>'
 
     return "\n".join(f"<h3>{html.escape(rule)}</h3>\n{table(rows)}" for rule, rows in rules if rows)
 
