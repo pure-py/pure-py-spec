@@ -132,9 +132,7 @@ def submission() -> str:
     body = "".join(
         "<tr>" + "".join(f"<td>{html.escape(c)}</td>" for c in row) + "</tr>\n" for row in rows
     )
-    return (
-        f"{heading}\n<table>\n<tr><th>Target</th><th>Check</th><th>Result</th></tr>\n{body}</table>"
-    )
+    return f"{heading}\n<table>\n<tr><th>Target</th><th>Check</th><th>Result</th><th>Detail</th></tr>\n{body}</table>"
 
 
 def page(repos: list[str], report: str) -> str:

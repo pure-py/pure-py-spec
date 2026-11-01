@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Report on a make target, run prerequisite by prerequisite: a tab-separated line per target that has a
-comment above its rule, giving its name, the comment and whether it passed, failed or wasn't run because a
-prerequisite failed, written to standard output, with the make output on standard error. Further arguments
-are passed to make. Exits with failure if any target failed."""
+comment above its rule, giving its name, the comment, whether it passed, failed or wasn't run because a
+prerequisite failed, and the detail its recipe printed on lines starting "report:", written to standard
+output, with the make output on standard error. Further arguments are passed to make. Exits with failure if
+any target failed."""
 
 import pathlib
 import re
@@ -37,13 +38,22 @@ def main() -> None:
         if target not in graph:
             return "passed"
         comment, prerequisites = graph[target]
+        details: list[str] = []
         if any(run(p) != "passed" for p in prerequisites):
             outcome = "not run"
         else:
-            made = subprocess.run(["make", target, *options], stdout=sys.stderr, check=False)
+            made = subprocess.run(
+                ["make", target, *options], capture_output=True, text=True, check=False
+            )
+            sys.stderr.write(made.stdout + made.stderr)
             outcome = "passed" if made.returncode == 0 else "failed"
+            details = [
+                line.removeprefix("report: ")
+                for line in made.stdout.splitlines()
+                if line.startswith("report: ")
+            ]
         if comment:
-            report.append(f"{target}\t{comment}\t{outcome}")
+            report.append(f"{target}\t{comment}\t{outcome}\t{'; '.join(details)}")
         return outcome
 
     outcome = run(root)

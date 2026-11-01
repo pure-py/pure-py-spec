@@ -119,6 +119,8 @@ supplementary.zip: spec-anon.pdf
 	./anonymise-mechanisation.sh .submission/src .submission
 	cd .submission && zip -q -9 -r ../$@ mechanisation
 	rm -rf .submission
+	@n=$$(git rev-list --count $(PUREPY_RELEASE)..HEAD -- src/purepy_conformance); \
+		echo "report: mechanisation $(PUREPY_RELEASE); suite $$n commit$$([ $$n -eq 1 ] || echo s) since $(PUREPY_RELEASE)"
 
 paper-submission: check-consistency paper-anon.pdf supplementary.zip
 
