@@ -17,7 +17,7 @@ $(\sigma_1, \sigma_2)$ with $\Sigma \vdash \sigma_1 \subty \tau_1$ and $\Sigma \
 Run-time overloads of a unary operator $\ominus$ pair an operand bound $\tau$ with a definition of $\hat{\ominus}(v)$ in
 the same way.
 \end{specdefinition}
-\noindent The function $\typeOf(v)$ (\S\ref{aux:type-of}) gives the type at which a value is resolved:
+\noindent The function $\typeOf(v)$ (\S\ref{aux:type-of}) gives the run-time type of a value, determined by its outermost form:
 the literal type of a literal, \pyinline{float} for a float literal, and \pyinline{object} for the elements of a list,
 tuple or dictionary and for any other value. The meaning $\hat{\odot}(v, v')$ of a binary operator is the implementation
 of the most specific run-time overload of $\odot$ at $\typeOf(v)$ and $\typeOf(v')$, or $\aborts{\errExcluded}$ if no
