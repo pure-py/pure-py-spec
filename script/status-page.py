@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""Status page of the organisation, from a directory of repository clones and the output file of the project
-integrity check, written to standard output"""
+"""Status page of the organisation"""
 
 import datetime
 import html

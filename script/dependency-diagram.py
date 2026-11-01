@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""D2 diagram of dependencies between repositories of the organisation, from a directory holding a clone of
-each, written to standard output"""
+"""D2 diagram of dependencies between the organisation's repositories"""
 
 import pathlib
 import re
