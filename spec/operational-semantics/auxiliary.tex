@@ -22,8 +22,8 @@ the same way.
 tuple or dictionary and for any other value. The result $\hat{\odot}(v, v')$ is given by the definition of the most
 specific run-time overload of $\odot$ at $(\typeOf(v), \typeOf(v'))$, and is $\aborts{\errExcluded}$ if no run-time
 overload of $\odot$ applies (\S\ref{aux:binop}). The result $\hat{\ominus}(v)$ is given in the same way
-(\S\ref{aux:unop}). Typing therefore fixes the types of operator applications but not the run-time overloads
-selected for them (\secref{well-formedness-operators}). With \pyinline{x: float = 1}, the expression
+(\S\ref{aux:unop}). Typing therefore fixes the types of operator applications (\secref{well-formedness-operators}),
+and evaluation selects the run-time overloads. With \pyinline{x: float = 1}, the expression
 \pyinline{x + 1} has type \pyinline{float} and evaluates to \pyinline{2} by the run-time overload at
 $(\tyInt, \tyInt)$.
 
