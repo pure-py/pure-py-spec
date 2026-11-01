@@ -55,15 +55,11 @@ def latest_release(repo: str) -> str | None:
     return view.stdout.strip() if view.returncode == 0 else None
 
 
-def use(pyproject: pathlib.Path, url: str) -> str:
-    """Label for Python package taken from a release asset: "runs with" when among the project's dependencies,
-    "tests against" when only in a dependency group"""
+def dependency_kind(pyproject: pathlib.Path, url: str) -> str:
+    """Runtime or dev dependency, for a Python package taken from a release asset"""
     project = tomllib.loads(pyproject.read_text()).get("project", {})
-    return (
-        "runs with"
-        if any(url in dep for dep in project.get("dependencies", []))
-        else "tests against"
-    )
+    runtime = any(url in dep for dep in project.get("dependencies", []))
+    return "runtime dependency" if runtime else "dev dependency"
 
 
 def edge(
@@ -84,7 +80,7 @@ def edge(
     if release := RELEASE.match(url_path):
         label = f"release {release['version']}"
         if path.name == "pyproject.toml":
-            label = f"{use(path, match[0])} {label}"
+            label = f"{dependency_kind(path, match[0])}, {label}"
         return Edge(source, repo, label, pinned=True, version=release["version"])
     if LATEST.match(url_path):
         return Edge(source, repo, "latest release", pinned=False)
