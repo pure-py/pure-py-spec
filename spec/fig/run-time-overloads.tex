@@ -9,9 +9,9 @@
 \pyinline{!=} & $(\tyObject, \tyObject)$ & $\val{\pyinline{True}}$ if $v$ and $v'$ are both \pyinline{nan} or $\eqOp{\Sigma}(v, v') = \val{\pyinline{False}}$; $\val{\pyinline{False}}$ if $\eqOp{\Sigma}(v, v') = \val{\pyinline{True}}$; $\eqOp{\Sigma}(v, v')$ otherwise \\
 \pyinline{in} & $(\tyObject, \tyObject)$ & $\inOp{\Sigma}(v, v')$ \\
 \pyinline{not in} & $(\tyObject, \tyObject)$ & $\val{\pyinline{True}}$ if $\inOp{\Sigma}(v, v') = \val{\pyinline{False}}$; $\val{\pyinline{False}}$ if $\inOp{\Sigma}(v, v') = \val{\pyinline{True}}$; $\inOp{\Sigma}(v, v')$ otherwise \\
-\pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & $(\tyFloat, \tyFloat)$ & $\val{\pyinline{True}}$ if neither $v$ nor $v'$ is \pyinline{nan} and $v < v'$, $v \leq v'$, $v > v'$ or $v \geq v'$ respectively as extended real numbers; $\val{\pyinline{False}}$ otherwise \\
+\pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & $(\tyFloat, \tyFloat)$ & \todo{Numeric order, as in Python} \\
 \pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & $(\tyStr, \tyStr)$ & $\val{\pyinline{True}}$ if $v < v'$, $v \leq v'$, $v > v'$ or $v \geq v'$ respectively in the lexicographic order on code points; $\val{\pyinline{False}}$ otherwise \\
-\pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{//}\quad\pyinline{\%} & $(\tyInt, \tyInt)$ & $\aborts{\errZeroDiv}$ if $\odot$ is \pyinline{//} or \pyinline{\%} and $v' = 0$; otherwise $\val{v + v'}$, $\val{v - v'}$, $\val{v \times v'}$, $\val{\lfloor v / v' \rfloor}$ or $\val{v - v' \lfloor v / v' \rfloor}$ respectively \\
+\pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{//}\quad\pyinline{\%} & $(\tyInt, \tyInt)$ & \todo{Integer arithmetic, as in Python; $\aborts{\errZeroDiv}$ if the divisor is zero} \\
 \pyinline{**} & $(\tyInt, \tyInt)$ & \todo{Integer power, as in Python, giving a float if $v'$ is negative} \\
 \pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{/}\quad\pyinline{//}\quad\pyinline{\%}\quad\pyinline{**} & $(\tyFloat, \tyFloat)$ & \todo{Float arithmetic, as in Python, with precision left to the implementation; $\aborts{\errZeroDiv}$ if the divisor is zero, and $\aborts{\errOverflow}$ if Python raises the exception of that name, such as for an integer too large to convert to a float} \\
 \pyinline{+} & $(\tyStr, \tyStr)$ & $\val{v \concat v'}$ \\
