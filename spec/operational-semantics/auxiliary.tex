@@ -11,10 +11,10 @@ The operators and the other auxiliary functions the evaluation rules use are def
 The implementation of an operator is selected at run time by the run-time types of its operands, using the
 run-time overloads of \figref{run-time-overloads}.
 \begin{specdefinition}{Run-time overload}
-A \emph{run-time overload} of a binary operator $\odot$ pairs operand bounds $(\tau_1, \tau_2)$ with an implementation
-of $\hat{\odot}$, and applies at operand types
+A \emph{run-time overload} of a binary operator $\odot$ pairs operand bounds $(\tau_1, \tau_2)$ with a definition
+of $\hat{\odot}(v, v')$, and applies at operand types
 $(\sigma_1, \sigma_2)$ with $\Sigma \vdash \sigma_1 \subty \tau_1$ and $\Sigma \vdash \sigma_2 \subty \tau_2$.
-Run-time overloads of a unary operator $\ominus$ pair an operand bound $\tau$ with an implementation of $\hat{\ominus}$ in
+Run-time overloads of a unary operator $\ominus$ pair an operand bound $\tau$ with a definition of $\hat{\ominus}(v)$ in
 the same way.
 \end{specdefinition}
 \noindent The function $\typeOf(v)$ (\S\ref{aux:type-of}) gives the type at which a value is resolved:
