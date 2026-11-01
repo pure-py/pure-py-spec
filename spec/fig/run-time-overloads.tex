@@ -15,12 +15,12 @@
 \pyinline{**} & $(\tyInt, \tyInt)$ & \todo{Integer power, as in Python, giving a float if $v'$ is negative} \\
 \pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{/}\quad\pyinline{//}\quad\pyinline{\%}\quad\pyinline{**} & $(\tyFloat, \tyFloat)$ & \todo{Float arithmetic, as in Python, with precision left to the implementation; $\aborts{\errZeroDiv}$ where the divisor is zero, and $\aborts{\errOverflow}$ where Python raises the exception of that name, such as for an integer too large to convert to a float} \\
 \pyinline{+} & $(\tyStr, \tyStr)$ & $\val{v \concat v'}$ \\
-\pyinline{+} & $(\tyList{\tyObject}, \tyList{\tyObject})$ & $\val{\exList{\seq{v} \concat \seq{v}'}}$ where $v = \exList{\seq{v}}$ and $v' = \exList{\seq{v}'}$ \\
-\pyinline{+} & $(\tyTuple{\tyObject^m}, \tyTuple{\tyObject^n})$ & $\val{\exTuple{v_1, \ldots, v_m, u_1, \ldots, u_n}}$ where $v = \exTuple{v_1, \ldots, v_m}$ and $v' = \exTuple{u_1, \ldots, u_n}$ \\
+\pyinline{+} & $(\tyList{\tyObject}, \tyList{\tyObject})$ & $\val{\exList{\seq{v} \concat \seq{v}'}}$ if $v = \exList{\seq{v}}$ and $v' = \exList{\seq{v}'}$ \\
+\pyinline{+} & $(\tyTuple{\tyObject^m}, \tyTuple{\tyObject^n})$ & $\val{\exTuple{v_1, \ldots, v_m, u_1, \ldots, u_n}}$ if $v = \exTuple{v_1, \ldots, v_m}$ and $v' = \exTuple{u_1, \ldots, u_n}$ \\
 \pyinline{*} & $(\tyStr, \tyInt)$ & $\val{v^n}$ where $n = \max(v', 0)$ \\
 \pyinline{*} & $(\tyInt, \tyStr)$ & $\val{v'^n}$ where $n = \max(v, 0)$ \\
-\pyinline{*} & $(\tyList{\tyObject}, \tyInt)$ & $\val{\exList{\seq{v}^n}}$ where $v = \exList{\seq{v}}$ and $n = \max(v', 0)$ \\
-\pyinline{*} & $(\tyInt, \tyList{\tyObject})$ & $\val{\exList{\seq{v}^n}}$ where $v' = \exList{\seq{v}}$ and $n = \max(v, 0)$
+\pyinline{*} & $(\tyList{\tyObject}, \tyInt)$ & $\val{\exList{\seq{v}^n}}$ if $v = \exList{\seq{v}}$, where $n = \max(v', 0)$ \\
+\pyinline{*} & $(\tyInt, \tyList{\tyObject})$ & $\val{\exList{\seq{v}^n}}$ if $v' = \exList{\seq{v}}$, where $n = \max(v, 0)$
 \end{tabular}
 \end{AddedBlock}
 \caption{\added{Run-time overloads}}
