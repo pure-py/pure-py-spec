@@ -103,10 +103,9 @@ def integrity(report: str) -> str:
 def description(target: str) -> str:
     """Double-hash comment above the target's rule in the Makefile"""
     lines = pathlib.Path("Makefile").read_text().splitlines()
-    above = next(
-        (lines[i - 1] for i, line in enumerate(lines) if line.startswith(f"{target}:")), ""
-    )
-    return above.removeprefix("## ") if above.startswith("## ") else ""
+    above = next(lines[i - 1] for i, line in enumerate(lines) if line.startswith(f"{target}:"))
+    assert above.startswith("## "), f"{target} has no description"
+    return above.removeprefix("## ")
 
 
 def submission() -> str:
@@ -175,7 +174,7 @@ def page(repos: list[str], report: str) -> str:
 {table(draft=True)}
 <h2>Project integrity</h2>
 {integrity(report)}
-<h2>{html.escape(description(SUBMISSION_TARGET) or "Submission")}</h2>
+<h2>{html.escape(description(SUBMISSION_TARGET))}</h2>
 {submission()}
 </body>
 </html>
