@@ -121,7 +121,7 @@ def arrow(colour: str, dashed: bool) -> str:
 
 
 KEY = [
-    (arrow("#333333", dashed=False), "Pin, moved by hand"),
+    (arrow("#333333", dashed=False), "Pin (moved by hand)"),
     (arrow("#333333", dashed=True), "Follows target"),
     (arrow("#b00020", dashed=False), "Pin behind latest release"),
 ]
