@@ -135,15 +135,22 @@ classes: {{
   pinned: {{ style.stroke: "#333333" }}
   tracking: {{ style.stroke: "#333333"; style.stroke-dash: 4 }}
   behind: {{ style.stroke: "#b00020" }}
+  key-arrow: {{ shape: text; width: 56; height: 26; style.font-size: 13; style.font-color: "#333333" }}
+  key-label: {{ shape: text; width: 190; height: 26; style.font-size: 13; style.font-color: "#333333" }}
 }}
 {nodes}{links}key: Key {{
   near: bottom-center
-  grid-columns: 1
-  grid-gap: 4
+  grid-rows: 3
+  grid-columns: 2
+  horizontal-gap: 0
+  vertical-gap: 0
   style: {{ fill: "#ffffff"; stroke: "#cccccc"; border-radius: 8; font-size: 14; bold: true }}
-  pinned: "━━━▶  Pin, moved by hand" {{ shape: text; style.font-size: 13; style.font-color: "#333333" }}
-  tracking: "╌╌╌▶  Follows target" {{ shape: text; style.font-size: 13; style.font-color: "#333333" }}
-  behind: "━━━▶  Pin behind latest release" {{ shape: text; style.font-size: 13; style.font-color: "#b00020" }}
+  pinned-arrow: "━━━▶" {{ class: key-arrow }}
+  pinned: "Pin, moved by hand" {{ class: key-label }}
+  tracking-arrow: "╌╌╌▶" {{ class: key-arrow }}
+  tracking: "Follows target" {{ class: key-label }}
+  behind-arrow: "━━━▶" {{ class: key-arrow; style.font-color: "#b00020" }}
+  behind: "Pin behind latest release" {{ class: key-label; style.font-color: "#b00020" }}
 }}
 """
 
