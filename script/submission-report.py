@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Report on a make target, run prerequisite by prerequisite: a tab-separated line per target described by
-a double-hash comment on its rule, giving its name, the description, whether it passed, failed or wasn't
+a double-hash comment on the line above its rule, giving its name, the description, whether it passed, failed or wasn't
 run because a prerequisite failed, and the detail its recipe printed on lines starting "report:"; a report
 line with a tab separates the label and outcome of a check within the target, giving a line of its own with
 no target. Written to standard output, with the make output on standard error. Further arguments are passed
@@ -15,9 +15,8 @@ import sys
 from dataclasses import dataclass
 from functools import cache
 
-RULE = re.compile(
-    r"^(?P<target>[^\s:#=$%]+):(?!=)\s*(?P<prerequisites>[^#]*?)\s*(?:##\s*(?P<description>.*?)\s*)?$"
-)
+RULE = re.compile(r"^(?P<target>[^\s:#=$%]+):(?!=)\s*(?P<prerequisites>.*)$")
+DESCRIPTION = "## "
 
 
 @dataclass(frozen=True)
@@ -32,9 +31,11 @@ def rules(makefile: str) -> dict[str, Rule]:
     result: dict[str, Rule] = {}
     for i, line in enumerate(lines):
         if match := RULE.match(line):
+            above = lines[i - 1] if i > 0 else ""
+            description = above.removeprefix(DESCRIPTION) if above.startswith(DESCRIPTION) else ""
             prerequisites = [p for p in match["prerequisites"].split() if not p.startswith("$")]
             recipe = i + 1 < len(lines) and lines[i + 1].startswith("\t")
-            result[match["target"]] = Rule(match["description"] or "", prerequisites, recipe)
+            result[match["target"]] = Rule(description, prerequisites, recipe)
     return result
 
 

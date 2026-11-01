@@ -63,7 +63,8 @@ $(SPEC_LABELS): PurePy-spec.pdf
 paper.pdf paper-anon.pdf: $(SPEC_LABELS)
 
 GRADUALITY_INPUTS := $(wildcard graduality/*.tex graduality/*/*.tex)
-graduality.pdf: $(GRADUALITY_INPUTS)  ## Draft notes on gradual typing, outside the 1.0 specification and paper
+## Draft notes on gradual typing, outside the 1.0 specification and paper
+graduality.pdf: $(GRADUALITY_INPUTS)
 
 # Anonymised build of source $(2) under job name $(1).
 define anon
@@ -74,37 +75,46 @@ $(PDFLATEX) -jobname=$(1) "\def\anonmode{}\input{$(2)}"
 $(call check-log,$(1))
 endef
 
-paper-anon.pdf: $(TEXFILES)  ## Anonymised paper built, references resolved
+## Anonymised paper built, references resolved
+paper-anon.pdf: $(TEXFILES)
 	$(call anon,paper-anon,paper.tex)
 	sed -n 's/^\\newlabel{references}{{[^}]*}{\([0-9]*\)}.*/\1/p' paper-anon.aux > paper-anon.references
 	rm -f $(BUILD_AUX)
 
 PAGE_LIMIT := 25
-check-page-limit: paper-anon.pdf  ## Anonymised paper within the page limit, references excluded
+## Anonymised paper within the page limit, references excluded
+check-page-limit: paper-anon.pdf
 	@page=$$(cat paper-anon.references); echo "report: references begin on page $$page, limit $(PAGE_LIMIT) pages"; \
 		test "$$page" -le $(PAGE_LIMIT)
 
-spec-anon.pdf: $(TEXFILES)  ## Anonymised specification built, references resolved
+## Anonymised specification built, references resolved
+spec-anon.pdf: $(TEXFILES)
 	$(call anon,spec-anon,PurePy-spec.tex)
 	rm -f $(BUILD_AUX)
 
-check-consistency:  ## Specification consistent with the conformance suite
+## Specification consistent with the conformance suite
+check-consistency:
 	uv run --locked python test/consistency.py
 
-check-suite:  ## Conformance suite passed by Python, with mypy as type checker
+## Conformance suite passed by Python, with mypy as type checker
+check-suite:
 	uv run --locked purepy-conformance --python \
 		--type-checker "mypy --python-version $$(cat .python-version) --config-file $(CURDIR)/test/mypy.ini --no-error-summary"
 
-wheel: check-targets check-consistency check-suite  ## Wheel of the conformance suite and runner
+## Wheel of the conformance suite and runner
+wheel: check-targets check-consistency check-suite
 	rm -rf dist && uv build --wheel
 
-dependencies.svg:  ## Dependency diagram of the organisation's repositories, from clones alongside this one
+## Dependency diagram of the organisation's repositories, from clones alongside this one
+dependencies.svg:
 	uv run --locked python script/dependency-diagram.py .. | d2 --pad 16 - $@
 
-integrity.txt:  ## Project integrity report
+## Project integrity report
+integrity.txt:
 	-script/check-project-integrity.sh pure-py pure-py-spec 1 "In progress,Awaiting Review" > $@
 
-status.html: dependencies.svg integrity.txt  ## Status page
+## Status page
+status.html: dependencies.svg integrity.txt
 	uv run --locked python script/status-page.py .. integrity.txt > $@
 
 # tracks: tag of same version
@@ -112,7 +122,8 @@ PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
 # Release of the mechanisation conforming to this specification
 PUREPY_RELEASE := v$(shell uv version --short --color never)
 
-supplementary.zip: spec-anon.pdf  ## Archive: anonymised specification, mechanisation at the specification's release, suite wheel
+## Archive: anonymised specification, mechanisation at the specification's release, suite wheel
+supplementary.zip: spec-anon.pdf
 	rm -f $@ && rm -rf .submission
 	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
 	git clone -q --depth 1 --branch $(PUREPY_RELEASE) $(PUREPY_REPO).git .submission/src
@@ -127,32 +138,39 @@ paper-submission: check-consistency paper-anon.pdf supplementary.zip
 .check-submission: supplementary.zip
 	rm -rf $@ && unzip -q $< -d $@
 
-check-anonymised: supplementary.zip  ## Archive free of project names (file names and contents)
+## Archive free of project names (file names and contents)
+check-anonymised: supplementary.zip
 	@! { unzip -l $<; unzip -p $<; } | grep -qiE 'pure-?py' || { echo "$<: project names found"; exit 1; }
 
-check-archived-theories: .check-submission  ## Archived proofs checked, archived type checker generated
+## Archived proofs checked, archived type checker generated
+check-archived-theories: .check-submission
 	$(MAKE) -C $</mechanisation build ISABELLE=$(ISABELLE)
 
-check-archived-suite: check-archived-theories  ## Archived suite passed by archived type checker
+## Archived suite passed by archived type checker
+check-archived-suite: check-archived-theories
 	$(MAKE) -C .check-submission/mechanisation check-conformance
 
 check-submission: check-targets paper-submission check-page-limit check-anonymised check-archived-suite
 
 # arXiv runs pdflatex without bibtex, so include the .bbl.
-paper-arXiv.zip: paper.pdf  ## Paper sources for arXiv
+## Paper sources for arXiv
+paper-arXiv.zip: paper.pdf
 	rm -f $@
 	zip -q -9 $@ paper.tex paper.bbl $(sort $(INPUTS) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX)) $(EVALUATION_FIGURE)
 
-clean:  ## Build products removed
+## Build products removed
+clean:
 	rm -rf .check-submission
 	rm -f $(AUX) *.pdf *.zip *.tsv *.references $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(EVALUATION_FIGURE)
 	rm -rf $(dir $(SPEC_LABELS))
 
-check-targets:  ## Every make target with a recipe described
+## Every make target with a recipe described
+check-targets:
 	script/submission-report.py --check
 
-help:  ## Targets with their descriptions
-	@grep -E '^[a-zA-Z0-9_.-]+:.*## ' $(MAKEFILE_LIST) | awk -F ':.*## ' '{ printf "%-24s %s\n", $$1, $$2 }'
+## Targets with their descriptions
+help:
+	@awk '/^## / { d = substr($$0, 4); next } d && /^[a-zA-Z0-9_.-]+:/ { t = $$0; sub(/:.*/, "", t); printf "%-24s %s\n", t, d } { d = "" }' $(MAKEFILE_LIST)
 
 .PHONY: default all help check-targets paper-submission check-page-limit check-anonymised check-archived-theories check-archived-suite check-submission clean \
 	check-consistency check-suite wheel dependencies.svg integrity.txt status.html
