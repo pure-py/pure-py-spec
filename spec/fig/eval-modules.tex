@@ -1,204 +1,47 @@
 \begin{figure}
-\flushleft \shadebox{$\rho, x \importsR r$}
+\flushleft \shadebox{$q, \mathcal{L} \Rightarrow_{\mathsf{mod}} o$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{eval-imp-member}}]
+\inferrule*[lab={\ruleName{eval-module}}]
 {
-  \bind{x}{v} \in \rho \\
-  v \neq \modStub{q'} \quad (\forall q')
+  \mathcal{M}(q) = \seq{\iota}\;t \\
+  q, \mathcal{L}(\pyinline{builtins}) \mathbin{\override} \importEnv{\mathcal{L}}(\seq{\iota}) \mathbin{\override} \scopeS(\declaresS(\seq{\iota}), t), t \Rightarrow o
 }
 {
-  \rho, x \importsR \val{v}
-}
-\and
-\inferrule*[lab={\ruleName{eval-imp-submodule}}]
-{
-  \bind{x}{\modStub{q'}} \in \rho \\
-  q' \Rightarrow_{\mathsf{mod}} \val{\rho'}
-}
-{
-  \rho, x \importsR \val{\modLoaded{q'}{\rho'}}
-}
-\and
-\inferrule*[lab={\ruleName{eval-imp-submodule-fail}}]
-{
-  \bind{x}{\modStub{q'}} \in \rho \\
-  q' \Rightarrow_{\mathsf{mod}} \aborts{\kappa}
-}
-{
-  \rho, x \importsR \aborts{\kappa}
+  q, \mathcal{L} \Rightarrow_{\mathsf{mod}} o
 }
 \end{mathpar}
 
-\caption{Name $x$ imported from module environment $\rho$ has result $r$}
-\label{fig:eval-imports}
-\end{figure}
-
-\begin{figure}
-\begin{subfigure}{\textwidth}
-\flushleft \shadebox{$q, \seq{\iota} \Rightarrow r$}
+\flushleft \shadebox{$\seq{q}, \mathcal{L} \Rightarrow_{\mathsf{mod}} o$}
 \begin{mathpar}
 \small
-\inferrule*[lab={\ruleName{eval-imports-nil}}]
+\inferrule*[lab={\ruleName{eval-modules-nil}}]
 {
   \strut
 }
 {
-  q, \varepsilon \Rightarrow \val{\varnothing}
+  \varepsilon, \mathcal{L} \Rightarrow_{\mathsf{mod}} \outcome{\varepsilon}{\assigns{\varnothing}}
 }
 \and
-\inferrule*[lab={\ruleName{eval-import}}]
+\inferrule*[lab={\ruleName{eval-modules-cons}}]
 {
-  q' = x \cons \seq{x} \\
-  x \Rightarrow_{\mathsf{mod}} \val{\rho} \\
-  x, \rho, \seq{x} \Rightarrow_{\mathsf{sub}} \val{\rho^\dagger} \\
-  q, \seq{\iota} \Rightarrow r
+  q, \mathcal{L} \Rightarrow_{\mathsf{mod}} \outcome{\seq{v}}{\assigns{\rho}} \\
+  \seq{q}, \mathcal{L} \override \set{\bind{q}{\submods(q) \override \rho}} \Rightarrow_{\mathsf{mod}} o
 }
 {
-  q, \exImport{q'} \cons \seq{\iota} \Rightarrow \mlet{\rho'}{r}{\val{\set{\bind{x}{\modLoaded{x}{\rho^\dagger}}} \extend \rho'}}
+  q \cons \seq{q}, \mathcal{L} \Rightarrow_{\mathsf{mod}} \outcome{\seq{v}}{\assigns{\varnothing}} \override o
 }
 \and
-\inferrule*[lab={\ruleName{eval-import-fail}}]
+\inferrule*[lab={\ruleName{eval-modules-fail}}]
 {
-  q' = x \cons \seq{x} \\
-  x \Rightarrow_{\mathsf{mod}} \aborts{\kappa}
+  q, \mathcal{L} \Rightarrow_{\mathsf{mod}} \outcome{\seq{v}}{\aborts{\kappa}}
 }
 {
-  q, \exImport{q'} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
-}
-\and
-\inferrule*[lab={\ruleName{eval-import-fail-chain}}]
-{
-  q' = x \cons \seq{x} \\
-  x \Rightarrow_{\mathsf{mod}} \val{\rho} \\
-  x, \rho, \seq{x} \Rightarrow_{\mathsf{sub}} \aborts{\kappa}
-}
-{
-  q, \exImport{q'} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
-}
-\and
-\inferrule*[lab={\ruleName{eval-from-import}}]
-{
-  \seq{q}^\dagger = \uniqueTo(q', q) \\
-  q^\dagger_j \Rightarrow_{\mathsf{mod}} \val{\rho_j} \quad (\forall j) \\
-  q' \Rightarrow_{\mathsf{mod}} \val{\rho} \\
-  \rho, x_i \importsR \val{v_i} \quad (\forall i) \\
-  q, \seq{\iota} \Rightarrow r
-}
-{
-  q, \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \mlet{\rho^\dagger}{r}{\val{\set{\bind{x_1}{v_1}, \ldots, \bind{x_{n+1}}{v_{n+1}}} \extend \rho^\dagger}}
-}
-\and
-\inferrule*[lab={\ruleName{eval-from-import-fail}}]
-{
-  \seq{q}^\dagger = \uniqueTo(q', q) \\
-  q^\dagger_j \Rightarrow_{\mathsf{mod}} \val{\rho_j} \quad (\forall j) \\
-  q' \Rightarrow_{\mathsf{mod}} \aborts{\kappa}
-}
-{
-  q, \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
-}
-\and
-\inferrule*[lab={\ruleName{eval-from-import-fail-containing}}]
-{
-  \seq{q}^\dagger = \uniqueTo(q', q) \\
-  q^\dagger_j \Rightarrow_{\mathsf{mod}} \aborts{\kappa} \\
-  q^\dagger_k \Rightarrow_{\mathsf{mod}} \val{\rho_k} \quad (\forall k < j)
-}
-{
-  q, \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
-}
-\and
-\inferrule*[lab={\ruleName{eval-from-import-fail-member}}]
-{
-  \seq{q}^\dagger = \uniqueTo(q', q) \\
-  q^\dagger_k \Rightarrow_{\mathsf{mod}} \val{\rho_k} \quad (\forall k) \\
-  q' \Rightarrow_{\mathsf{mod}} \val{\rho} \\
-  \rho, x_i \importsR \val{v_i} \quad (\forall i < j) \\
-  \rho, x_j \importsR \aborts{\kappa}
-}
-{
-  q, \exFromImport{q'}{x_1, \ldots, x_{n+1}} \cons \seq{\iota} \Rightarrow \aborts{\kappa}
+  q \cons \seq{q}, \mathcal{L} \Rightarrow_{\mathsf{mod}} \outcome{\seq{v}}{\aborts{\kappa}}
 }
 \end{mathpar}
 
-\subcaption{Import prefix $\seq{\iota}$ of module $q$ evaluates to result $r$}
-\end{subfigure}
-
-\vspace{2mm}
-
-\begin{subfigure}{\textwidth}
-\flushleft \shadebox{$q, \rho, \seq{x} \Rightarrow_{\mathsf{sub}} r$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{eval-submodules-nil}}]
-{
-  \strut
-}
-{
-  q, \rho, \varepsilon \Rightarrow_{\mathsf{sub}} \val{\rho}
-}
-\and
-\inferrule*[lab={\ruleName{eval-submodules-cons}}]
-{
-  q.x \Rightarrow_{\mathsf{mod}} \val{\rho'} \\
-  q.x, \rho', \seq{x} \Rightarrow_{\mathsf{sub}} r
-}
-{
-  q, \rho, x \cons \seq{x} \Rightarrow_{\mathsf{sub}}
-  \mlet{\rho^\dagger}{r}{\val{\rho \extend \set{\bind{x}{\modLoaded{q.x}{\rho^\dagger}}}}}
-}
-\and
-\inferrule*[lab={\ruleName{eval-submodules-fail}}]
-{
-  q.x \Rightarrow_{\mathsf{mod}} \aborts{\kappa}
-}
-{
-  q, \rho, x \cons \seq{x} \Rightarrow_{\mathsf{sub}} \aborts{\kappa}
-}
-\end{mathpar}
-\subcaption{Submodule chain $\seq{x}$ extends environment $\rho$ of module $q$, giving result $r$}
-\end{subfigure}
-\caption{Import evaluation}
-\label{fig:eval-import-prefix}
-\end{figure}
-
-\begin{figure}
-\flushleft \shadebox{$q \Rightarrow_{\mathsf{mod}} r$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{eval-predefined}}]
-{
-  \mathcal{P}(q) = (\Gamma, \rho)
-}
-{
-  q \Rightarrow_{\mathsf{mod}} \val{\rho}
-}
-\and
-\input{spec/rules/eval-module}
-\and
-\inferrule*[lab={\ruleName{eval-module-fail}}]
-{
-  \mathcal{M}(q) = \seq{\iota}\;t \\
-  q, \seq{\iota} \Rightarrow \aborts{\kappa}
-}
-{
-  q \Rightarrow_{\mathsf{mod}} \aborts{\kappa}
-}
-\and
-\inferrule*[lab={\ruleName{eval-module-fail-body}}]
-{
-  \mathcal{M}(q) = \seq{\iota}\;t \\
-  \mathcal{P}(\pyinline{builtins}) = (\Gamma, \rho) \\
-  q, \seq{\iota} \Rightarrow \val{\rho'} \\
-  q, \rho \mathbin{\override} \rho' \mathbin{\override} \scopeS(\declaresS(\seq{\iota}), t), t \Rightarrow \aborts{\kappa}
-}
-{
-  q \Rightarrow_{\mathsf{mod}} \aborts{\kappa}
-}
-\end{mathpar}
-
-\flushleft \shadebox{$\mathcal{M} \Rightarrow \kappa$}
+\flushleft \shadebox{$\mathcal{M}, \mathcal{A} \Rightarrow \seq{v}, \kappa$}
 \begin{mathpar}
 \small
 \input{spec/rules/eval-program}

@@ -3,7 +3,8 @@ type Nothing = None
 
 
 def f() -> Nothing:
-    print("f")
+    pass
 
 
 f()
+print("f")

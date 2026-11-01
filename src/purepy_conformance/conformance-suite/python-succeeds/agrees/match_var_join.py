@@ -9,13 +9,13 @@ class A:
 class B:
     s: str
 
-def show(v: A | B) -> None:
+def show(v: A | B) -> int | str:
     match v:
         case A(n=x):
-            print("A")
+            pass
         case B(s=x):
-            print("B")
-    print(x)
+            pass
+    return x
 
-show(A(1))
-show(B("two"))
+print(show(A(1)))
+print(show(B("two")))

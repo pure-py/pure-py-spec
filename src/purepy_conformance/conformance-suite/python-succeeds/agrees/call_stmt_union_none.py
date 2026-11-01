@@ -7,7 +7,8 @@ def f(k: Callable[[int], None] | Callable[[float], None]) -> None:
 
 
 def g(n: int) -> None:
-    print(n)
+    pass
 
 
 f(g)
+print("done")

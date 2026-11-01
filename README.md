@@ -2,7 +2,7 @@
 
 [![consistency checks](https://github.com/pure-py/pure-py-spec/actions/workflows/consistency-checks.yml/badge.svg)](https://github.com/pure-py/pure-py-spec/actions/workflows/consistency-checks.yml)
 
-## [v0.23.2](https://pure-py.github.io/pure-py-spec/v0.23.2/PurePy-spec.pdf)
+## [v0.24.0](https://pure-py.github.io/pure-py-spec/v0.24.0/PurePy-spec.pdf)
 
 PurePy is a pure (side-effect free) subset of Python, intended initially for researchers in programming
 languages and programming pedagogy, and in the longer term as a common language for scientific computing,
@@ -51,6 +51,11 @@ have the outcome of Python, and with `--run-undefined` also each test undefined 
 ```bash
 purepy-conformance --type-checker "purepy --check" purepy
 ```
+
+The files beside a test give its expectations: `.expected` holds the output of a test that succeeds, `.status.expected`
+its exit status when non-zero, `.exception.expected` the exception raised by a test that raises, `.output.expected`
+the output before the exception, `.error.expected` the diagnostic of a test the type checker rejects, and `.args`
+the command-line arguments of a run, one per line.
 
 ## Development
 

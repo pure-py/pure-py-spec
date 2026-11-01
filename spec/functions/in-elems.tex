@@ -1,0 +1,3 @@
+\inElems{\Sigma}(v, \varepsilon) &{}= \val{\pyinline{False}} \\*
+\inElems{\Sigma}(v, v' \cons \seq{v}) &{}= \inElems{\Sigma}(v, \seq{v}) && \quad \text{if } \eqOp{\Sigma}(v, v') = \val{\pyinline{False}} \\*
+\inElems{\Sigma}(v, v' \cons \seq{v}) &{}= \eqOp{\Sigma}(v, v') \quad \text{(otherwise)}

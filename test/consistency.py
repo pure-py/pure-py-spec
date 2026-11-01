@@ -22,6 +22,14 @@ PYTHON_VERSION = (ROOT / ".python-version").read_text().strip()
 RULE_NAME = re.compile(r"\\ruleName\{([a-z0-9-]+)\}")
 RULE_DEF = re.compile(r"lab=\{\\ruleName\{([a-z0-9-]+)\}\}")
 CITATION = re.compile(r"# rule: ([a-z0-9-]+)")
+DELETED = re.compile(
+    r"\\begin\{DeletedBlock\}.*?\\end\{DeletedBlock\}|\\deleted\{[^{}]*\}", re.DOTALL
+)
+
+
+def current(f: pathlib.Path) -> str:
+    """Source with text in deleted change markup removed."""
+    return DELETED.sub("", f.read_text(encoding="utf-8"))
 
 
 def check_python_version(r: Results) -> None:
@@ -38,7 +46,7 @@ def check_unique_rule_names(r: Results) -> None:
         where: dict[str, list[str]] = {}
         for source in ("spec", "paper"):
             for f in sorted((ROOT / source).rglob("*.tex")):
-                for name in RULE_DEF.findall(f.read_text(encoding="utf-8")):
+                for name in RULE_DEF.findall(current(f)):
                     where.setdefault(name, []).append(str(f.relative_to(ROOT)))
         for name, files in sorted(where.items()):
             if len(files) > 1:
@@ -50,9 +58,7 @@ def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
     line; a test rejected by the parser cites none."""
     with r.test("rule attribution"):
         spec = {
-            m
-            for f in sorted((ROOT / "spec").rglob("*.tex"))
-            for m in RULE_NAME.findall(f.read_text(encoding="utf-8"))
+            m for f in sorted((ROOT / "spec").rglob("*.tex")) for m in RULE_NAME.findall(current(f))
         }
         for test in tests(suite_dir):
             path = test / MAIN if test.is_dir() else test
