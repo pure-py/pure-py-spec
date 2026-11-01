@@ -27,8 +27,8 @@ and evaluation selects the run-time overloads. With \pyinline{x: float = 1}, the
 \pyinline{x + 1} has type \pyinline{float} and evaluates to \pyinline{2} by the run-time overload at
 $(\tyInt, \tyInt)$.
 
-\begin{lemma}[Operators are defined]
-\label{lem:operators-defined}
+\begin{lemma}[Most specific run-time overload]
+\label{lem:most-specific-run-time-overload}
 For all values $v$ and $v'$, the run-time overloads of $\odot$ at $(\typeOf(v), \typeOf(v'))$ have a least element if
 they are not empty, and similarly for $\ominus$ at $\typeOf(v)$, so $\hat{\odot}(v, v')$ and $\hat{\ominus}(v)$ are
 defined.
