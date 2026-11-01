@@ -272,8 +272,8 @@ def main(argv: Sequence[str] | None = None) -> None:
     parser.add_argument(
         "--python-mode",
         action="store_true",
-        help="check the suite against Python and mypy: each test, whether or not it is well-formed in PurePy, "
-        "has its recorded Python outcome, and mypy accepts each test which is well-formed in PurePy",
+        help="check the suite against Python and mypy. Every test must have its recorded Python outcome, and "
+        "mypy must accept every test which is well-formed in PurePy",
     )
     parser.add_argument(
         "--jobs", type=int, help="number of tests run in parallel (default: number of cores)"
