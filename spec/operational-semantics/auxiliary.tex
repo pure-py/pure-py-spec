@@ -2,3 +2,12 @@
 
 The operators and the other auxiliary functions the evaluation rules use are defined in
 \secref{auxiliary-values}, and module and class resolution in \secref{auxiliary-classes}.
+
+\begin{AddedBlock}
+\begin{lemma}[Binary operators are defined]
+\label{lem:binop-defined}
+For every binary operator $\odot$ and values $v$ and $v'$, the run-time overloads of $\odot$ at
+$(\typeOf(v), \typeOf(v'))$ have a least element if they are not empty, so $\hat{\odot}(v, v')$ is defined
+(\S\ref{aux:binop}).
+\end{lemma}
+\end{AddedBlock}
