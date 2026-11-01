@@ -33,7 +33,7 @@ $(\tyInt, \tyInt)$.
 
 \begin{lemma}[Soundness of overload resolution]
 \label{lem:overload-resolution-soundness}
-Suppose $\vdash v : \sigma_1$ and $\vdash v' : \sigma_2$ and $\resolveOp{\Sigma}(\odot, \sigma_1, \sigma_2) = \tau$.
+Suppose $\vdash v : \sigma_1$ and $\vdash v' : \sigma_2$ with $\resolveOp{\Sigma}(\odot, \sigma_1, \sigma_2) = \tau$.
 Then some run-time overload of $\odot$ applies at $(\typeOf(v), \typeOf(v'))$, and if
 $\hat{\odot}(v, v') = \val{v^\dagger}$ then $\vdash v^\dagger : \tau$. Similarly for $\ominus$.
 \end{lemma}
