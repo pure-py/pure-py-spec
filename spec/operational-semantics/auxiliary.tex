@@ -19,7 +19,7 @@ Run-time overloads of a unary operator $\ominus$ pair an operand bound $\tau$ wi
 the same way.
 \end{specdefinition}
 \noindent The function $\typeOf(v)$ (\S\ref{aux:type-of}) gives the run-time type of a value.
-The result $\hat{\odot}(v, v')$ is given by the definition of the most
+The result $\hat{\odot}(v, v')$ is given by the most
 specific run-time overload of $\odot$ at $(\typeOf(v), \typeOf(v'))$, and is $\aborts{\errExcluded}$ if no run-time
 overload of $\odot$ applies. The result $\hat{\ominus}(v)$ is given in the same way. Overload resolution (\secref{well-formedness-operators}) therefore fixes the types of operator
 applications but not which run-time overload defines the result of each application. With $\exAssign{x\exAnnot{\tyFloat}}{1}$, the expression
