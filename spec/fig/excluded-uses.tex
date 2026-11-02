@@ -3,13 +3,13 @@
 \footnotesize
 \setlength{\tabcolsep}{4pt}
 \begin{AddedBlock}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.42\textwidth}>{\raggedright\arraybackslash}p{0.48\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.42\textwidth}>{\raggedright\arraybackslash}p{0.34\textwidth}>{\raggedright\arraybackslash}p{0.14\textwidth}}
 \arrayrulecolor{gray!60}\hline
-\rowcolor{grammarheadcolor}Use & Depends on \\
-\pyinline{print} inside function & Expression-level printing \\\rowgap
-\pyinline{print} as first-class value & \pyinline{*args} and keyword-only parameters \\\rowgap
-\pyinline{round} with second argument & Default values \\\rowgap
-\pyinline{sys.exit} with no arguments & Default values
+\rowcolor{grammarheadcolor}Use & Depends on & Exclusion \\
+\pyinline{print} inside function & Expression-level printing & Static \\\rowgap
+\pyinline{print} as first-class value & \pyinline{*args} and keyword-only parameters & Static \\\rowgap
+\pyinline{round} with second argument & Default values & Static \\\rowgap
+\pyinline{sys.exit} with no arguments & Default values & Static
 \end{tabular}
 \end{AddedBlock}
 \caption{\added{Uses of predefined functions which depend on features excluded from this version}}
