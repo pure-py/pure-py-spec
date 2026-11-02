@@ -80,8 +80,9 @@ def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
 
 
 def check_classification(r: Results, suite_dir: pathlib.Path) -> None:
-    """Require the classification placeholder in parser rejections and exclusions from this version of valid Python,
-    and allow it only in rejections of valid Python."""
+    """Check which expected errors end with the classification placeholder. For a program which Python runs, the
+    placeholder is required if the parser rejects the program or the program uses a feature excluded from this
+    version, and optional if the type checker rejects it. No other expected error uses the placeholder."""
     with r.test("classification of excluded features"):
         for test in tests(suite_dir):
             path = test / MAIN if test.is_dir() else test

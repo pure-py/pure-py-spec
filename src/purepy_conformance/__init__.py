@@ -148,11 +148,15 @@ class Runner(Results):
         type_checker: list[str],
         interpreter: list[str] | None,
         python_mode: bool,
+        check_messages: bool,
     ) -> None:
         super().__init__()
         self.type_checker = type_checker
         self.interpreter = interpreter  # None: tests not run
         self.python_mode = python_mode  # Suite checked against Python and mypy
+        self.check_messages = (
+            check_messages  # Diagnostics checked against those of reference type checker
+        )
         self.type_checked = 0
         self.run_only = 0
 
@@ -248,7 +252,7 @@ class Runner(Results):
             ]
         undefined = purepy == PurePyOutcome.UNDEFINED
         return [
-            *self.type_check(path, exit, error_expected, purepy),
+            *self.type_check(path, exit, error_expected and self.check_messages, purepy),
             *(self.interpret(path, python_outcome, undefined) if well_formed else []),
         ]
 
@@ -311,6 +315,11 @@ def main(argv: Sequence[str] | None = None) -> None:
         "mypy must accept every test which is well-formed in PurePy",
     )
     parser.add_argument(
+        "--check-messages",
+        action="store_true",
+        help="check each diagnostic of the type checker against the diagnostic of the reference type checker",
+    )
+    parser.add_argument(
         "--jobs", type=int, help="number of tests run in parallel (default: number of cores)"
     )
     args = parser.parse_args(argv)
@@ -318,6 +327,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         shlex.split(args.type_checker),
         None if args.no_run else shlex.split(args.interpreter),
         args.python_mode,
+        args.check_messages,
     )
     with suite() as path:
         runner.run_suite(path, args.jobs)

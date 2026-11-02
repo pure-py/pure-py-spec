@@ -54,13 +54,14 @@ purepy-conformance --type-checker "purepy --check" purepy
 
 The files beside a test give its expectations: `.expected` holds the output of a test that succeeds, `.status.expected`
 its exit status when non-zero, `.exception.expected` the exception raised by a test that raises, `.output.expected`
-the output before the exception, `.error.expected` the diagnostic of a test the type checker rejects, and `.args`
-the command-line arguments of a run, one per line.
+the output before the exception, `.error.expected` the diagnostic of the reference type checker for a test it
+rejects, and `.args` the command-line arguments of a run, one per line.
 
-A diagnostic for an excluded Python feature names the feature and says whether it is excluded by design or from
-this version. Its `.error.expected` ends with the placeholder `{classification}`, which the suite replaces by the
-wording for the test's outcome; the wording is defined by `Classification` in the `purepy_conformance` package, which
-an implementation can import.
+An implementation conforms by its exit statuses, and may word its diagnostics as it chooses. With `--check-messages`,
+the suite also checks each diagnostic against `.error.expected`, as the CI of the reference type checker does. A
+diagnostic for an excluded Python feature names the feature and says whether it is excluded by design or from this
+version; its `.error.expected` ends with the placeholder `{classification}`, which the suite replaces by the wording
+defined by `Classification` in the `purepy_conformance` package.
 
 ## Development
 
