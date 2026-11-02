@@ -4,13 +4,14 @@ languages. The hatched cells of the figure are empty because every well-formed p
 Python program, and each result in the last column is the same as under Python.
 \end{DeletedBlock}
 \begin{AddedBlock}
-A Python program is \emph{syntactically valid} if it does not raise \pyinline{SyntaxError} under Python. A Python
-program is a \emph{\PurePy program} if it has the syntax of \secref{syntax}, and a \PurePy program is
-\emph{well-formed} if it satisfies the well-formedness rules of \secref{well-formedness}. Some of the operations excluded by \PurePy, such as comparison of two functions, cannot be
-rejected statically\paperonly{ (\secref{no-coercions})}\speconly{ (summarised in the informative
-\annexref{exclusions})}. A run which reaches one of these \emph{dynamically excluded} operations has undefined
-behaviour, and aborts with $\errUndef$. \PurePy is a subset of Python: every well-formed program is syntactically
-valid, and every terminating run with defined behaviour under \PurePy produces the same result under Python.
+\PurePy is a subset of Python, defined by static rules: a Python program is a \emph{\PurePy program} if it has the
+syntax of \secref{syntax}, and a \PurePy program is \emph{well-formed} if it satisfies the well-formedness rules of
+\secref{well-formedness}. Not every behaviour excluded by \PurePy can be rejected statically,
+however\paperonly{ (\secref{no-coercions})}\speconly{ (the excluded behaviours are summarised in the informative
+\annexref{exclusions})}. A run which reaches one of these \emph{dynamically excluded} operations, such as comparison
+of two functions, has undefined behaviour, and aborts with $\errUndef$. In all other respects \PurePy agrees with
+Python: every well-formed program is \emph{syntactically valid}, in that it does not raise \pyinline{SyntaxError}
+under Python, and every terminating run with defined behaviour under \PurePy produces the same result under Python.
 \figref{taxonomy} classifies programs and runs by their outcomes under the two languages. The hatched cells of the
 figure are empty because every well-formed program is syntactically valid. Each result in the last column is the same
 as under Python.
