@@ -57,7 +57,7 @@ its exit status when non-zero, `.exception.expected` the exception raised by a t
 the output before the exception, `.error.expected` the diagnostic of the reference type checker for a test it
 rejects, and `.args` the command-line arguments of a run, one per line.
 
-An implementation conforms by its exit statuses, and may word its diagnostics as it chooses. With `--check-messages`,
+An implementation conforms by its exit statuses, and may word diagnostics as it chooses. With `--check-messages`,
 the suite also checks each diagnostic against `.error.expected`. The reference type checker is tested with this
 option. A diagnostic for an excluded Python feature names the feature and says whether it is excluded by design or
 from this version; its `.error.expected` ends with the placeholder `{classification}`, which the suite replaces by the
