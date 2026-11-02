@@ -4,9 +4,9 @@ languages. The hatched cells of the figure are empty because every well-formed p
 Python program, and each result in the last column is the same as under Python.
 \end{DeletedBlock}
 \begin{AddedBlock}
-A Python program is \emph{syntactically valid} if Python compiles it without raising \pyinline{SyntaxError}, and
-\emph{well-formed} if it has the syntax of \secref{syntax} and satisfies the well-formedness rules of
-\secref{well-formedness}. Some of the operations excluded by \PurePy, such as comparison of two functions, cannot be
+A Python program is \emph{syntactically valid} if it does not raise \pyinline{SyntaxError} under Python. A Python
+program is a \emph{\PurePy program} if it has the syntax of \secref{syntax}, and a \PurePy program is
+\emph{well-formed} if it satisfies the well-formedness rules of \secref{well-formedness}. Some of the operations excluded by \PurePy, such as comparison of two functions, cannot be
 rejected statically\paperonly{ (\secref{no-coercions})}\speconly{ (summarised in the informative
 \annexref{exclusions})}. A run which reaches one of these \emph{dynamically excluded} operations has undefined
 behaviour, and aborts with $\errUndef$. \PurePy is a subset of Python: every well-formed program is syntactically
