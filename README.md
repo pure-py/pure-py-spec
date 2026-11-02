@@ -16,7 +16,7 @@ semantics.
 ## Project structure
 
 - `paper.tex`: paper
-- `PurePy-spec.tex`: language specification, a standalone document
+- `PurePy-spec.tex`: language specification
 - `spec/`: specification sources, including figures, rules, definitions and lemmas shared with paper
 - `paper/`: paper prose not shared with specification
 - `tex/`: macros and bibliography shared by both documents
