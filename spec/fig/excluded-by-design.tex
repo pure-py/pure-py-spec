@@ -8,32 +8,32 @@
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Feature & Python & Rejected by \\
 \designgroup{Mutable state}
-\pyinline{global} and \pyinline{nonlocal} & Assigns to variable of enclosing scope & Parser \\\rowgap
-\pyinline{del} & Removes binding & Parser \\\rowgap
-Augmented assignment \pyinline{+=}, etc. & Updates in place if type supports it & Parser \\\rowgap
-Walrus operator \pyinline{:=} & Assigns within expression & Parser \\\rowgap
-Item assignment \pyinline{xs[0] = v} & Updates container in place & Parser \\\rowgap
-Attribute as assignment or declaration target, \pyinline{p.x = v} or \pyinline{p.x: int} & Updates object in place & Parser \\\rowgap
-Built-ins \pyinline{setattr} and \pyinline{delattr} & Sets or deletes attribute named by string & Type checker \\\rowgap
-\pyinline{is} and \pyinline{is not}, except with \pyinline{None}, \pyinline{True} or \pyinline{False} & Compares objects by identity & Parser \\\rowgap
-Built-in \pyinline{id} & Returns identity of object & Type checker \\\rowgap
+\pyinline{global} and \pyinline{nonlocal} & Assign to variable of enclosing scope & Parser \\\rowgap
+\pyinline{del} & Remove binding & Parser \\\rowgap
+Augmented assignment \pyinline{+=}, etc. & Update in place if type supports it & Parser \\\rowgap
+Walrus operator \pyinline{:=} & Assign within expression & Parser \\\rowgap
+Item assignment \pyinline{xs[0] = v} & Update container in place & Parser \\\rowgap
+Attribute as assignment or declaration target, \pyinline{p.x = v} or \pyinline{p.x: int} & Update object in place & Parser \\\rowgap
+Built-ins \pyinline{setattr} and \pyinline{delattr} & Set or delete attribute named by string & Type checker \\\rowgap
+\pyinline{is} and \pyinline{is not}, except with \pyinline{None}, \pyinline{True} or \pyinline{False} & Compare objects by identity & Parser \\\rowgap
+Built-in \pyinline{id} & Return identity of object & Type checker \\\rowgap
 \designgroup{Iteration}
-\pyinline{for} and \pyinline{while} loops, \pyinline{break} and \pyinline{continue} & Iterates by updating loop variable & Parser \\\rowgap
-\pyinline{yield}, \pyinline{yield from} and generator expressions & Creates generator, consumed by mutation & Parser \\\rowgap
-Built-ins \pyinline{iter} and \pyinline{next} & Creates or advances iterator & Type checker \\\rowgap
+\pyinline{for} and \pyinline{while} loops, \pyinline{break} and \pyinline{continue} & Iterate by updating loop variable & Parser \\\rowgap
+\pyinline{yield}, \pyinline{yield from} and generator expressions & Create generator, consumed by mutation & Parser \\\rowgap
+Built-ins \pyinline{iter} and \pyinline{next} & Create or advance iterator & Type checker \\\rowgap
 \designgroup{Load-dependent meaning}
 Import inside function body or branch, or after statement & Dependencies of module discovered as body executes & Parser \\\rowgap
-Wildcard import \pyinline{from q import *} & Introduces names of \pyinline{q} implicitly & Parser \\\rowgap
-Built-ins \pyinline{eval} and \pyinline{exec} & Runs code given as string & Type checker \\\rowgap
-Built-in \pyinline{getattr} & Reads attribute named by string & Type checker \\\rowgap
-Built-ins \pyinline{globals}, \pyinline{locals} and \pyinline{vars} & Returns namespace as dictionary & Type checker \\\rowgap
-Built-in \pyinline{__import__} & Imports module named by string & Type checker \\\rowgap
+Wildcard import \pyinline{from q import *} & Introduce names of \pyinline{q} implicitly & Parser \\\rowgap
+Built-ins \pyinline{eval} and \pyinline{exec} & Run code given as string & Type checker \\\rowgap
+Built-in \pyinline{getattr} & Read attribute named by string & Type checker \\\rowgap
+Built-ins \pyinline{globals}, \pyinline{locals} and \pyinline{vars} & Return namespace as dictionary & Type checker \\\rowgap
+Built-in \pyinline{__import__} & Import module named by string & Type checker \\\rowgap
 \designgroup{Implicit coercions}
-Dictionary type with key type other than \pyinline{str}, or dictionary pattern with key other than string literal & Accepts any hashable key & Parser \\\rowgap
-\designgroup{Type annotations}
-Parameter or return type without annotation & Accepts definition without annotations & Parser \\\rowgap
-Annotation which is not a type expression under the Python typing specification, such as \pyinline{list[int, int]} or \pyinline{Literal[1.5]} & Ignores annotation & Parser \\\rowgap
-\pyinline{Any} and \pyinline{cast} of \pyinline{typing} & Disables static checking of value & Type checker
+Dictionary type with key type other than \pyinline{str}, or dictionary pattern with key other than string literal & Accept any hashable key & Parser \\\rowgap
+\designgroup{Gradual typing}
+Parameter or return type without annotation & Accept definition without annotations & Parser \\\rowgap
+Annotation which is not a type expression under the Python typing specification, such as \pyinline{list[int, int]} or \pyinline{Literal[1.5]} & Ignore annotation & Parser \\\rowgap
+\pyinline{Any} and \pyinline{cast} of \pyinline{typing} & Disable static checking of value & Type checker
 \end{tabular}
 \end{AddedBlock}
 \caption{\added{Python features excluded by design}}
