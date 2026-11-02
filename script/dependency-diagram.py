@@ -121,9 +121,8 @@ def d2(repos: list[pathlib.Path]) -> str:
 
     def link(e: Edge) -> str:
         behind = e.version is not None and e.version != latest[e.target]
-        label = f"{e.label}, latest {latest[e.target]}" if behind else e.label
         style = "behind" if behind else "pinned" if e.pinned else "tracking"
-        return f'"{e.source}" -> "{e.target}": {label} {{class: {style}}}\n'
+        return f'"{e.source}" -> "{e.target}": {e.label} {{class: {style}}}\n'
 
     nodes = "".join(map(node, repos))
     links = "".join(
