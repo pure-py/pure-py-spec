@@ -21,7 +21,7 @@ Built-in \pyinline{id} & Returns identity of object & Type checker \\\rowgap
 \pyinline{yield}, \pyinline{yield from} and generator expressions & Creates generator, consumed by mutation & Parser \\\rowgap
 Built-ins \pyinline{iter} and \pyinline{next} & Creates or advances iterator & Type checker \\\rowgap
 \designgroup{Load-dependent meaning}
-Import inside function body or branch, or after statement & Dependencies of module known only as its statements run & Parser \\\rowgap
+Import inside function body or branch, or after statement & Dependencies of module discovered as body executes & Parser \\\rowgap
 Wildcard import \pyinline{from q import *} & Introduces names of \pyinline{q} implicitly & Parser \\\rowgap
 Built-ins \pyinline{eval}, \pyinline{exec}, \pyinline{getattr}, \pyinline{setattr}, \pyinline{delattr},
 \pyinline{globals}, \pyinline{locals}, \pyinline{vars} and \pyinline{__import__} & Resolves or binds names at run time & Type checker \\\rowgap
