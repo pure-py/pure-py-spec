@@ -1,1 +1,1 @@
-module 'sys' has no member 'version'
+'sys.version' {classification}

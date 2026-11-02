@@ -45,6 +45,36 @@ class PurePyOutcome(StrEnum):
 SYNTAX_ERROR = "SyntaxError"
 
 
+class Classification(StrEnum):
+    """Wording of the classification in a diagnostic for an excluded Python feature."""
+
+    BY_DESIGN = "not allowed in PurePy (excluded by design)"
+    FOR_NOW = "not allowed in PurePy (excluded from this version)"
+
+
+def excluded(feature: str, classification: Classification) -> str:
+    """Diagnostic for a rejection of feature, with its classification."""
+    return f"{feature} {classification}"
+
+
+# Ends an expected error which names an excluded feature, standing for the classification of the test's outcome
+CLASSIFICATION = "{classification}"
+
+# Classification of an excluded feature, for each PurePy outcome which rejects a program
+CLASSIFICATION_OF: dict[PurePyOutcome, Classification] = {
+    PurePyOutcome.PARSER_REJECTS: Classification.BY_DESIGN,
+    PurePyOutcome.TYPING_REJECTS: Classification.BY_DESIGN,
+    PurePyOutcome.EXCLUDED_FOR_NOW: Classification.FOR_NOW,
+}
+
+
+def expected_error(text: str, purepy: PurePyOutcome) -> str:
+    """Expected error, with a trailing classification placeholder replaced by the full diagnostic."""
+    if text.endswith(f" {CLASSIFICATION}"):
+        return excluded(text.removesuffix(f" {CLASSIFICATION}"), CLASSIFICATION_OF[purepy])
+    return text
+
+
 class Exit(IntEnum):
     OK = 0
     NOT_ALLOWED = 1
@@ -126,7 +156,9 @@ class Runner(Results):
         self.type_checked = 0
         self.run_only = 0
 
-    def type_check(self, path: pathlib.Path, exit: Exit, error_expected: bool) -> list[str]:
+    def type_check(
+        self, path: pathlib.Path, exit: Exit, error_expected: bool, purepy: PurePyOutcome
+    ) -> list[str]:
         """Each test is checked in a separate directory, so other tests can't interfere. Single-module tests
         are copied to a new directory before running."""
         with tempfile.TemporaryDirectory() as tmp:
@@ -141,9 +173,10 @@ class Runner(Results):
             return []
         if not error.exists():
             return [f"check: missing {error.name}"]
-        if error.read_text().strip() not in output:
+        expected = expected_error(error.read_text().strip(), purepy)
+        if expected not in output:
             got = output.strip().replace(f"{checked.parent}/", "")
-            return [f"check: expected {error.read_text().strip()!r}, got: {got}"]
+            return [f"check: expected {expected!r}, got: {got}"]
         return []
 
     def type_check_accepts(self, test: pathlib.Path) -> list[str]:
@@ -215,7 +248,7 @@ class Runner(Results):
             ]
         undefined = purepy == PurePyOutcome.UNDEFINED
         return [
-            *self.type_check(path, exit, error_expected),
+            *self.type_check(path, exit, error_expected, purepy),
             *(self.interpret(path, python_outcome, undefined) if well_formed else []),
         ]
 

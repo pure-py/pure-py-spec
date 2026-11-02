@@ -57,6 +57,11 @@ its exit status when non-zero, `.exception.expected` the exception raised by a t
 the output before the exception, `.error.expected` the diagnostic of a test the type checker rejects, and `.args`
 the command-line arguments of a run, one per line.
 
+A diagnostic for an excluded Python feature names the feature and says whether it is excluded by design or from
+this version. Its `.error.expected` ends with the placeholder `{classification}`, which the suite replaces by the
+wording for the test's outcome; the wording is defined by `Classification` in the `purepy_conformance` package, which
+an implementation can import.
+
 ## Development
 
 Synchronise the project environment and install the development dependencies:

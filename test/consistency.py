@@ -7,8 +7,11 @@ import tomllib
 
 import purepy_conformance
 from purepy_conformance import (
+    CLASSIFICATION,
+    ERROR_EXPECTED,
     MAIN,
     PurePyOutcome,
+    PythonOutcome,
     Results,
     run,
     suite,
@@ -76,6 +79,30 @@ def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
                 r.fail(f"{path.relative_to(suite_dir)} cites {cited.group(1)}, not in the spec")
 
 
+def check_classification(r: Results, suite_dir: pathlib.Path) -> None:
+    """Every test which rejects a syntactically valid program by the parser or as excluded from this version ends its
+    expected error with the classification placeholder; a test of a Python syntax error does not use it, and nor does
+    a test which PurePy accepts."""
+    with r.test("classification of excluded features"):
+        for test in tests(suite_dir):
+            path = test / MAIN if test.is_dir() else test
+            error = path.with_suffix(ERROR_EXPECTED)
+            if not error.exists():
+                continue
+            python, purepy = test.relative_to(suite_dir).parts[:2]
+            text = error.read_text(encoding="utf-8").strip()
+            ends = text.endswith(f" {CLASSIFICATION}")
+            required = python != PythonOutcome.REJECTS and purepy in (
+                PurePyOutcome.PARSER_REJECTS,
+                PurePyOutcome.EXCLUDED_FOR_NOW,
+            )
+            allowed = python != PythonOutcome.REJECTS and purepy != PurePyOutcome.AGREES
+            if required and not ends:
+                r.fail(f"{error.relative_to(suite_dir)} does not end with {CLASSIFICATION}")
+            elif CLASSIFICATION in text and not (allowed and ends):
+                r.fail(f"{error.relative_to(suite_dir)} uses {CLASSIFICATION}")
+
+
 def check_lint(r: Results) -> None:
     with r.test("consistency script and runner pass mypy and ruff"):
         sources = [str(TEST / "consistency.py"), inspect.getfile(purepy_conformance)]
@@ -96,6 +123,7 @@ def main() -> None:
     check_unique_rule_names(consistency)
     with suite() as suite_dir:
         check_rule_attribution(consistency, suite_dir)
+        check_classification(consistency, suite_dir)
         check_lint(consistency)
     consistency.summary()
     sys.exit(1 if consistency.failed else 0)
