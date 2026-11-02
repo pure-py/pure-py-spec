@@ -146,7 +146,7 @@ supplementary.zip: spec-anon.pdf
 	@n=$$(git rev-list --count $(PUREPY_RELEASE)..HEAD -- src/purepy_conformance); \
 		echo "report: mechanisation $(PUREPY_RELEASE); suite $$n commit$$([ $$n -eq 1 ] || echo s) since $(PUREPY_RELEASE)"
 
-## PLDI 2027 submission
+## Anonymised paper and archive built
 paper-submission: check-consistency paper-anon.pdf supplementary.zip
 
 .check-submission: supplementary.zip
@@ -164,6 +164,7 @@ check-archived-theories: .check-submission
 check-archived-suite: check-archived-theories
 	$(MAKE) -C .check-submission/mechanisation check-conformance
 
+## PLDI 2027 submission
 check-submission: check-targets paper-submission check-page-limit check-paper-anonymised check-review-mode \
 	check-anonymised check-archived-suite
 

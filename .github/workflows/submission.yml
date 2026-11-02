@@ -1,4 +1,4 @@
-name: Submission
+name: PLDI 2027 submission
 
 # Submission artifact built and checked on request, with the report and the artifact uploaded
 on:
