@@ -135,7 +135,7 @@ PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
 # Release of the mechanisation conforming to this specification
 PUREPY_RELEASE := v$(shell uv version --short --color never)
 
-## Archive holds anonymised spec, mechanisation release at spec's version, and conformance suite wheel
+## Archive builds, with mechanisation release matching spec version
 supplementary.zip: spec-anon.pdf
 	rm -f $@ && rm -rf .submission
 	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
