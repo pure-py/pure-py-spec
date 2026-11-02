@@ -1,6 +1,5 @@
 name: Consistency checks
 
-# Specification against the conformance suite, and wheel of the conformance suite and runner
 on:
   workflow_dispatch:
   push:
@@ -23,4 +22,6 @@ jobs:
           enable-cache: true
 
       - name: Run checks and build wheel
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: make wheel

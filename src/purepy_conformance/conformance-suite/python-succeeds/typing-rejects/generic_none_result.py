@@ -1,6 +1,7 @@
 # rule: call
 def show[T](x: T) -> None:
-    print(x)
+    pass
 
 
 y: object = show(1)
+print(y)

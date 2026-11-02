@@ -1,2 +1,3 @@
 # rule: var
-print(next(iter([1, 2])))
+it: object = iter([1, 2])
+print(1)
