@@ -90,9 +90,15 @@ check-page-limit: paper-anon.pdf
 ## Anonymised paper free of author and project names (text and metadata)
 check-paper-anonymised: paper-anon.pdf
 	@names=$$(grep -o '^\\author{[^}]*}' paper.tex | sed -e 's/^\\author{//' -e 's/}$$//' | paste -sd '|' -); \
-		text=$$(pdfinfo $< && pdftotext $< -) || exit 1; \
-		found=$$(echo "$$text" | grep -oiE "pure-?py|$$names" | sort -u | paste -sd ',' -); \
-		test -z "$$found" || { echo "report: found $$found"; exit 1; }
+		pattern="pure-?py|$$names"; meta=$$(pdfinfo $<) || exit 1; \
+		found=$$(echo "$$meta" | grep -oiE "$$pattern" | sort -u | sed 's/$$/ in metadata/'); \
+		for page in $$(seq 1 $$(echo "$$meta" | sed -n 's/^Pages: *//p')); do \
+			text=$$(pdftotext -f $$page -l $$page $< -) || exit 1; \
+			found="$$found$$(echo "$$text" | grep -oiE "$$pattern" | sort -u | sed "s/\$$/	$$page/")"$$'\n'; \
+		done; \
+		found=$$(echo "$$found" | awk -F'\t' 'NF == 2 { p[$$1] = p[$$1] (p[$$1] ? ", " : "") $$2; n[$$1]++ } NF == 1 && $$1 != "" { m[$$1] } \
+			END { for (k in p) printf "%s on page%s %s; ", k, (n[k] > 1 ? "s" : ""), p[k]; for (k in m) printf "%s; ", k }' | sed 's/; $$//'); \
+		test -z "$$found" || { echo "report: $$found"; exit 1; }
 
 ## Anonymised paper in review mode, with line numbers
 check-review-mode: paper-anon.pdf
@@ -146,7 +152,7 @@ supplementary.zip: spec-anon.pdf
 	@n=$$(git rev-list --count $(PUREPY_RELEASE)..HEAD -- src/purepy_conformance); \
 		echo "report: mechanisation $(PUREPY_RELEASE); suite $$n commit$$([ $$n -eq 1 ] || echo s) since $(PUREPY_RELEASE)"
 
-## PLDI 2027 submission
+## Anonymised paper and archive built
 paper-submission: check-consistency paper-anon.pdf supplementary.zip
 
 .check-submission: supplementary.zip
@@ -164,6 +170,7 @@ check-archived-theories: .check-submission
 check-archived-suite: check-archived-theories
 	$(MAKE) -C .check-submission/mechanisation check-conformance
 
+## PLDI 2027 submission
 check-submission: check-targets paper-submission check-page-limit check-paper-anonymised check-review-mode \
 	check-anonymised check-archived-suite
 

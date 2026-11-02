@@ -5,7 +5,8 @@ run because a prerequisite failed, and the detail its recipe printed on lines st
 line with a tab separates the label and outcome of a check within the target, giving a line of its own with
 no target. Written to standard output, with the make output on standard error. Further arguments are passed
 to make. Exits with failure if any target failed. With --check instead of a target, checks that every
-target with a recipe is described, except the special and internal ones starting with a dot."""
+target with a recipe is described, except the special and internal ones starting with a dot, and that every
+workflow reporting on a target is named by its description."""
 
 import os
 import pathlib
@@ -15,6 +16,8 @@ import sys
 from dataclasses import dataclass
 from functools import cache
 
+REPORT = re.compile(r"submission-report\.py\s+([\w.-]+)")
+NAME = re.compile(r"^name:\s*(.+)$", re.MULTILINE)
 RULE = re.compile(r"^(?P<target>[^\s:#=$%]+):(?!=)\s*(?P<prerequisites>.*)$")
 DESCRIPTION = "## "
 
@@ -39,6 +42,16 @@ def rules(makefile: str) -> dict[str, Rule]:
     return result
 
 
+def reporting_workflows() -> list[tuple[pathlib.Path, str, str]]:
+    """File, name and reported target of each workflow running this script on a target"""
+    result = []
+    for workflow in sorted(pathlib.Path(".github/workflows").glob("*.yml")):
+        text = workflow.read_text()
+        if (run := REPORT.search(text)) and (name := NAME.search(text)):
+            result.append((workflow, name[1].strip(), run[1]))
+    return result
+
+
 def main() -> None:
     root, *options = sys.argv[1:]
     graph = rules(pathlib.Path("Makefile").read_text())
@@ -48,9 +61,16 @@ def main() -> None:
             for t, rule in graph.items()
             if rule.recipe and not rule.description and not t.startswith(".")
         ]
+        misnamed = [
+            f"{workflow}: named {name!r}, not {graph[target].description!r}"
+            for workflow, name, target in reporting_workflows()
+            if target not in graph or name != graph[target].description
+        ]
         for target in undescribed:
             print(f"{target}: no description")
-        sys.exit(bool(undescribed))
+        for line in misnamed:
+            print(line)
+        sys.exit(bool(undescribed or misnamed))
     report: list[str] = []
 
     @cache
