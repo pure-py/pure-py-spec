@@ -120,7 +120,6 @@ check-suite-python:
 	uv run --locked purepy-conformance --python-mode \
 		--type-checker "mypy --python-version $$(cat .python-version) --config-file $(CURDIR)/test/mypy.ini --no-error-summary"
 
-# Deferred, so that GitHub is queried only by the target using it
 # tracks: latest release
 PUREPY_LATEST_WHEEL = $(shell gh release view --repo https://github.com/pure-py/isabelle-purepy --json assets \
 	--jq '.assets[] | select(.name | endswith(".whl")) | .url')
