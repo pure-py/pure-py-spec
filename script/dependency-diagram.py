@@ -232,7 +232,7 @@ direction: right
 classes: {{
   pinned: {{ style.stroke: "#333333" }}
   tracking: {{ style.stroke: "#333333"; style.stroke-dash: 4 }}
-  behind: {{ style.stroke: "#b00020" }}
+  behind: {{ style.stroke: "#e00000" }}
   project: {{ width: 200; height: 90; style.font-size: 14 }}
   standalone: {{ width: 200; style.font-size: 14 }}
   repository: {{ style.font-size: 18 }}
