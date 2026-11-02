@@ -126,6 +126,7 @@ PUREPY_LATEST_WHEEL = $(shell gh release view --repo https://github.com/pure-py/
 
 ## Latest mechanisation release passes the suite, except for listed expected failures
 check-suite-purepy:
+	@test -n "$(PUREPY_LATEST_WHEEL)" || { echo "no release of the mechanisation found"; exit 1; }
 	uv run --locked --with "$(PUREPY_LATEST_WHEEL)" python test/expected-failures.py
 
 ## Wheel of the conformance suite and runner
