@@ -16,10 +16,9 @@ Issue	Title	Milestone
 === Active issues without a milestone ===
 Issue	Title	Status
 #14	Syntactic extensions	In progress
-#313	Features excluded by design	In progress
 
 === Issues in closed milestones that aren't Done or Rejected ===
 
 === Closed issues with open sub-issues ===
 
-7 issue(s) found.
+6 issue(s) found.
