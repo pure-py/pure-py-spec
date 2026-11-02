@@ -20,14 +20,10 @@ Mutating methods of built-in types: \pyinline{append}, \pyinline{extend}, \pyinl
 \pyinline{remove}, \pyinline{clear}, \pyinline{sort} and \pyinline{reverse} of \pyinline{list}, and \pyinline{clear},
 \pyinline{pop}, \pyinline{popitem}, \pyinline{setdefault} and \pyinline{update} of \pyinline{dict} & Update value in
 place & Type checker \\\rowgap
-\designgroup{Control flow and effects}
-\pyinline{for} and \pyinline{while} loops, \pyinline{break} and \pyinline{continue} & Iterates by mutating loop state & Parser \\\rowgap
-\pyinline{try}, \pyinline{except}, \pyinline{finally} and \pyinline{raise} & Raises and handles exceptions & Parser \\\rowgap
-\pyinline{with} & Enters and exits context manager & Parser \\\rowgap
+\designgroup{Iteration}
+\pyinline{for} and \pyinline{while} loops, \pyinline{break} and \pyinline{continue} & Iterates by updating loop variable & Parser \\\rowgap
 \pyinline{yield}, \pyinline{yield from} and generator expressions & Creates generator, consumed by mutation & Parser \\\rowgap
-\pyinline{async} and \pyinline{await} & Defines and awaits coroutines & Parser \\\rowgap
 Built-ins \pyinline{iter} and \pyinline{next} & Creates and advances iterator & Type checker \\\rowgap
-Built-ins \pyinline{input} and \pyinline{open} & Reads input or opens file & Type checker \\\rowgap
 \designgroup{Load-dependent meaning}
 Import inside function body or branch, or after a statement & Dependencies of module known only as its statements run & Parser \\\rowgap
 Wildcard import \pyinline{from q import *} & Introduces names of \pyinline{q} implicitly & Parser \\\rowgap
