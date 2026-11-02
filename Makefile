@@ -125,7 +125,7 @@ check-suite-python:
 PUREPY_LATEST_WHEEL = $(shell gh release view --repo https://github.com/pure-py/isabelle-purepy --json assets \
 	--jq '.assets[] | select(.name | endswith(".whl")) | .url')
 
-## Type checker of the latest mechanisation release passes the suite, except for the listed expected failures
+## Latest mechanisation release passes the suite, except for listed expected failures
 check-suite-purepy:
 	uv run --locked --with "$(PUREPY_LATEST_WHEEL)" python test/expected-failures.py
 

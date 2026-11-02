@@ -15,15 +15,15 @@ semantics.
 
 ## Project structure
 
-- `paper.tex`: the paper
-- `PurePy-spec.tex`: the language specification, a standalone document
-- `spec/`: sources of the specification, including the figures, rules, definitions and lemmas shared with the paper
-- `paper/`: sources of the paper's own prose
+- `paper.tex`: paper
+- `PurePy-spec.tex`: language specification, a standalone document
+- `spec/`: specification sources, including figures, rules, definitions and lemmas shared with paper
+- `paper/`: paper prose not shared with specification
 - `tex/`: macros and bibliography shared by both documents
-- `graduality.tex`, `graduality/`: draft notes on gradual typing, built as a separate document and not part of the 1.0 specification or paper
-- `src/purepy_conformance/`: the conformance suite, included in the package, and its runner, the `purepy-conformance` command
-- `test/`: consistency of the specification with the conformance suite, and the expected failures of the reference type checker
-- `script/`: status page, including the project board integrity check, run hourly by CI
+- `graduality.tex`, `graduality/`: draft notes on gradual typing, built as a separate document, outside 1.0 specification and paper
+- `src/purepy_conformance/`: conformance suite and its runner, `purepy-conformance` command, packaged together
+- `test/`: consistency of specification and suite; expected failures of latest mechanisation release
+- `script/`: status page with project board integrity check, run hourly by CI
 
 Each section has separate prose in the two documents, and material shared by both lives under `spec/` and is
 input by each. Within a shared source, `\paperonly{...}` and `\speconly{...}` restrict a phrase to one document.
@@ -42,8 +42,8 @@ specification, run the suite against Python with mypy as type checker, and build
 make wheel
 ```
 
-The reference type checker is `purepy`, generated from the mechanisation in the `isabelle-purepy` repository;
-`make check-suite-purepy` runs the suite against its latest release.
+The reference implementation is the latest release of the mechanisation in the `isabelle-purepy` repository;
+`make check-suite-purepy` runs the suite against it.
 
 An implementation runs the suite with the `purepy-conformance` command of the installed package, providing a type
 checker and interpreter (default `python3`), each as a command taking the path of a module. The type checker
