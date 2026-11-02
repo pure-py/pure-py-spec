@@ -80,8 +80,7 @@ def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
 
 
 def check_classification(r: Results, suite_dir: pathlib.Path) -> None:
-    """Require the classification placeholder for each program which Python runs and which the parser rejects or
-    which is excluded from this version."""
+    """Check classification placeholder on expected errors for excluded features"""
     with r.test("classification of excluded features"):
         for test in tests(suite_dir):
             path = test / MAIN if test.is_dir() else test
