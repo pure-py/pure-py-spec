@@ -1,8 +1,8 @@
 % xr-hyper, for references into the specification (\specfigref), must load before hyperref, which acmart loads.
 \RequirePackage{xr-hyper}
-% \anonmode adds the acmart anonymous option and an anonymised title.
+% \anonmode adds the acmart anonymous and review options and an anonymised title.
 \ifdefined\anonmode
-  \documentclass[acmsmall,anonymous]{acmart}
+  \documentclass[acmsmall,anonymous,review]{acmart}
 \else
   \documentclass[acmsmall]{acmart}
 \fi
