@@ -27,7 +27,7 @@ class Rule:
 
 
 def rules(makefile: str) -> dict[str, Rule]:
-    lines = makefile.splitlines()
+    lines = makefile.replace("\\\n", " ").splitlines()
     result: dict[str, Rule] = {}
     for i, line in enumerate(lines):
         if match := RULE.match(line):

@@ -87,6 +87,17 @@ check-page-limit: paper-anon.pdf
 	@page=$$(cat paper-anon.references); echo "report: references begin on page $$page, limit $(PAGE_LIMIT) pages"; \
 		test "$$page" -le $(PAGE_LIMIT)
 
+## Anonymised paper free of author and project names (text and metadata)
+check-paper-anonymised: paper-anon.pdf
+	@names=$$(grep -o '^\\author{[^}]*}' paper.tex | sed -e 's/^\\author{//' -e 's/}$$//' | paste -sd '|' -); \
+		found=$$({ pdfinfo $<; pdftotext $< -; } | grep -oiE "pure-?py|$$names" | sort -u | paste -sd ',' -); \
+		test -z "$$found" || { echo "report: found $$found"; exit 1; }
+
+## Anonymised paper in review mode, with line numbers
+check-review-mode: paper-anon.pdf
+	@n=$$(pdftotext -layout -f 2 -l 2 $< - | grep -cE '^ *[0-9]+ {2,}'); \
+		echo "report: $$n numbered lines on page 2"; test "$$n" -ge 20
+
 ## Anonymised spec builds, with no undefined references or citations
 spec-anon.pdf: $(TEXFILES)
 	$(call anon,spec-anon,PurePy-spec.tex)
@@ -151,7 +162,8 @@ check-archived-theories: .check-submission
 check-archived-suite: check-archived-theories
 	$(MAKE) -C .check-submission/mechanisation check-conformance
 
-check-submission: check-targets paper-submission check-page-limit check-anonymised check-archived-suite
+check-submission: check-targets paper-submission check-page-limit check-paper-anonymised check-review-mode \
+	check-anonymised check-archived-suite
 
 # arXiv runs pdflatex without bibtex, so include the .bbl.
 ## Paper sources for arXiv
@@ -173,5 +185,6 @@ check-targets:
 help:
 	@awk '/^## / { d = substr($$0, 4); next } d && /^[a-zA-Z0-9_.-]+:/ { t = $$0; sub(/:.*/, "", t); printf "%-24s %s\n", t, d } { d = "" }' $(MAKEFILE_LIST)
 
-.PHONY: default all help check-targets paper-submission check-page-limit check-anonymised check-archived-theories check-archived-suite check-submission clean \
+.PHONY: default all help check-targets paper-submission check-page-limit check-paper-anonymised check-review-mode \
+	check-anonymised check-archived-theories check-archived-suite check-submission clean \
 	check-consistency check-suite wheel dependencies.svg integrity.txt status.html
