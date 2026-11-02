@@ -90,9 +90,15 @@ check-page-limit: paper-anon.pdf
 ## Anonymised paper free of author and project names (text and metadata)
 check-paper-anonymised: paper-anon.pdf
 	@names=$$(grep -o '^\\author{[^}]*}' paper.tex | sed -e 's/^\\author{//' -e 's/}$$//' | paste -sd '|' -); \
-		text=$$(pdfinfo $< && pdftotext $< -) || exit 1; \
-		found=$$(echo "$$text" | grep -oiE "pure-?py|$$names" | sort -u | paste -sd ',' -); \
-		test -z "$$found" || { echo "report: found $$found"; exit 1; }
+		pattern="pure-?py|$$names"; meta=$$(pdfinfo $<) || exit 1; \
+		found=$$(echo "$$meta" | grep -oiE "$$pattern" | sort -u | sed 's/$$/ in metadata/'); \
+		for page in $$(seq 1 $$(echo "$$meta" | sed -n 's/^Pages: *//p')); do \
+			text=$$(pdftotext -f $$page -l $$page $< -) || exit 1; \
+			found="$$found$$(echo "$$text" | grep -oiE "$$pattern" | sort -u | sed "s/\$$/	$$page/")"$$'\n'; \
+		done; \
+		found=$$(echo "$$found" | awk -F'\t' 'NF == 2 { p[$$1] = p[$$1] (p[$$1] ? ", " : "") $$2; n[$$1]++ } NF == 1 && $$1 != "" { m[$$1] } \
+			END { for (k in p) printf "%s on page%s %s; ", k, (n[k] > 1 ? "s" : ""), p[k]; for (k in m) printf "%s; ", k }' | sed 's/; $$//'); \
+		test -z "$$found" || { echo "report: $$found"; exit 1; }
 
 ## Anonymised paper in review mode, with line numbers
 check-review-mode: paper-anon.pdf
