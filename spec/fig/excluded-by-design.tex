@@ -13,6 +13,7 @@
 Augmented assignment \pyinline{+=}, etc. & Update in place if type supports it & Parser \\\rowgap
 Walrus operator \pyinline{:=} & Assign within expression & Parser \\\rowgap
 Item assignment \pyinline{xs[0] = v} & Update container in place & Parser \\\rowgap
+Mutating methods of \pyinline{list} and \pyinline{dict}, such as \pyinline{append} and \pyinline{update} & Update container in place & Type checker \\\rowgap
 Attribute as assignment or declaration target, \pyinline{p.x = v} or \pyinline{p.x: int} & Update object in place & Parser \\\rowgap
 Built-ins \pyinline{setattr} and \pyinline{delattr} & Set or delete attribute named by string & Type checker \\\rowgap
 \pyinline{is} and \pyinline{is not}, except with \pyinline{None}, \pyinline{True} or \pyinline{False} & Compare objects by identity & Parser \\\rowgap

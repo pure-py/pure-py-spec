@@ -10,10 +10,12 @@ other excluded feature is merely excluded from this version, and \figref{exclude
 \annexref{exclusions} lists the common ones.
 
 A program may also be rejected because it uses an included feature in a way which the well-formedness rules do not
-allow, such as a non-Boolean test. All such rejections are by design, with the exception of the uses listed in
-\figref{excluded-uses}, which are excluded from this version.
+allow, such as a non-Boolean test. All such rejections are by design, unless the use violates one of the restrictions
+of this version listed in \figref{restricted-features}, in which case the use is excluded from this version. A use of a
+feature listed in \figref{excluded-by-design} is excluded by design even if it also violates one of these restrictions,
+as for a call of the mutating method \pyinline{append} of a list.
 \end{AddedBlock}
 
 \input{spec/fig/excluded-by-design}
 
-\input{spec/fig/excluded-uses}
+\input{spec/fig/restricted-features}
