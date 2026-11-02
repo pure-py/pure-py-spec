@@ -132,7 +132,7 @@ def submission() -> str:
     listing = subprocess.run(
         ["gh", "run", "list", "--repo", f"{ORG}/{SPEC_REPO}", "--workflow", SUBMISSION_WORKFLOW]
         + ["--branch", "main", "--status", "completed", "--limit", "1"]
-        + ["--json", "databaseId,conclusion,createdAt,url,headSha"],
+        + ["--json", "databaseId,conclusion,createdAt,url"],
         capture_output=True,
         text=True,
         check=False,
@@ -155,10 +155,7 @@ def submission() -> str:
             else []
         )
     when = run["createdAt"][:16].replace("T", " ")
-    heading = (
-        f'<p>Run of <a href="{run["url"]}">{when}</a> UTC on commit {run["headSha"][:7]}: '
-        f"{html.escape(run['conclusion'])}.</p>"
-    )
+    heading = f'<p><a href="{run["url"]}">{html.escape(run["conclusion"]).capitalize()}</a> on {when} UTC.</p>'
     body = "".join(
         "<tr>" + "".join(f"<td>{html.escape(c)}</td>" for c in row) + "</tr>\n" for row in rows
     )
