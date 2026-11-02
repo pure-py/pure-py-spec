@@ -1,11 +1,11 @@
 # rule: var
-def f(v: list[int]) -> None:
+def f(v: list[int]) -> int:
     match v:
         case [x]:
             pass
         case _:
             pass
-    print(x)
+    return x
 
 
-f([1])
+print(f([1]))
