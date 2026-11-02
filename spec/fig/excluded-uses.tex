@@ -1,0 +1,15 @@
+\begin{figure}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.34\textwidth}>{\raggedright\arraybackslash}p{0.42\textwidth}>{\raggedright\arraybackslash}p{0.14\textwidth}}
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}Use & Depends on excluded feature & Exclusion \\
+\pyinline{print} inside function & Expression-level printing & Static \\\rowgap
+\pyinline{print} as first-class value & \pyinline{*args}, keyword-only parameters and default values & Static \\\rowgap
+\pyinline{round} with second argument & Default values & Static \\\rowgap
+\pyinline{sys.exit} with no arguments & Default values & Static
+\end{tabular}
+\caption{Uses of predefined functions excluded from this version}
+\label{fig:excluded-uses}
+\end{figure}

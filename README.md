@@ -44,7 +44,8 @@ make wheel
 
 An implementation runs the suite with the `purepy-conformance` command of the installed package, providing a type
 checker and interpreter (default `python3`), each as a command taking the path of a module. The type checker
-checks every test. The interpreter runs every well-formed test and must give the recorded Python outcome; reporting
+checks every test, and rejects a program by exit status 5 if the program uses a feature excluded from this version,
+and otherwise by 1 if outside the syntax of PurePy and 3 if ill-formed. The interpreter runs every well-formed test and must give the recorded Python outcome; reporting
 undefined behaviour, by exit status 4, is also accepted when the run has undefined behaviour in PurePy.
 
 ```bash
@@ -53,8 +54,14 @@ purepy-conformance --type-checker "purepy --check" purepy
 
 The files beside a test give its expectations: `.expected` holds the output of a test that succeeds, `.status.expected`
 its exit status when non-zero, `.exception.expected` the exception raised by a test that raises, `.output.expected`
-the output before the exception, `.error.expected` the diagnostic of a test the type checker rejects, and `.args`
-the command-line arguments of a run, one per line.
+the output before the exception, `.error.expected` the diagnostic of the reference type checker for a test it
+rejects, and `.args` the command-line arguments of a run, one per line.
+
+An implementation conforms by its exit statuses, and may word diagnostics as it chooses. With `--check-messages`,
+the suite also checks each diagnostic against `.error.expected`. The reference type checker is tested with this
+option. A diagnostic for an excluded Python feature names the feature and says whether it is excluded by design or
+from this version; its `.error.expected` ends with the placeholder `{classification}`, which the suite replaces by the
+wording defined by `Classification` in the `purepy_conformance` package.
 
 ## Development
 

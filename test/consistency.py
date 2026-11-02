@@ -7,8 +7,11 @@ import tomllib
 
 import purepy_conformance
 from purepy_conformance import (
+    CLASSIFICATION,
+    ERROR_EXPECTED,
     MAIN,
     PurePyOutcome,
+    PythonOutcome,
     Results,
     run,
     suite,
@@ -54,8 +57,8 @@ def check_unique_rule_names(r: Results) -> None:
 
 
 def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
-    """Every test rejected by the type checker, undefined or agreeing cites a rule of the spec on its first
-    line; a test rejected by the parser cites none."""
+    """Check rule citations. A test cites a rule of the spec on its first line if it is well-formed or ill-formed,
+    and cites none if the parser rejects it or it uses a feature excluded from this version."""
     with r.test("rule attribution"):
         spec = {
             m for f in sorted((ROOT / "spec").rglob("*.tex")) for m in RULE_NAME.findall(current(f))
@@ -63,7 +66,10 @@ def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
         for test in tests(suite_dir):
             path = test / MAIN if test.is_dir() else test
             dirs = test.relative_to(suite_dir).parts
-            cites = dirs[1] != PurePyOutcome.PARSER_REJECTS
+            cites = dirs[1] not in (
+                PurePyOutcome.PARSER_REJECTS,
+                PurePyOutcome.EXCLUDED_FOR_NOW,
+            )
             cited = CITATION.match(path.read_text(encoding="utf-8").split("\n", 1)[0])
             if cited is None and cites:
                 r.fail(f"{path.relative_to(suite_dir)} cites no rule")
@@ -71,6 +77,28 @@ def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
                 r.fail(f"{path.relative_to(suite_dir)} cites {cited.group(1)}")
             elif cited is not None and cited.group(1) not in spec:
                 r.fail(f"{path.relative_to(suite_dir)} cites {cited.group(1)}, not in the spec")
+
+
+def check_classification(r: Results, suite_dir: pathlib.Path) -> None:
+    """Check classification placeholder on expected errors for excluded features"""
+    with r.test("classification of excluded features"):
+        for test in tests(suite_dir):
+            path = test / MAIN if test.is_dir() else test
+            error = path.with_suffix(ERROR_EXPECTED)
+            if not error.exists():
+                continue
+            python, purepy = test.relative_to(suite_dir).parts[:2]
+            text = error.read_text(encoding="utf-8").strip()
+            ends = text.endswith(f" {CLASSIFICATION}")
+            required = python != PythonOutcome.REJECTS and purepy in (
+                PurePyOutcome.PARSER_REJECTS,
+                PurePyOutcome.EXCLUDED_FOR_NOW,
+            )
+            allowed = python != PythonOutcome.REJECTS and purepy != PurePyOutcome.AGREES
+            if required and not ends:
+                r.fail(f"{error.relative_to(suite_dir)} does not end with {CLASSIFICATION}")
+            elif CLASSIFICATION in text and not (allowed and ends):
+                r.fail(f"{error.relative_to(suite_dir)} uses {CLASSIFICATION}")
 
 
 def check_lint(r: Results) -> None:
@@ -93,6 +121,7 @@ def main() -> None:
     check_unique_rule_names(consistency)
     with suite() as suite_dir:
         check_rule_attribution(consistency, suite_dir)
+        check_classification(consistency, suite_dir)
         check_lint(consistency)
     consistency.summary()
     sys.exit(1 if consistency.failed else 0)

@@ -1,3 +1,1 @@
-x: None = None
-print(x is None)
-print(x is not None)
+print([1] is [1])

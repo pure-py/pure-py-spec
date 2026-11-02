@@ -1,0 +1,36 @@
+\begin{figure}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.24\textwidth}>{\raggedright\arraybackslash}p{0.68\textwidth}}
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}Feature & Examples \\
+Sets & Set literals, set comprehensions, \pyinline{set} and \pyinline{frozenset} \\\rowgap
+Operators & Bitwise operators \pyinline{&}, \pyinline{|}, \filename{\textasciicircum}, \filename{\textasciitilde}, \pyinline{<<} and \pyinline{>>};
+chained comparisons \pyinline{a < b < c}; \pyinline{is} and \pyinline{is not} with \pyinline{None}, \pyinline{True} or
+\pyinline{False} \\\rowgap
+Expressions & Slicing, f-strings, starred expressions, dictionary unpacking \\\rowgap
+Literals & Complex, bytes and ellipsis literals \\\rowgap
+Assignment & Unpacking assignment \pyinline{a, b = t}, chained assignment \pyinline{a = b = 1}, unpacking in comprehensions \\\rowgap
+Parameters and arguments & Default values, \pyinline{*args}, \pyinline{**kwargs}, keyword-only and positional-only
+parameters, unpacking in argument lists, \pyinline{print} with several arguments or keyword arguments \\\rowgap
+Function definitions & Decorators \\\rowgap
+Classes & Classes other than dataclasses, methods, class decorators other than \pyinline{@dataclass}, field defaults,
+multiple inheritance, class keyword arguments, enumerations, classes defined outside module top level, classes as
+values \\\rowgap
+Patterns & Case guards, or-patterns, star patterns, attribute value patterns, complex and bytes literal patterns, rest
+capture in dictionary patterns \\\rowgap
+Types & Bounds and constraints on type parameters, \pyinline{ParamSpec}, \pyinline{TypeVarTuple}, type statements outside
+module top level, \pyinline{Callable[..., int]}, \pyinline{tuple[int, ...]}, \pyinline{Literal} with several values,
+string annotations \\\rowgap
+Imports & \pyinline{import a as b}, \pyinline{from a import b as c}, \pyinline{import a, b}, relative imports \\\rowgap
+Exceptions and effects & \pyinline{try}, \pyinline{except}, \pyinline{finally}, \pyinline{raise}, \pyinline{with},
+\pyinline{async}, \pyinline{await}, \pyinline{input}, \pyinline{open}, expression-level printing \\\rowgap
+Library & Standard library modules other than \pyinline{builtins}, \pyinline{dataclasses}, \pyinline{sys} and
+\pyinline{typing}, such as \pyinline{re}; attributes of those modules not listed in \figref{predefined-signatures}, such as
+\pyinline{sum} and \pyinline{sys.version}; attributes of built-in types other than mutating methods, such as
+\pyinline{str.upper}
+\end{tabular}
+\caption{Common Python features excluded from this version}
+\label{fig:excluded-from-version}
+\end{figure}
