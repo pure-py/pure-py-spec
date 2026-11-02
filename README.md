@@ -22,7 +22,7 @@ semantics.
 - `tex/`: macros and bibliography shared by both documents
 - `graduality.tex`, `graduality/`: draft notes on gradual typing, built as a separate document and not part of the 1.0 specification or paper
 - `src/purepy_conformance/`: the conformance suite, included in the package, and its runner, the `purepy-conformance` command
-- `test/`: consistency of the specification with the conformance suite
+- `test/`: consistency of the specification with the conformance suite, and the expected failures of the reference type checker
 - `script/`: status page, including the project board integrity check, run hourly by CI
 
 Each section has separate prose in the two documents, and material shared by both lives under `spec/` and is
@@ -41,6 +41,11 @@ specification, run the suite against Python with mypy as type checker, and build
 ```bash
 make wheel
 ```
+
+The type checker generated from the mechanisation in the `isabelle-purepy` repository is the reference type
+checker. `make check-reference` runs the suite against the type checker of its latest release, with diagnostics
+checked. `test/expected-failures.txt` lists the tests that type checker fails, each with the issue it waits on;
+the check fails on any other failure, and on a listed test which passes.
 
 An implementation runs the suite with the `purepy-conformance` command of the installed package, providing a type
 checker and interpreter (default `python3`), each as a command taking the path of a module. The type checker
@@ -71,10 +76,10 @@ Synchronise the project environment and install the development dependencies:
 uv sync --locked
 ```
 
-Format the script:
+Format the scripts:
 
 ```bash
-uv run --locked ruff format ./test/consistency.py ./src/purepy_conformance
+uv run --locked ruff format ./test ./src/purepy_conformance
 ```
 
 ## PLDI 2027 submission
