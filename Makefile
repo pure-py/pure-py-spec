@@ -75,7 +75,7 @@ $(PDFLATEX) -jobname=$(1) "\def\anonmode{}\input{$(2)}"
 $(call check-log,$(1))
 endef
 
-## Anonymised paper builds, with no undefined cross-references or citations
+## Anonymised paper builds, with no undefined references or citations
 paper-anon.pdf: $(TEXFILES)
 	$(call anon,paper-anon,paper.tex)
 	sed -n 's/^\\newlabel{references}{{[^}]*}{\([0-9]*\)}.*/\1/p' paper-anon.aux > paper-anon.references
@@ -87,7 +87,7 @@ check-page-limit: paper-anon.pdf
 	@page=$$(cat paper-anon.references); echo "report: references begin on page $$page, limit $(PAGE_LIMIT) pages"; \
 		test "$$page" -le $(PAGE_LIMIT)
 
-## Anonymised spec builds, with no undefined cross-references or citations
+## Anonymised spec builds, with no undefined references or citations
 spec-anon.pdf: $(TEXFILES)
 	$(call anon,spec-anon,PurePy-spec.tex)
 	rm -f $(BUILD_AUX)
@@ -122,7 +122,7 @@ PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
 # Release of the mechanisation conforming to this specification
 PUREPY_RELEASE := v$(shell uv version --short --color never)
 
-## Archive holds anonymised spec, mechanisation release at spec's version, and suite wheel
+## Archive holds anonymised spec, mechanisation release at spec's version, and conformance suite wheel
 supplementary.zip: spec-anon.pdf
 	rm -f $@ && rm -rf .submission
 	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
@@ -147,7 +147,7 @@ check-anonymised: supplementary.zip
 check-archived-theories: .check-submission
 	$(MAKE) -C $</mechanisation build ISABELLE=$(ISABELLE)
 
-## Type checker generated from archived mechanisation passes archived suite
+## Type checker generated from archived mechanisation passes archived conformance suite
 check-archived-suite: check-archived-theories
 	$(MAKE) -C .check-submission/mechanisation check-conformance
 
