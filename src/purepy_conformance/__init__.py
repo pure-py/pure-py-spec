@@ -37,7 +37,7 @@ class PythonOutcome(StrEnum):
 class PurePyOutcome(StrEnum):
     PARSER_REJECTS = "parser-rejects"
     TYPING_REJECTS = "typing-rejects"
-    EXCLUDED_FROM_VERSION = "excluded-from-version"
+    EXCLUDED_FOR_NOW = "excluded-for-now"
     UNDEFINED = "undefined"
     AGREES = "agrees"
 
@@ -50,7 +50,7 @@ class Exit(IntEnum):
     NOT_ALLOWED = 1
     ILL_FORMED = 3
     UNDEFINED = 4  # Interpreter: run aborted with undefined behaviour
-    EXCLUDED_FROM_VERSION = 5  # Type checker: program uses feature excluded from this version
+    EXCLUDED_FOR_NOW = 5  # Type checker: program uses feature excluded from this version
 
 
 class Expectation(NamedTuple):
@@ -63,7 +63,7 @@ class Expectation(NamedTuple):
 TYPE_CHECKER_VERDICT: dict[PurePyOutcome, tuple[Exit, bool]] = {
     PurePyOutcome.PARSER_REJECTS: (Exit.NOT_ALLOWED, True),
     PurePyOutcome.TYPING_REJECTS: (Exit.ILL_FORMED, True),
-    PurePyOutcome.EXCLUDED_FROM_VERSION: (Exit.EXCLUDED_FROM_VERSION, True),
+    PurePyOutcome.EXCLUDED_FOR_NOW: (Exit.EXCLUDED_FOR_NOW, True),
     PurePyOutcome.UNDEFINED: (Exit.OK, False),
     PurePyOutcome.AGREES: (Exit.OK, False),
 }

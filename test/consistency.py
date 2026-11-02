@@ -65,7 +65,7 @@ def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
             dirs = test.relative_to(suite_dir).parts
             cites = dirs[1] not in (
                 PurePyOutcome.PARSER_REJECTS,
-                PurePyOutcome.EXCLUDED_FROM_VERSION,
+                PurePyOutcome.EXCLUDED_FOR_NOW,
             )
             cited = CITATION.match(path.read_text(encoding="utf-8").split("\n", 1)[0])
             if cited is None and cites:
