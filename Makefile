@@ -121,8 +121,9 @@ check-suite-python:
 		--type-checker "mypy --python-version $$(cat .python-version) --config-file $(CURDIR)/test/mypy.ini --no-error-summary"
 
 # Type checker of the latest mechanisation release; expanded only when used, since it queries GitHub
-PUREPY_LATEST_WHEEL = $(shell gh api repos/pure-py/isabelle-purepy/releases/latest \
-	--jq '.assets[] | select(.name | endswith(".whl")) | .browser_download_url')
+# tracks: latest release
+PUREPY_LATEST_WHEEL = $(shell gh release view --repo https://github.com/pure-py/isabelle-purepy --json assets \
+	--jq '.assets[] | select(.name | endswith(".whl")) | .url')
 
 ## Type checker of the latest mechanisation release passes the suite, except for the listed expected failures
 check-suite-purepy:
