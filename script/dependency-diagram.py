@@ -132,7 +132,7 @@ def edge(
 ) -> Edge | None:
     """Dependency implied by a URL in a file; none if a plain link to a repository, issue or pull request,
     which is a reference rather than a dependency. A "pin:" or "tracks:" comment on the same or preceding
-    line labels the dependency."""
+    line is interpreted as the kind of the dependency, followed by its label."""
     repo = match["repo"]
     url_path = match["path"]
     if repo is None:
