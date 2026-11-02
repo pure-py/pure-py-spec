@@ -55,7 +55,7 @@ def check_unique_rule_names(r: Results) -> None:
 
 def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
     """Every test rejected by the type checker, undefined or agreeing cites a rule of the spec on its first
-    line; a test rejected by the parser cites none."""
+    line; a test rejected by the parser or using a feature not yet specified cites none."""
     with r.test("rule attribution"):
         spec = {
             m for f in sorted((ROOT / "spec").rglob("*.tex")) for m in RULE_NAME.findall(current(f))
@@ -63,7 +63,7 @@ def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
         for test in tests(suite_dir):
             path = test / MAIN if test.is_dir() else test
             dirs = test.relative_to(suite_dir).parts
-            cites = dirs[1] != PurePyOutcome.PARSER_REJECTS
+            cites = dirs[1] not in (PurePyOutcome.PARSER_REJECTS, PurePyOutcome.NOT_YET_SPECIFIED)
             cited = CITATION.match(path.read_text(encoding="utf-8").split("\n", 1)[0])
             if cited is None and cites:
                 r.fail(f"{path.relative_to(suite_dir)} cites no rule")
