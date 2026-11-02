@@ -21,7 +21,7 @@
   \node at (0.1,6.15) {\textbf{Python}\\(directory)};
   \node at (2.5,6.15) {Rejected by\\parser\\\testdir{parser-rejects/}};
   \node at (4.7,6.15) {Rejected by\\type checker\\\testdir{typing-rejects/}};
-  \node at (6.9,6.15) {\added{Excluded from}\\\added{this version}\\\added{\testdir{excluded-for-now/}}};
+  \node at (6.9,6.15) {Excluded from\\this version\\\testdir{excluded-for-now/}};
   \node at (9.5,6.15) {Well-formed,\\yields\\$\aborts{\errUndef}$\\\testdir{undefined/}};
   \node at (11.7,6.15) {Well-formed,\\yields other\\result\\\testdir{agrees/}};
   \node at (0.1,4.35) {Raises\\\pyinline{SyntaxError}\\\testdir{python-rejects/}};
@@ -36,7 +36,7 @@
   % Key, in two rows
   \foreach \style/\x/\y/\label in {agree/0/-0.55/Same result as Python, excluded/4.2/-0.55/Excluded by \PurePy,
       raises/8.4/-0.55/Python raises exception, impossible/0/-1.05/Cannot occur,
-      version/8.4/-1.05/\added{Excluded from this version}} {
+      version/8.4/-1.05/Excluded from this version} {
     \fill[\style] (\x,\y) rectangle ++(0.35,0.3);
     \draw[black!33] (\x,\y) rectangle ++(0.35,0.3);
     \node[anchor=west] at (\x+0.45,\y+0.15) {\label};

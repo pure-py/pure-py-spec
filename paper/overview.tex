@@ -192,7 +192,7 @@ are excluded, since the names introduced are not explicit; PEP 8 recommends agai
 them.\footnote{\url{https://peps.python.org/pep-0008/}} Every function definition annotates each
 parameter and its return type, and every dataclass field carries a type expression, so the type of a
 definition is given rather than inferred (\secref{well-formedness}); Python requires neither. A
-\pyinline{class} definition must be a dataclass, and a dataclass body declares fields and nothing else. \PurePy therefore \replaced{does not yet support any}{supports none } of Python's
+\pyinline{class} definition must be a dataclass, and a dataclass body declares fields and nothing else. \PurePy therefore does not yet support any of Python's
 class-based extension mechanisms, such as \pyinline{__getitem__} for subscripting, \pyinline{__iter__} for
 iteration or \pyinline{__eq__} for equality. Subscripting, iteration, equality and membership have the fixed
 meanings given in \secref{operational-semantics}.

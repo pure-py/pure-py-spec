@@ -3,7 +3,6 @@
 \footnotesize
 \setlength{\tabcolsep}{4pt}
 \newcommand*{\designgroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{3}{l}{\itshape #1} \\\noalign{\vskip 0.5mm}}
-\begin{AddedBlock}
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.42\textwidth}>{\raggedright\arraybackslash}p{0.34\textwidth}>{\raggedright\arraybackslash}p{0.14\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Feature & Python & Exclusion \\
@@ -38,7 +37,6 @@ Parameter or return type without annotation & Accept definition without annotati
 Annotation which is not a type, such as \pyinline{1} or \pyinline{list[int, int]} & Ignore annotation & Syntactic \\\rowgap
 \pyinline{Any} and \pyinline{cast} of \pyinline{typing} & Disable static checking of value & Static
 \end{tabular}
-\end{AddedBlock}
-\caption{\added{Python features excluded by design}}
+\caption{Python features excluded by design}
 \label{fig:excluded-by-design}
 \end{figure}

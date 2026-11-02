@@ -5,13 +5,6 @@
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.29\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}>{\raggedright\arraybackslash}p{0.30\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}Construct & Python & Exclusion & Mechanism \\
-\deleted{\pyinline{global} and \pyinline{nonlocal}} & \deleted{Direct assignment to variable of enclosing scope} & \deleted{Syntactic} & \deleted{Not in grammar} \\\rowgap
-\deleted{\pyinline{del}} & \deleted{Removes binding} & \deleted{Syntactic} & \deleted{Not in grammar} \\\rowgap
-\deleted{Augmented assignment \pyinline{+=}, etc.} & \deleted{Updates in place if type supports it} & \deleted{Syntactic} & \deleted{Not in grammar} \\\rowgap
-\deleted{Walrus operator \pyinline{:=}} & \deleted{Assigns within expression} & \deleted{Syntactic} & \deleted{Not in grammar} \\\rowgap
-\deleted{Item assignment \pyinline{xs[0] = v}} & \deleted{Updates container in place} & \deleted{Syntactic} & \deleted{Not in grammar; assignment targets are variables} \\\rowgap
-\deleted{Attribute assignment \pyinline{p.x = v}} & \deleted{Updates object in place} & \deleted{Syntactic} & \deleted{Not in grammar; assignment targets are variables} \\\rowgap
-\deleted{Mutating methods, such as \pyinline{list.append}} & \deleted{Update value in place} & \deleted{Static} & \deleted{Only objects and modules have attributes} \\\rowgap
 Reassignment & Changes value of variable & Static & Variable declared once and assigned at most once on any path \\\rowgap
 Lambdas capturing comprehension variable & Variable mutated on each iteration; lambda sees final value & Static & Lambda may not capture generator variable
 \end{tabular}
