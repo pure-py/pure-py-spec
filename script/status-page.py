@@ -28,7 +28,7 @@ STYLE = """
 body { font-family: system-ui, sans-serif; max-width: 70em; margin: 2em auto; padding: 0 1em; }
 img.diagram { width: 44em; max-width: 100%; }
 img.badge { vertical-align: middle; }
-tr.failed td { color: #b00020; }
+tr.failed td { color: #e00000; }
 table { border-collapse: collapse; }
 th, td { text-align: left; padding: 0.3em 0.6em; border-bottom: 1px solid #ccc; white-space: nowrap; }
 td.title { white-space: normal; }
