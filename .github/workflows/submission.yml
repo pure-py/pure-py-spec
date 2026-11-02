@@ -41,7 +41,7 @@ jobs:
         run: |
           apt-get update -q
           apt-get install -y -q --no-install-recommends \
-            make git zip unzip curl ca-certificates \
+            make git zip unzip curl ca-certificates poppler-utils \
             texlive-latex-extra texlive-fonts-extra texlive-science \
             texlive-publishers texlive-bibtex-extra texlive-plain-generic
 

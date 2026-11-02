@@ -90,12 +90,14 @@ check-page-limit: paper-anon.pdf
 ## Anonymised paper free of author and project names (text and metadata)
 check-paper-anonymised: paper-anon.pdf
 	@names=$$(grep -o '^\\author{[^}]*}' paper.tex | sed -e 's/^\\author{//' -e 's/}$$//' | paste -sd '|' -); \
-		found=$$({ pdfinfo $<; pdftotext $< -; } | grep -oiE "pure-?py|$$names" | sort -u | paste -sd ',' -); \
+		text=$$(pdfinfo $< && pdftotext $< -) || exit 1; \
+		found=$$(echo "$$text" | grep -oiE "pure-?py|$$names" | sort -u | paste -sd ',' -); \
 		test -z "$$found" || { echo "report: found $$found"; exit 1; }
 
 ## Anonymised paper in review mode, with line numbers
 check-review-mode: paper-anon.pdf
-	@n=$$(pdftotext -layout -f 2 -l 2 $< - | grep -cE '^ *[0-9]+ {2,}'); \
+	@text=$$(pdftotext -layout -f 2 -l 2 $< -) || exit 1; \
+		n=$$(echo "$$text" | grep -cE '^ *[0-9]+ {2,}'); \
 		echo "report: $$n numbered lines on page 2"; test "$$n" -ge 20
 
 ## Anonymised spec builds, with no undefined references or citations
@@ -133,7 +135,7 @@ PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
 # Release of the mechanisation conforming to this specification
 PUREPY_RELEASE := v$(shell uv version --short --color never)
 
-## Archive holds anonymised spec, mechanisation release at spec's version, and conformance suite wheel
+## Archive builds, with mechanisation release matching spec version
 supplementary.zip: spec-anon.pdf
 	rm -f $@ && rm -rf .submission
 	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
