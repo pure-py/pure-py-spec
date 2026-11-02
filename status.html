@@ -19,25 +19,27 @@ table.integrity td:first-child { width: 4em; }
 </head>
 <body>
 <h1>PurePy status</h1>
-<p>Updated <time>2026-11-02 11:24</time> UTC.</p>
+<p>Updated <time>2026-11-02 11:29</time> UTC.</p>
 <h2>PLDI 2027 submission status</h2>
-<p><a href="https://github.com/pure-py/pure-py-spec/actions/runs/41310908609"><img class="badge" src="https://github.com/pure-py/pure-py-spec/actions/workflows/submission.yml/badge.svg?branch=main" alt="failure"></a> 2026-11-01 13:21 UTC</p>
+<p><a href="https://github.com/pure-py/pure-py-spec/actions/runs/41436598697"><img class="badge" src="https://github.com/pure-py/pure-py-spec/actions/workflows/submission.yml/badge.svg?branch=main" alt="failure"></a> 2026-11-02 11:24 UTC</p>
 <table>
 <tr><th>Target</th><th>Check</th><th>Result</th><th>Detail</th></tr>
 <tr><td>check-targets</td><td>Every target with a recipe is described</td><td>passed</td><td></td></tr>
-<tr><td>check-consistency</td><td>Specification consistent with conformance suite</td><td>passed</td><td></td></tr>
+<tr><td>check-consistency</td><td>Spec consistent with conformance suite</td><td>passed</td><td></td></tr>
 <tr><td></td><td>package requires the pinned Python version</td><td>passed</td><td></td></tr>
 <tr><td></td><td>unique rule names</td><td>passed</td><td></td></tr>
 <tr><td></td><td>rule attribution</td><td>passed</td><td></td></tr>
 <tr><td></td><td>consistency script and runner pass mypy and ruff</td><td>passed</td><td></td></tr>
-<tr><td>paper-anon.pdf</td><td>Anonymised paper builds, with no undefined cross-references or citations</td><td>passed</td><td></td></tr>
-<tr><td>spec-anon.pdf</td><td>Anonymised specification builds, with no undefined cross-references or citations</td><td>passed</td><td></td></tr>
-<tr class="failed"><td>supplementary.zip</td><td>Archive holds anonymised specification, mechanisation release at specification&#x27;s version, and suite wheel</td><td>failed</td><td>fatal: Remote branch v0.24.0 not found in upstream origin</td></tr>
+<tr><td>paper-anon.pdf</td><td>Anonymised paper builds, with no undefined references or citations</td><td>passed</td><td></td></tr>
+<tr><td>spec-anon.pdf</td><td>Anonymised spec builds, with no undefined references or citations</td><td>passed</td><td></td></tr>
+<tr class="failed"><td>supplementary.zip</td><td>Archive holds anonymised spec, mechanisation release at spec&#x27;s version, and conformance suite wheel</td><td>failed</td><td>fatal: Remote branch v0.24.0 not found in upstream origin</td></tr>
 <tr><td>paper-submission</td><td>PLDI 2027 submission</td><td>not run</td><td></td></tr>
 <tr class="failed"><td>check-page-limit</td><td>Anonymised paper within page limit, references excluded</td><td>failed</td><td>references begin on page 30, limit 25 pages</td></tr>
+<tr><td>check-paper-anonymised</td><td>Anonymised paper free of author and project names (text and metadata)</td><td>passed</td><td></td></tr>
+<tr class="failed"><td>check-review-mode</td><td>Anonymised paper in review mode, with line numbers</td><td>failed</td><td>0 numbered lines on page 2</td></tr>
 <tr><td>check-anonymised</td><td>Archive anonymised: no project names in file names or contents</td><td>not run</td><td></td></tr>
 <tr><td>check-archived-theories</td><td>Archived mechanisation builds: proofs checked, type checker generated</td><td>not run</td><td></td></tr>
-<tr><td>check-archived-suite</td><td>Type checker generated from archived mechanisation passes archived suite</td><td>not run</td><td></td></tr>
+<tr><td>check-archived-suite</td><td>Type checker generated from archived mechanisation passes archived conformance suite</td><td>not run</td><td></td></tr>
 </table>
 <h2>Dependencies</h2>
 <img class="diagram" src="dependencies.svg" alt="Dependencies between repositories">
@@ -48,6 +50,7 @@ table.integrity td:first-child { width: 4em; }
 <table>
 <tr><th>Repository</th><th>#</th><th>Title</th><th>Author</th><th>Review</th><th>Checks</th><th>Updated</th></tr>
 <tr><td>isabelle-python-codegen</td><td><a href="https://github.com/pure-py/isabelle-python-codegen/pull/4">#4</a></td><td class="title"><a href="https://github.com/pure-py/isabelle-python-codegen/pull/4" class="title">Test oracle approach which directly compares Isabelle (SML backend) to its extracted Python</a></td><td>dorchard</td><td>none</td><td>failing</td><td>2026-10-23</td></tr>
+<tr><td>pure-py-spec</td><td><a href="https://github.com/pure-py/pure-py-spec/pull/315">#315</a></td><td class="title"><a href="https://github.com/pure-py/pure-py-spec/pull/315" class="title">Features excluded by design</a></td><td>rolyp-claude-bot</td><td>none</td><td>running</td><td>2026-11-02</td></tr>
 </table>
 <h2>Draft pull requests</h2>
 <table>
