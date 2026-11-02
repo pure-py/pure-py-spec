@@ -116,20 +116,20 @@ check-consistency:
 	uv run --locked python test/consistency.py
 
 ## Python passes conformance suite, with mypy as type checker
-check-suite:
+check-suite-python:
 	uv run --locked purepy-conformance --python-mode \
 		--type-checker "mypy --python-version $$(cat .python-version) --config-file $(CURDIR)/test/mypy.ini --no-error-summary"
 
-# Type checker of the latest release of the mechanisation, expanded only when used
+# Type checker of the latest mechanisation release; expanded only when used, since it queries GitHub
 PUREPY_LATEST_WHEEL = $(shell gh api repos/pure-py/isabelle-purepy/releases/latest \
 	--jq '.assets[] | select(.name | endswith(".whl")) | .browser_download_url')
 
 ## Type checker of the latest mechanisation release passes the suite, except for the listed expected failures
-check-reference:
+check-suite-purepy:
 	uv run --locked --with "$(PUREPY_LATEST_WHEEL)" python test/expected-failures.py
 
 ## Wheel of the conformance suite and runner
-wheel: check-targets check-consistency check-suite check-reference
+wheel: check-targets check-consistency check-suite-python check-suite-purepy
 	rm -rf dist && uv build --wheel
 
 ## Dependency diagram of the organisation's repositories, from clones alongside this repository
@@ -204,4 +204,4 @@ help:
 
 .PHONY: default all help check-targets paper-submission check-page-limit check-paper-anonymised check-review-mode \
 	check-anonymised check-archived-theories check-archived-suite check-submission clean \
-	check-consistency check-suite check-reference wheel dependencies.svg integrity.txt status.html
+	check-consistency check-suite-python check-suite-purepy wheel dependencies.svg integrity.txt status.html

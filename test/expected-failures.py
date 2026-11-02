@@ -2,7 +2,7 @@
 """Run the conformance suite against a type checker, with diagnostics checked, and compare the failures with
 test/expected-failures.txt, which lists the tests the type checker is expected to fail: one per line, named as
 the suite names it, followed by a tab and the issue the test waits on. A directory ending in a slash stands for
-every test under it. Exits with failure if a test outside the list fails, or if no test under a listed entry
+every test under it. Exit with failure if a test outside the list fails, or if no test under a listed entry
 fails."""
 
 import argparse

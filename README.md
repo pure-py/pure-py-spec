@@ -42,10 +42,10 @@ specification, run the suite against Python with mypy as type checker, and build
 make wheel
 ```
 
-The type checker generated from the mechanisation in the `isabelle-purepy` repository is the reference type
-checker. `make check-reference` runs the suite against the type checker of its latest release, with diagnostics
-checked. `test/expected-failures.txt` lists the tests that type checker fails, each with the issue it waits on;
-the check fails on any other failure, and on a listed test which passes.
+The reference type checker is `purepy`, generated from the mechanisation in the `isabelle-purepy` repository. The
+suite is also run against the type checker of the latest release of the mechanisation, with diagnostics checked,
+by `make check-suite-purepy`. The tests failed by that type checker are listed in `test/expected-failures.txt`,
+each with the issue it waits on; the check fails on any other failure, and on a listed test which passes.
 
 An implementation runs the suite with the `purepy-conformance` command of the installed package, providing a type
 checker and interpreter (default `python3`), each as a command taking the path of a module. The type checker
