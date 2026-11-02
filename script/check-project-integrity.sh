@@ -89,27 +89,27 @@ check() {
   done < <(echo "$items" | jq -r ".[] | $filter | $fmt")
 }
 
-check "Every open issue is on the project board" $'Issue\tTitle' "$OPEN_ISSUES" \
+check "Open issues missing from the project board" $'Issue\tTitle' "$OPEN_ISSUES" \
   'select(.number as $n | '"$ON_BOARD"' | index($n) | not)' \
   '"#\(.number)\t\(.title)"'
 
-check "Every open issue has a Status" $'Issue\tTitle' "$ALL_ITEMS" \
+check "Open issues without a Status" $'Issue\tTitle' "$ALL_ITEMS" \
   'select(.content.state == "OPEN" and .fieldValueByName == null)' \
   '"#\(.content.number)\t\(.content.title)"'
 
-check "Milestoned issues are not Proposed" $'Issue\tTitle\tMilestone' "$ALL_ITEMS" \
+check "Milestoned issues marked Proposed" $'Issue\tTitle\tMilestone' "$ALL_ITEMS" \
   'select(.content.state == "OPEN" and .content.milestone != null and .fieldValueByName.name == "Proposed")' \
   '"#\(.content.number)\t\(.content.title)\t\(.content.milestone.title)"'
 
-check "Active issues have a milestone" $'Issue\tTitle\tStatus' "$ALL_ITEMS" \
+check "Active issues without a milestone" $'Issue\tTitle\tStatus' "$ALL_ITEMS" \
   'select(.content.state == "OPEN" and .content.milestone == null and (.fieldValueByName.name as $s | '"$ACTIVE_STATUSES"' | index($s)))' \
   '"#\(.content.number)\t\(.content.title)\t\(.fieldValueByName.name)"'
 
-check "Closed milestones contain only Done or Rejected issues" $'Issue\tTitle\tStatus\tMilestone' "$ALL_ITEMS" \
+check "Issues in closed milestones that aren't Done or Rejected" $'Issue\tTitle\tStatus\tMilestone' "$ALL_ITEMS" \
   'select(.content.milestone != null and (.content.milestone.title as $m | '"$CLOSED_MILESTONES"' | index($m)) and (.fieldValueByName.name != "Done" and .fieldValueByName.name != "Rejected"))' \
   '"#\(.content.number)\t\(.content.title)\t\(.fieldValueByName.name // "none")\t\(.content.milestone.title)"'
 
-check "Sub-issues of closed issues are closed" $'Issue\tTitle\tOpen sub-issues' "$CLOSED_ISSUES" \
+check "Closed issues with open sub-issues" $'Issue\tTitle\tOpen sub-issues' "$CLOSED_ISSUES" \
   'select(any(.subIssues.nodes[]; .state == "OPEN"))' \
   '"#\(.number)\t\(.title)\t\([.subIssues.nodes[] | select(.state == "OPEN") | "#\(.number)"] | join(", "))"'
 
