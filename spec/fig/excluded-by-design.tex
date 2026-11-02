@@ -16,10 +16,6 @@ Item assignment \pyinline{xs[0] = v} & Updates container in place & Parser \\\ro
 Attribute as assignment or declaration target, \pyinline{p.x = v} or \pyinline{p.x: int} & Updates object in place & Parser \\\rowgap
 \pyinline{is} and \pyinline{is not}, other than against \pyinline{None}, \pyinline{True} or \pyinline{False} & Compares objects by identity & Parser \\\rowgap
 Built-in \pyinline{id} & Gives identity of object & Type checker \\\rowgap
-Mutating methods of built-in types: \pyinline{append}, \pyinline{extend}, \pyinline{insert}, \pyinline{pop},
-\pyinline{remove}, \pyinline{clear}, \pyinline{sort} and \pyinline{reverse} of \pyinline{list}, and \pyinline{clear},
-\pyinline{pop}, \pyinline{popitem}, \pyinline{setdefault} and \pyinline{update} of \pyinline{dict} & Update value in
-place & Type checker \\\rowgap
 \designgroup{Iteration}
 \pyinline{for} and \pyinline{while} loops, \pyinline{break} and \pyinline{continue} & Iterates by updating loop variable & Parser \\\rowgap
 \pyinline{yield}, \pyinline{yield from} and generator expressions & Creates generator, consumed by mutation & Parser \\\rowgap
@@ -37,6 +33,6 @@ Annotation which is not a type expression under the Python typing specification,
 \pyinline{Any} and \pyinline{cast} of \pyinline{typing} & Disables static checking of value & Type checker
 \end{tabular}
 \end{AddedBlock}
-\caption{\added{Features outside \PurePy excluded by design}}
+\caption{\added{Python features excluded by design}}
 \label{fig:excluded-by-design}
 \end{figure}

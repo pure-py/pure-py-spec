@@ -45,7 +45,7 @@ make wheel
 An implementation runs the suite with the `purepy-conformance` command of the installed package, providing a type
 checker and interpreter (default `python3`), each as a command taking the path of a module. The type checker
 checks every test, and rejects a program by exit status 1 if the parser rejects it, 3 if it is ill-formed and 5 if it
-uses a feature not yet specified. The interpreter runs every well-formed test and must give the recorded Python outcome; reporting
+uses a feature excluded from this version. The interpreter runs every well-formed test and must give the recorded Python outcome; reporting
 undefined behaviour, by exit status 4, is also accepted when the run has undefined behaviour in PurePy.
 
 ```bash
