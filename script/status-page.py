@@ -26,7 +26,9 @@ REVIEW = {
 }
 STYLE = """
 body { font-family: system-ui, sans-serif; max-width: 70em; margin: 2em auto; padding: 0 1em; }
-img { width: 44em; max-width: 100%; }
+img.diagram { width: 44em; max-width: 100%; }
+img.badge { vertical-align: middle; }
+tr.failed td { color: #b00020; }
 table { border-collapse: collapse; }
 th, td { text-align: left; padding: 0.3em 0.6em; border-bottom: 1px solid #ccc; white-space: nowrap; }
 td.title { white-space: normal; }
@@ -155,9 +157,16 @@ def submission() -> str:
             else []
         )
     when = run["createdAt"][:16].replace("T", " ")
-    heading = f'<p><a href="{run["url"]}">{html.escape(run["conclusion"]).capitalize()}</a> on {when} UTC.</p>'
+    badge = f"https://github.com/{ORG}/{SPEC_REPO}/actions/workflows/{SUBMISSION_WORKFLOW}/badge.svg?branch=main"
+    heading = (
+        f'<p><a href="{run["url"]}"><img class="badge" src="{badge}" alt="{html.escape(run["conclusion"])}"></a>'
+        f" {when} UTC</p>"
+    )
     body = "".join(
-        "<tr>" + "".join(f"<td>{html.escape(c)}</td>" for c in row) + "</tr>\n" for row in rows
+        ('<tr class="failed">' if row[2] == "failed" else "<tr>")
+        + "".join(f"<td>{html.escape(c)}</td>" for c in row)
+        + "</tr>\n"
+        for row in rows
     )
     return f"{heading}\n<table>\n<tr><th>Target</th><th>Check</th><th>Result</th><th>Detail</th></tr>\n{body}</table>"
 
@@ -185,7 +194,7 @@ def page(repos: list[str], report: str) -> str:
 <h2>{html.escape(description(SUBMISSION_TARGET))} status</h2>
 {submission()}
 <h2>Dependencies</h2>
-<img src="dependencies.svg" alt="Dependencies between repositories">
+<img class="diagram" src="dependencies.svg" alt="Dependencies between repositories">
 <table class="key">
 {"".join(f"<tr><td>{a}</td><td>{label}</td></tr>" for a, label in KEY)}
 </table>
