@@ -1,25 +1,25 @@
 Checking project integrity for pure-py/pure-py-spec (project 1)...
 
-=== Every open issue is on the project board ===
+=== Open issues missing from the project board ===
 Issue	Title
 #56	Default arguments
 #234	`@overload`
 
-=== Every open issue has a Status ===
+=== Open issues without a Status ===
 
-=== Milestoned issues are not Proposed ===
+=== Milestoned issues marked Proposed ===
 Issue	Title	Milestone
 #105	`__all__` for wildcard imports	pure-py-spec 1.1
 #196	Tighter rule attribution	PLDI 2027
 #222	Iterator functions	pure-py-spec 1.1
 
-=== Active issues have a milestone ===
+=== Active issues without a milestone ===
 Issue	Title	Status
 #14	Syntactic extensions	In progress
 #313	Features excluded by design	In progress
 
-=== Closed milestones contain only Done or Rejected issues ===
+=== Issues in closed milestones that aren't Done or Rejected ===
 
-=== Sub-issues of closed issues are closed ===
+=== Closed issues with open sub-issues ===
 
 7 issue(s) found.

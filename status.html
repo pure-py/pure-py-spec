@@ -5,53 +5,23 @@
 <title>PurePy status</title>
 <style>
 body { font-family: system-ui, sans-serif; max-width: 70em; margin: 2em auto; padding: 0 1em; }
-img { width: 44em; max-width: 100%; }
+img.diagram { width: 44em; max-width: 100%; }
+img.badge { vertical-align: middle; }
+tr.failed td { color: #e00000; }
 table { border-collapse: collapse; }
 th, td { text-align: left; padding: 0.3em 0.6em; border-bottom: 1px solid #ccc; white-space: nowrap; }
 td.title { white-space: normal; }
+table.key { font-size: 0.8em; }
+table.key td { border: none; padding: 0 0.5em; }
+table.key svg { vertical-align: middle; }
 table.integrity td:first-child { width: 4em; }
 </style>
 </head>
 <body>
 <h1>PurePy status</h1>
-<p>Updated <time>2026-11-02 09:12</time> UTC.</p>
-<h2>Dependencies</h2>
-<img src="dependencies.svg" alt="Dependencies between repositories">
-<h2>Open pull requests</h2>
-<table>
-<tr><th>Repository</th><th>#</th><th>Title</th><th>Author</th><th>Review</th><th>Checks</th><th>Updated</th></tr>
-<tr><td>isabelle-python-codegen</td><td><a href="https://github.com/pure-py/isabelle-python-codegen/pull/4">#4</a></td><td class="title"><a href="https://github.com/pure-py/isabelle-python-codegen/pull/4" class="title">Test oracle approach which directly compares Isabelle (SML backend) to its extracted Python</a></td><td>dorchard</td><td>none</td><td>failing</td><td>2026-10-23</td></tr>
-<tr><td>pure-py-spec</td><td><a href="https://github.com/pure-py/pure-py-spec/pull/314">#314</a></td><td class="title"><a href="https://github.com/pure-py/pure-py-spec/pull/314" class="title">Project nodes in the dependency diagram, HTML key and submission section fixes</a></td><td>rolyp-claude-bot</td><td>none</td><td>passing</td><td>2026-11-02</td></tr>
-</table>
-<h2>Draft pull requests</h2>
-<table>
-<tr><th>Repository</th><th>#</th><th>Title</th><th>Author</th><th>Review</th><th>Checks</th><th>Updated</th></tr>
-<tr><td>isabelle-python-codegen</td><td><a href="https://github.com/pure-py/isabelle-python-codegen/pull/6">#6</a></td><td class="title"><a href="https://github.com/pure-py/isabelle-python-codegen/pull/6" class="title">Fixes for oracle</a></td><td>dorchard</td><td>none</td><td>none</td><td>2026-10-23</td></tr>
-<tr><td>pure-py-spec</td><td><a href="https://github.com/pure-py/pure-py-spec/pull/129">#129</a></td><td class="title"><a href="https://github.com/pure-py/pure-py-spec/pull/129" class="title">WIP grammar definition in Ott</a></td><td>nikolaushuber</td><td>none</td><td>passing</td><td>2026-10-26</td></tr>
-<tr><td>pure-py.github.io</td><td><a href="https://github.com/pure-py/pure-py.github.io/pull/20">#20</a></td><td class="title"><a href="https://github.com/pure-py/pure-py.github.io/pull/20" class="title">Integrate playground</a></td><td>jacobpake</td><td>approved</td><td>passing</td><td>2026-11-02</td></tr>
-</table>
-<h2>Project integrity</h2>
-<h3>Every open issue is on the project board</h3>
-<table class="integrity">
-<tr><th>Issue</th><th>Title</th></tr>
-<tr><td><a href="https://github.com/pure-py/pure-py-spec/issues/56">#56</a></td><td>Default arguments</td></tr>
-<tr><td><a href="https://github.com/pure-py/pure-py-spec/issues/234">#234</a></td><td>`@overload`</td></tr>
-</table>
-<h3>Milestoned issues are not Proposed</h3>
-<table class="integrity">
-<tr><th>Issue</th><th>Title</th><th>Milestone</th></tr>
-<tr><td><a href="https://github.com/pure-py/pure-py-spec/issues/105">#105</a></td><td>`__all__` for wildcard imports</td><td>pure-py-spec 1.1</td></tr>
-<tr><td><a href="https://github.com/pure-py/pure-py-spec/issues/196">#196</a></td><td>Tighter rule attribution</td><td>PLDI 2027</td></tr>
-<tr><td><a href="https://github.com/pure-py/pure-py-spec/issues/222">#222</a></td><td>Iterator functions</td><td>pure-py-spec 1.1</td></tr>
-</table>
-<h3>Active issues have a milestone</h3>
-<table class="integrity">
-<tr><th>Issue</th><th>Title</th><th>Status</th></tr>
-<tr><td><a href="https://github.com/pure-py/pure-py-spec/issues/14">#14</a></td><td>Syntactic extensions</td><td>In progress</td></tr>
-<tr><td><a href="https://github.com/pure-py/pure-py-spec/issues/313">#313</a></td><td>Features excluded by design</td><td>In progress</td></tr>
-</table>
-<h2>Submission</h2>
-<p>Run of <a href="https://github.com/pure-py/pure-py-spec/actions/runs/41310908609">2026-11-01 13:21</a> UTC on commit 74135bc: failure.</p>
+<p>Updated <time>2026-11-02 11:24</time> UTC.</p>
+<h2>PLDI 2027 submission status</h2>
+<p><a href="https://github.com/pure-py/pure-py-spec/actions/runs/41310908609"><img class="badge" src="https://github.com/pure-py/pure-py-spec/actions/workflows/submission.yml/badge.svg?branch=main" alt="failure"></a> 2026-11-01 13:21 UTC</p>
 <table>
 <tr><th>Target</th><th>Check</th><th>Result</th><th>Detail</th></tr>
 <tr><td>check-targets</td><td>Every target with a recipe is described</td><td>passed</td><td></td></tr>
@@ -62,12 +32,49 @@ table.integrity td:first-child { width: 4em; }
 <tr><td></td><td>consistency script and runner pass mypy and ruff</td><td>passed</td><td></td></tr>
 <tr><td>paper-anon.pdf</td><td>Anonymised paper builds, with no undefined cross-references or citations</td><td>passed</td><td></td></tr>
 <tr><td>spec-anon.pdf</td><td>Anonymised specification builds, with no undefined cross-references or citations</td><td>passed</td><td></td></tr>
-<tr><td>supplementary.zip</td><td>Archive holds anonymised specification, mechanisation release at specification&#x27;s version, and suite wheel</td><td>failed</td><td>fatal: Remote branch v0.24.0 not found in upstream origin</td></tr>
+<tr class="failed"><td>supplementary.zip</td><td>Archive holds anonymised specification, mechanisation release at specification&#x27;s version, and suite wheel</td><td>failed</td><td>fatal: Remote branch v0.24.0 not found in upstream origin</td></tr>
 <tr><td>paper-submission</td><td>PLDI 2027 submission</td><td>not run</td><td></td></tr>
-<tr><td>check-page-limit</td><td>Anonymised paper within page limit, references excluded</td><td>failed</td><td>references begin on page 30, limit 25 pages</td></tr>
+<tr class="failed"><td>check-page-limit</td><td>Anonymised paper within page limit, references excluded</td><td>failed</td><td>references begin on page 30, limit 25 pages</td></tr>
 <tr><td>check-anonymised</td><td>Archive anonymised: no project names in file names or contents</td><td>not run</td><td></td></tr>
 <tr><td>check-archived-theories</td><td>Archived mechanisation builds: proofs checked, type checker generated</td><td>not run</td><td></td></tr>
 <tr><td>check-archived-suite</td><td>Type checker generated from archived mechanisation passes archived suite</td><td>not run</td><td></td></tr>
+</table>
+<h2>Dependencies</h2>
+<img class="diagram" src="dependencies.svg" alt="Dependencies between repositories">
+<table class="key">
+<tr><td><svg width="36" height="10"><line x1="0" y1="5" x2="26" y2="5" stroke="#333333" stroke-width="1.5"/><polygon points="26,1 36,5 26,9" fill="#333333"/></svg></td><td>Pin (moved by hand)</td></tr><tr><td><svg width="36" height="10"><line x1="0" y1="5" x2="26" y2="5" stroke="#333333" stroke-width="1.5" stroke-dasharray="6 4"/><polygon points="26,1 36,5 26,9" fill="#333333"/></svg></td><td>Follows target</td></tr><tr><td><svg width="36" height="10"><line x1="0" y1="5" x2="26" y2="5" stroke="#e00000" stroke-width="1.5"/><polygon points="26,1 36,5 26,9" fill="#e00000"/></svg></td><td>Pin behind latest release</td></tr>
+</table>
+<h2>Open pull requests</h2>
+<table>
+<tr><th>Repository</th><th>#</th><th>Title</th><th>Author</th><th>Review</th><th>Checks</th><th>Updated</th></tr>
+<tr><td>isabelle-python-codegen</td><td><a href="https://github.com/pure-py/isabelle-python-codegen/pull/4">#4</a></td><td class="title"><a href="https://github.com/pure-py/isabelle-python-codegen/pull/4" class="title">Test oracle approach which directly compares Isabelle (SML backend) to its extracted Python</a></td><td>dorchard</td><td>none</td><td>failing</td><td>2026-10-23</td></tr>
+</table>
+<h2>Draft pull requests</h2>
+<table>
+<tr><th>Repository</th><th>#</th><th>Title</th><th>Author</th><th>Review</th><th>Checks</th><th>Updated</th></tr>
+<tr><td>isabelle-python-codegen</td><td><a href="https://github.com/pure-py/isabelle-python-codegen/pull/6">#6</a></td><td class="title"><a href="https://github.com/pure-py/isabelle-python-codegen/pull/6" class="title">Fixes for oracle</a></td><td>dorchard</td><td>none</td><td>none</td><td>2026-10-23</td></tr>
+<tr><td>pure-py-spec</td><td><a href="https://github.com/pure-py/pure-py-spec/pull/129">#129</a></td><td class="title"><a href="https://github.com/pure-py/pure-py-spec/pull/129" class="title">WIP grammar definition in Ott</a></td><td>nikolaushuber</td><td>none</td><td>passing</td><td>2026-10-26</td></tr>
+<tr><td>pure-py.github.io</td><td><a href="https://github.com/pure-py/pure-py.github.io/pull/20">#20</a></td><td class="title"><a href="https://github.com/pure-py/pure-py.github.io/pull/20" class="title">Integrate playground</a></td><td>jacobpake</td><td>approved</td><td>passing</td><td>2026-11-02</td></tr>
+</table>
+<h2>Project integrity</h2>
+<h3>Open issues missing from the project board</h3>
+<table class="integrity">
+<tr><th>Issue</th><th>Title</th></tr>
+<tr><td><a href="https://github.com/pure-py/pure-py-spec/issues/56">#56</a></td><td>Default arguments</td></tr>
+<tr><td><a href="https://github.com/pure-py/pure-py-spec/issues/234">#234</a></td><td>`@overload`</td></tr>
+</table>
+<h3>Milestoned issues marked Proposed</h3>
+<table class="integrity">
+<tr><th>Issue</th><th>Title</th><th>Milestone</th></tr>
+<tr><td><a href="https://github.com/pure-py/pure-py-spec/issues/105">#105</a></td><td>`__all__` for wildcard imports</td><td>pure-py-spec 1.1</td></tr>
+<tr><td><a href="https://github.com/pure-py/pure-py-spec/issues/196">#196</a></td><td>Tighter rule attribution</td><td>PLDI 2027</td></tr>
+<tr><td><a href="https://github.com/pure-py/pure-py-spec/issues/222">#222</a></td><td>Iterator functions</td><td>pure-py-spec 1.1</td></tr>
+</table>
+<h3>Active issues without a milestone</h3>
+<table class="integrity">
+<tr><th>Issue</th><th>Title</th><th>Status</th></tr>
+<tr><td><a href="https://github.com/pure-py/pure-py-spec/issues/14">#14</a></td><td>Syntactic extensions</td><td>In progress</td></tr>
+<tr><td><a href="https://github.com/pure-py/pure-py-spec/issues/313">#313</a></td><td>Features excluded by design</td><td>In progress</td></tr>
 </table>
 </body>
 </html>
