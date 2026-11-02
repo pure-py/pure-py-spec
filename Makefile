@@ -186,7 +186,7 @@ clean:
 	rm -f $(AUX) *.pdf *.zip *.tsv *.references $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(EVALUATION_FIGURE)
 	rm -rf $(dir $(SPEC_LABELS))
 
-## Every target with a recipe is described
+## Make targets documented, and workflows named after their targets
 check-targets:
 	script/submission-report.py --check
 
