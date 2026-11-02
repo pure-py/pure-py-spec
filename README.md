@@ -48,7 +48,8 @@ since, ahead of the implementation. Such tests are listed in `test/expected-fail
 isabelle-purepy issue for the change. The suite is run against the latest release by `make check-suite-purepy`,
 with diagnostics checked; the check fails unless the failing tests are exactly those listed, so a suite change is
 either passed by the implementation or declared as waiting for it, and its entry goes once the implementation
-catches up.
+catches up. An entry with a closed issue also fails the check, since the implementation has then caught up and the
+test still fails.
 
 An implementation runs the suite with the `purepy-conformance` command of the installed package, providing a type
 checker and interpreter (default `python3`), each as a command taking the path of a module. The type checker
