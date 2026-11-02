@@ -190,10 +190,10 @@ def page(repos: list[str], report: str) -> str:
 </head>
 <body>
 <h1>PurePy status</h1>
-<p>Updated <time>{updated}</time> UTC.</p>
 <h2>{html.escape(description(SUBMISSION_TARGET))} status</h2>
 {submission()}
 <h2>Dependencies</h2>
+<p>Updated <time>{updated}</time> UTC.</p>
 <img class="diagram" src="dependencies.svg" alt="Dependencies between repositories">
 <table class="key">
 {"".join(f"<tr><td>{a}</td><td>{label}</td></tr>" for a, label in KEY)}
