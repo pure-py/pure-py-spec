@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """D2 diagram of dependencies between the organisation's repositories"""
 
+import json
 import pathlib
 import re
 import subprocess
@@ -16,15 +17,74 @@ URL = re.compile(
 RELEASE = re.compile(r"^/(?:releases/download/)?(?P<version>v\d[\d.]*)/")
 LATEST = re.compile(r"^/latest/")
 ANNOTATION = re.compile(r"\b(?P<kind>pin|tracks): (?P<label>[^#]*?)\s*$")
+WHEEL = re.compile(r"/(?P<package>[A-Za-z0-9_.]+?)-\d[^/]*\.whl$")
+SESSION = re.compile(r'^session\s+"?(?P<name>[\w.-]+)"?', re.MULTILINE)
+ICONS = {
+    kind: pathlib.Path(__file__).resolve().parent / "icons" / file
+    for kind, file in [
+        ("Isabelle", "isabelle.png"),
+        ("Python", "python.svg"),
+        ("SvelteKit", "svelte.svg"),
+    ]
+}
+
+
+@dataclass(frozen=True)
+class Project:
+    kind: str
+    name: str
+    directory: pathlib.PurePath
+    file: str
 
 
 @dataclass(frozen=True)
 class Edge:
     source: str
     target: str
+    target_repo: str
     label: str
     pinned: bool
     version: str | None = None  # Pinned release
+
+
+def package(name: str) -> str:
+    return re.sub(r"[-_.]+", "-", name).lower()
+
+
+def project(repo: pathlib.Path, path: pathlib.PurePath) -> Project | None:
+    """Project defined by a SvelteKit configuration, Isabelle ROOT file, or Python project file with a build
+    system or below the repository root, since a Python project file at the root without one only serves
+    the tests of another kind of project"""
+    if path.name not in ("svelte.config.js", "ROOT", "pyproject.toml"):
+        return None
+    text = (repo / path).read_text()
+    if path.name == "svelte.config.js":
+        name = json.loads((repo / path.parent / "package.json").read_text())["name"]
+        return Project("SvelteKit", name, path.parent, path.name)
+    if path.name == "ROOT" and (session := SESSION.search(text)):
+        return Project("Isabelle", session["name"], path.parent, path.name)
+    if path.name == "pyproject.toml":
+        config = tomllib.loads(text)
+        if "build-system" in config or path.parent != pathlib.PurePath("."):
+            return Project("Python", config["project"]["name"], path.parent, path.name)
+    return None
+
+
+def projects(repo: pathlib.Path) -> list[Project]:
+    found = (project(repo, path.relative_to(repo)) for path in tracked_files(repo))
+    return [p for p in found if p]
+
+
+def owner(found: list[Project], path: pathlib.PurePath) -> Project | None:
+    """Project of a file: the one in the deepest directory containing it, where a project at the repository
+    root owns only its own project file"""
+    owners = [
+        p
+        for p in found
+        if path == p.directory / p.file
+        or (p.directory != pathlib.PurePath(".") and p.directory in path.parents)
+    ]
+    return max(owners, key=lambda p: len(p.directory.parts), default=None)
 
 
 def tracked_files(repo: pathlib.Path) -> list[pathlib.Path]:
@@ -62,7 +122,13 @@ def dependency_kind(pyproject: pathlib.Path, url: str) -> str:
 
 
 def edge(
-    source: str, path: pathlib.Path, lines: list[str], index: int, match: re.Match[str]
+    found: dict[str, list[Project]],
+    source_repo: str,
+    source: str,
+    path: pathlib.Path,
+    lines: list[str],
+    index: int,
+    match: re.Match[str],
 ) -> Edge | None:
     """Dependency denoted by a URL in a file, or none for a link to a repository, issue or pull request; a
     "pin:" or "tracks:" comment on the same or preceding line labels it"""
@@ -75,26 +141,45 @@ def edge(
             repo = PAGES
     git = repo.endswith(".git")
     repo = repo.removesuffix(".git")
-    if repo == source or url_path.startswith(("/issues/", "/pull/")):
+    if repo == source_repo or url_path.startswith(("/issues/", "/pull/")):
         return None
+    target = node_id(found, repo)
     if release := RELEASE.match(url_path):
         label = f"release {release['version']}"
         if path.name == "pyproject.toml":
             label = f"{dependency_kind(path, match[0])}, {label}"
-        return Edge(source, repo, label, pinned=True, version=release["version"])
+        if wheel := WHEEL.search(url_path):
+            target = node_id(
+                found,
+                repo,
+                next(
+                    (
+                        p
+                        for p in found.get(repo, [])
+                        if package(p.name) == package(wheel["package"])
+                    ),
+                    None,
+                ),
+            )
+        return Edge(source, target, repo, label, pinned=True, version=release["version"])
     if LATEST.match(url_path):
-        return Edge(source, repo, "latest release", pinned=False)
+        return Edge(source, target, repo, "latest release", pinned=False)
     annotated = [ANNOTATION.search(line) for line in lines[max(index - 1, 0) : index + 1]]
     if annotation := next((a for a in reversed(annotated) if a), None):
-        return Edge(source, repo, annotation["label"], pinned=annotation["kind"] == "pin")
+        return Edge(source, target, repo, annotation["label"], pinned=annotation["kind"] == "pin")
     if git:
         sys.exit(
-            f"{source}: unannotated reference to {repo} at line {index + 1}: {lines[index].strip()}"
+            f"{source_repo}: unannotated reference to {repo} at line {index + 1}: {lines[index].strip()}"
         )
     return None
 
 
-def edges(repo: pathlib.Path) -> set[Edge]:
+def node_id(found: dict[str, list[Project]], repo: str, p: Project | None = None) -> str:
+    """Repository, or project within a repository holding several"""
+    return f'"{repo}"."{p.name}"' if p and len(found.get(repo, [])) > 1 else f'"{repo}"'
+
+
+def edges(found: dict[str, list[Project]], repo: pathlib.Path) -> set[Edge]:
     def edges_of(path: pathlib.Path) -> set[Edge]:
         if path.name == "uv.lock":  # Repeats the project file's pins
             return set()
@@ -102,31 +187,45 @@ def edges(repo: pathlib.Path) -> set[Edge]:
             lines = path.read_text().splitlines()
         except (UnicodeDecodeError, OSError):
             return set()
-        found = (
-            edge(repo.name, path, lines, i, match)
+        source = node_id(found, repo.name, owner(found[repo.name], path.relative_to(repo)))
+        es = (
+            edge(found, repo.name, source, path, lines, i, match)
             for i, line in enumerate(lines)
             for match in URL.finditer(line)
         )
-        return {e for e in found if e}
+        return {e for e in es if e}
 
     return set().union(*map(edges_of, tracked_files(repo)))
 
 
 def d2(repos: list[pathlib.Path]) -> str:
     latest = {repo.name: latest_release(repo.name) for repo in repos}
+    found = {repo.name: projects(repo) for repo in repos}
 
     def node(repo: pathlib.Path) -> str:
-        label = f"{repo.name}\\n{latest[repo.name]}" if latest[repo.name] else repo.name
-        return f'"{repo.name}": "{label}"\n'
+        """Repository, drawn as its project when it holds one, otherwise containing its projects"""
+        lines = [repo.name]
+        own = found[repo.name]
+        if len(own) == 1 and own[0].name != repo.name:
+            lines.append(own[0].name)
+        if version := latest[repo.name]:
+            lines.append(version)
+        label = "\\n".join(lines)
+        if len(own) == 1:
+            return f'"{repo.name}": "{label}" {{ class: standalone; icon: {ICONS[own[0].kind]} }}\n'
+        inner = "".join(f'  "{p.name}" {{ class: project; icon: {ICONS[p.kind]} }}\n' for p in own)
+        return f'"{repo.name}": "{label}" {{\n  class: repository\n{inner}}}\n'
 
     def link(e: Edge) -> str:
-        behind = e.version is not None and e.version != latest[e.target]
+        behind = e.version is not None and e.version != latest[e.target_repo]
         style = "behind" if behind else "pinned" if e.pinned else "tracking"
-        return f'"{e.source}" -> "{e.target}": {e.label} {{class: {style}}}\n'
+        return f"{e.source} -> {e.target}: {e.label} {{class: {style}}}\n"
 
     nodes = "".join(map(node, repos))
     links = "".join(
-        link(e) for repo in repos for e in sorted(edges(repo), key=lambda e: (e.target, e.label))
+        link(e)
+        for repo in repos
+        for e in sorted(edges(found, repo), key=lambda e: (e.target, e.label))
     )
     return f"""vars: {{ d2-config: {{ layout-engine: elk }} }}
 direction: right
@@ -134,6 +233,9 @@ classes: {{
   pinned: {{ style.stroke: "#333333" }}
   tracking: {{ style.stroke: "#333333"; style.stroke-dash: 4 }}
   behind: {{ style.stroke: "#b00020" }}
+  project: {{ width: 200; height: 90; style.font-size: 14 }}
+  standalone: {{ width: 200; style.font-size: 14 }}
+  repository: {{ style.font-size: 18 }}
 }}
 {nodes}{links}"""
 
