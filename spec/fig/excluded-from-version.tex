@@ -27,9 +27,10 @@ string annotations \\\rowgap
 Imports & \pyinline{import a as b}, \pyinline{from a import b as c}, \pyinline{import a, b}, relative imports \\\rowgap
 Exceptions and effects & \pyinline{try}, \pyinline{except}, \pyinline{finally}, \pyinline{raise}, \pyinline{with},
 \pyinline{async}, \pyinline{await}, \pyinline{input}, \pyinline{open}, expression-level printing \\\rowgap
-Library & Built-in functions and standard library modules other than those predefined, such as \pyinline{sum} and
-\pyinline{re}; attributes of predefined modules other than those predefined, such as \pyinline{sys.version};
-attributes of built-in types other than mutating methods, such as \pyinline{str.upper}
+Library & Standard library modules other than \pyinline{builtins}, \pyinline{dataclasses}, \pyinline{sys} and
+\pyinline{typing}, such as \pyinline{re}; attributes of those modules not listed in \figref{predefined-signatures}, such as
+\pyinline{sum} and \pyinline{sys.version}; attributes of built-in types other than mutating methods, such as
+\pyinline{str.upper}
 \end{tabular}
 \end{AddedBlock}
 \caption{\added{Common Python features excluded from this version}}
