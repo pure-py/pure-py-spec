@@ -14,8 +14,8 @@ Augmented assignment \pyinline{+=}, etc. & Updates in place if type supports it 
 Walrus operator \pyinline{:=} & Assigns within expression & Parser \\\rowgap
 Item assignment \pyinline{xs[0] = v} & Updates container in place & Parser \\\rowgap
 Attribute as assignment or declaration target, \pyinline{p.x = v} or \pyinline{p.x: int} & Updates object in place & Parser \\\rowgap
-\pyinline{is} and \pyinline{is not}, other than against \pyinline{None}, \pyinline{True} or \pyinline{False} & Compares objects by identity & Parser \\\rowgap
-Built-in \pyinline{id} & Gives identity of object & Type checker \\\rowgap
+\pyinline{is} and \pyinline{is not}, except with \pyinline{None}, \pyinline{True} or \pyinline{False} & Compares objects by identity & Parser \\\rowgap
+Built-in \pyinline{id} & Returns identity of object & Type checker \\\rowgap
 \designgroup{Iteration}
 \pyinline{for} and \pyinline{while} loops, \pyinline{break} and \pyinline{continue} & Iterates by updating loop variable & Parser \\\rowgap
 \pyinline{yield}, \pyinline{yield from} and generator expressions & Creates generator, consumed by mutation & Parser \\\rowgap
