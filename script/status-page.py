@@ -182,6 +182,8 @@ def page(repos: list[str], report: str) -> str:
 <body>
 <h1>PurePy status</h1>
 <p>Updated <time>{updated}</time> UTC.</p>
+<h2>{html.escape(description(SUBMISSION_TARGET))} status</h2>
+{submission()}
 <h2>Dependencies</h2>
 <img src="dependencies.svg" alt="Dependencies between repositories">
 <table class="key">
@@ -193,8 +195,6 @@ def page(repos: list[str], report: str) -> str:
 {table(draft=True)}
 <h2>Project integrity</h2>
 {integrity(report)}
-<h2>{html.escape(description(SUBMISSION_TARGET))}</h2>
-{submission()}
 </body>
 </html>
 """
