@@ -1,7 +1,5 @@
 name: Consistency checks
 
-# Specification against the conformance suite, the suite against the reference type checker, and wheel of the
-# conformance suite and runner
 on:
   workflow_dispatch:
   push:
