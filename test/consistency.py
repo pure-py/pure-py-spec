@@ -57,8 +57,8 @@ def check_unique_rule_names(r: Results) -> None:
 
 
 def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
-    """Every test rejected by the type checker, undefined or agreeing cites a rule of the spec on its first
-    line; a test rejected by the parser or excluded from this version cites none."""
+    """Check rule citations. A test cites a rule of the spec on its first line if it is well-formed or ill-formed,
+    and cites none if the parser rejects it or it uses a feature excluded from this version."""
     with r.test("rule attribution"):
         spec = {
             m for f in sorted((ROOT / "spec").rglob("*.tex")) for m in RULE_NAME.findall(current(f))

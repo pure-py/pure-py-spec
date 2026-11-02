@@ -317,7 +317,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     parser.add_argument(
         "--check-messages",
         action="store_true",
-        help="check each diagnostic of the type checker against the diagnostic of the reference type checker",
+        help="check diagnostics against those of the reference type checker",
     )
     parser.add_argument(
         "--jobs", type=int, help="number of tests run in parallel (default: number of cores)"
