@@ -63,7 +63,7 @@ $(SPEC_LABELS): PurePy-spec.pdf
 paper.pdf paper-anon.pdf: $(SPEC_LABELS)
 
 GRADUALITY_INPUTS := $(wildcard graduality/*.tex graduality/*/*.tex)
-## Draft notes on gradual typing, outside the 1.0 specification and paper
+## Draft notes on gradual typing, outside the 1.0 spec and paper
 graduality.pdf: $(GRADUALITY_INPUTS)
 
 # Anonymised build of source $(2) under job name $(1).
@@ -87,12 +87,12 @@ check-page-limit: paper-anon.pdf
 	@page=$$(cat paper-anon.references); echo "report: references begin on page $$page, limit $(PAGE_LIMIT) pages"; \
 		test "$$page" -le $(PAGE_LIMIT)
 
-## Anonymised specification builds, with no undefined cross-references or citations
+## Anonymised spec builds, with no undefined cross-references or citations
 spec-anon.pdf: $(TEXFILES)
 	$(call anon,spec-anon,PurePy-spec.tex)
 	rm -f $(BUILD_AUX)
 
-## Specification consistent with conformance suite
+## Spec consistent with conformance suite
 check-consistency:
 	uv run --locked python test/consistency.py
 
@@ -122,7 +122,7 @@ PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
 # Release of the mechanisation conforming to this specification
 PUREPY_RELEASE := v$(shell uv version --short --color never)
 
-## Archive holds anonymised specification, mechanisation release at specification's version, and suite wheel
+## Archive holds anonymised spec, mechanisation release at spec's version, and suite wheel
 supplementary.zip: spec-anon.pdf
 	rm -f $@ && rm -rf .submission
 	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
