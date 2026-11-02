@@ -80,7 +80,7 @@ class Exit(IntEnum):
     NOT_ALLOWED = 1
     ILL_FORMED = 3
     UNDEFINED = 4  # Interpreter: run aborted with undefined behaviour
-    EXCLUDED_FOR_NOW = 5  # Type checker: program uses feature excluded from this version
+    EXCLUDED_FOR_NOW = 5  # Feature excluded from this version, found by parser or type checker
 
 
 class Expectation(NamedTuple):
