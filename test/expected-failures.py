@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Run the conformance suite against a type checker, with diagnostics checked, and compare the failures with
-test/expected-failures.txt, which lists the tests the type checker is expected to fail: one per line, named as
-the suite names it, followed by a tab and the issue the test waits on. A directory ending in a slash stands for
-every test under it. Fail unless the failures are exactly those listed."""
+"""Run the conformance suite against a type checker, with diagnostics checked, and fail unless the failing tests
+are exactly those listed in test/expected-failures.txt: tests changed ahead of the implementation, one per line as
+the suite names them, each followed by a tab and the issue for the change. A directory ending in a slash stands
+for every test under it."""
 
 import argparse
 import pathlib

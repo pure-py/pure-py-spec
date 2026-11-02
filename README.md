@@ -43,9 +43,12 @@ make wheel
 ```
 
 The reference type checker is `purepy`, generated from the mechanisation in the `isabelle-purepy` repository. The
-suite is also run against the type checker of the latest release of the mechanisation, with diagnostics checked,
-by `make check-suite-purepy`. The tests failed by that type checker are listed in `test/expected-failures.txt`,
-each with the issue it waits on, and the check fails unless the failures are exactly those listed.
+latest mechanisation release passes the suite at its spec version, so any test failed by the release has changed
+since, ahead of the implementation. Such tests are listed in `test/expected-failures.txt`, each with the
+isabelle-purepy issue for the change. The suite is run against the latest release by `make check-suite-purepy`,
+with diagnostics checked; the check fails unless the failing tests are exactly those listed, so a suite change is
+either passed by the implementation or declared as waiting for it, and its entry goes once the implementation
+catches up.
 
 An implementation runs the suite with the `purepy-conformance` command of the installed package, providing a type
 checker and interpreter (default `python3`), each as a command taking the path of a module. The type checker
