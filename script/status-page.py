@@ -106,7 +106,7 @@ def integrity(report: str) -> str:
 
 
 def description(target: str) -> str:
-    """Double-hash comment above the target's rule in the Makefile"""
+    """Double-hash comment above target's rule in the Makefile"""
     lines = pathlib.Path("Makefile").read_text().splitlines()
     above = next(lines[i - 1] for i, line in enumerate(lines) if line.startswith(f"{target}:"))
     assert above.startswith("## "), f"{target} has no description"
