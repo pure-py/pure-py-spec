@@ -32,7 +32,7 @@ Built-ins \pyinline{globals}, \pyinline{locals} and \pyinline{vars} & Return nam
 Built-in \pyinline{__import__} & Import module named by string & Static \\\rowgap
 \designgroup{Implicit coercions}
 Dictionary with keys other than strings, such as \filename{\{1:\ v\}} & Accept any hashable key & Static \\\rowgap
-Dictionary type with key type other than \pyinline{str}, such as \pyinline{dict[int, str]} & Accept any hashable key & Syntactic \\\rowgap
+Key type other than \pyinline{str}, such as \pyinline{dict[int, str]} & Accept any hashable key & Syntactic \\\rowgap
 \designgroup{Gradual typing}
 \pyinline{Any} and \pyinline{cast} of \pyinline{typing} & Disable static checking of value & Static \\\rowgap
 \designgroup{Compatibility with mypy}
