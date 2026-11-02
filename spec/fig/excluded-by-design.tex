@@ -6,37 +6,37 @@
 \begin{AddedBlock}
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.42\textwidth}>{\raggedright\arraybackslash}p{0.34\textwidth}>{\raggedright\arraybackslash}p{0.14\textwidth}}
 \arrayrulecolor{gray!60}\hline
-\rowcolor{grammarheadcolor}Feature & Python & Rejected by \\
+\rowcolor{grammarheadcolor}Feature & Python & Exclusion \\
 \designgroup{Mutable state}
-\pyinline{global} and \pyinline{nonlocal} & Assign to variable of enclosing scope & Parser \\\rowgap
-\pyinline{del} & Remove binding & Parser \\\rowgap
-Augmented assignment \pyinline{+=}, etc. & Update in place if type supports it & Parser \\\rowgap
-Walrus operator \pyinline{:=} & Assign within expression & Parser \\\rowgap
-Item assignment \pyinline{xs[0] = v} & Update container in place & Parser \\\rowgap
-Mutating methods of \pyinline{list} and \pyinline{dict}, such as \pyinline{append} and \pyinline{update} & Update container in place & Type checker \\\rowgap
-Attribute assignment \pyinline{p.x = v} & Update object in place & Parser \\\rowgap
-Built-ins \pyinline{setattr} and \pyinline{delattr} & Set or delete attribute named by string & Type checker \\\rowgap
-\pyinline{is} and \pyinline{is not}, except with \pyinline{None}, \pyinline{True} or \pyinline{False} & Compare objects by identity & Parser \\\rowgap
-Built-in \pyinline{id} & Return identity of object & Type checker \\\rowgap
+\pyinline{global} and \pyinline{nonlocal} & Assign to variable of enclosing scope & Syntactic \\\rowgap
+\pyinline{del} & Remove binding & Syntactic \\\rowgap
+Augmented assignment \pyinline{+=}, etc. & Update in place if type supports it & Syntactic \\\rowgap
+Walrus operator \pyinline{:=} & Assign within expression & Syntactic \\\rowgap
+Item assignment \pyinline{xs[0] = v} & Update container in place & Syntactic \\\rowgap
+Mutating methods of \pyinline{list} and \pyinline{dict}, such as \pyinline{append} and \pyinline{update} & Update container in place & Static \\\rowgap
+Attribute assignment \pyinline{p.x = v} & Update object in place & Syntactic \\\rowgap
+Built-ins \pyinline{setattr} and \pyinline{delattr} & Set or delete attribute named by string & Static \\\rowgap
+\pyinline{is} and \pyinline{is not}, except with \pyinline{None}, \pyinline{True} or \pyinline{False} & Compare objects by identity & Syntactic \\\rowgap
+Built-in \pyinline{id} & Return identity of object & Static \\\rowgap
 \designgroup{Iteration}
-\pyinline{for} and \pyinline{while} loops, \pyinline{break} and \pyinline{continue} & Iterate by updating loop variable & Parser \\\rowgap
-\pyinline{yield}, \pyinline{yield from} and generator expressions & Create generator, consumed by mutation & Parser \\\rowgap
-Built-ins \pyinline{iter} and \pyinline{next} & Create or advance iterator & Type checker \\\rowgap
+\pyinline{for} and \pyinline{while} loops, \pyinline{break} and \pyinline{continue} & Iterate by updating loop variable & Syntactic \\\rowgap
+\pyinline{yield}, \pyinline{yield from} and generator expressions & Create generator, consumed by mutation & Syntactic \\\rowgap
+Built-ins \pyinline{iter} and \pyinline{next} & Create or advance iterator & Static \\\rowgap
 \designgroup{Load-dependent meaning}
-Import inside function body or branch, or after statement & Dependencies of module discovered as body executes & Parser \\\rowgap
-Wildcard import \pyinline{from q import *} & Introduce names of \pyinline{q} implicitly & Parser \\\rowgap
+Import inside function body or branch, or after statement & Dependencies of module discovered as body executes & Syntactic \\\rowgap
+Wildcard import \pyinline{from q import *} & Introduce names of \pyinline{q} implicitly & Syntactic \\\rowgap
 \designgroup{Reflection}
-Built-ins \pyinline{eval} and \pyinline{exec} & Run code given as string & Type checker \\\rowgap
-Built-in \pyinline{getattr} & Read attribute named by string & Type checker \\\rowgap
-Built-ins \pyinline{globals}, \pyinline{locals} and \pyinline{vars} & Return namespace as dictionary & Type checker \\\rowgap
-Built-in \pyinline{__import__} & Import module named by string & Type checker \\\rowgap
+Built-ins \pyinline{eval} and \pyinline{exec} & Run code given as string & Static \\\rowgap
+Built-in \pyinline{getattr} & Read attribute named by string & Static \\\rowgap
+Built-ins \pyinline{globals}, \pyinline{locals} and \pyinline{vars} & Return namespace as dictionary & Static \\\rowgap
+Built-in \pyinline{__import__} & Import module named by string & Static \\\rowgap
 \designgroup{Implicit coercions}
-Dictionary with keys other than strings, such as \filename{\{1:\ v\}} & Accept any hashable key & Parser or type checker \\\rowgap
+Dictionary with keys other than strings, such as \filename{\{1:\ v\}} & Accept any hashable key & Syntactic in types and patterns, static in expressions \\\rowgap
 \designgroup{Gradual typing}
-\pyinline{Any} and \pyinline{cast} of \pyinline{typing} & Disable static checking of value & Type checker \\\rowgap
+\pyinline{Any} and \pyinline{cast} of \pyinline{typing} & Disable static checking of value & Static \\\rowgap
 \designgroup{Compatibility with mypy}
-Parameter or return type without annotation & Accept definition without annotations & Parser \\\rowgap
-Annotation which is not a type, such as \pyinline{1} or \pyinline{list[int, int]} & Ignore annotation & Parser
+Parameter or return type without annotation & Accept definition without annotations & Syntactic \\\rowgap
+Annotation which is not a type, such as \pyinline{1} or \pyinline{list[int, int]} & Ignore annotation & Syntactic
 \end{tabular}
 \end{AddedBlock}
 \caption{\added{Python features excluded by design}}
