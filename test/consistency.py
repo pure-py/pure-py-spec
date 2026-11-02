@@ -80,9 +80,8 @@ def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
 
 
 def check_classification(r: Results, suite_dir: pathlib.Path) -> None:
-    """Every test which rejects a syntactically valid program by the parser or as excluded from this version ends its
-    expected error with the classification placeholder; a test of a Python syntax error does not use it, and nor does
-    a test which PurePy accepts."""
+    """Require the classification placeholder in parser rejections and exclusions from this version of valid Python,
+    and allow it only in rejections of valid Python."""
     with r.test("classification of excluded features"):
         for test in tests(suite_dir):
             path = test / MAIN if test.is_dir() else test
