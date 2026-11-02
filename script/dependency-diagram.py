@@ -130,7 +130,7 @@ def edge(
     index: int,
     match: re.Match[str],
 ) -> Edge | None:
-    """Dependency denoted by a URL in a file, or none for a link to a repository, issue or pull request; a
+    """Dependency implied by a URL in a file, or none for a link to a repository, issue or pull request; a
     "pin:" or "tracks:" comment on the same or preceding line labels it"""
     repo = match["repo"]
     url_path = match["path"]
