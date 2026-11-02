@@ -57,7 +57,7 @@ def excluded(feature: str, classification: Classification) -> str:
     return f"{feature} {classification}"
 
 
-# Ends an expected error which names an excluded feature, standing for the classification of the test's outcome
+# Placeholder for classification at end of expected error for excluded feature
 CLASSIFICATION = "{classification}"
 
 # Classification of an excluded feature, for each PurePy outcome which rejects a program
