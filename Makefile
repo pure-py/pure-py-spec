@@ -63,7 +63,7 @@ $(SPEC_LABELS): PurePy-spec.pdf
 paper.pdf paper-anon.pdf: $(SPEC_LABELS)
 
 GRADUALITY_INPUTS := $(wildcard graduality/*.tex graduality/*/*.tex)
-## Draft notes on gradual typing, outside the 1.0 specification and paper
+## Draft notes on gradual typing, outside the 1.0 spec and paper
 graduality.pdf: $(GRADUALITY_INPUTS)
 
 # Anonymised build of source $(2) under job name $(1).
@@ -75,7 +75,7 @@ $(PDFLATEX) -jobname=$(1) "\def\anonmode{}\input{$(2)}"
 $(call check-log,$(1))
 endef
 
-## Anonymised paper builds, with no undefined cross-references or citations
+## Anonymised paper builds, with no undefined references or citations
 paper-anon.pdf: $(TEXFILES)
 	$(call anon,paper-anon,paper.tex)
 	sed -n 's/^\\newlabel{references}{{[^}]*}{\([0-9]*\)}.*/\1/p' paper-anon.aux > paper-anon.references
@@ -87,12 +87,23 @@ check-page-limit: paper-anon.pdf
 	@page=$$(cat paper-anon.references); echo "report: references begin on page $$page, limit $(PAGE_LIMIT) pages"; \
 		test "$$page" -le $(PAGE_LIMIT)
 
-## Anonymised specification builds, with no undefined cross-references or citations
+## Anonymised paper free of author and project names (text and metadata)
+check-paper-anonymised: paper-anon.pdf
+	@names=$$(grep -o '^\\author{[^}]*}' paper.tex | sed -e 's/^\\author{//' -e 's/}$$//' | paste -sd '|' -); \
+		found=$$({ pdfinfo $<; pdftotext $< -; } | grep -oiE "pure-?py|$$names" | sort -u | paste -sd ',' -); \
+		test -z "$$found" || { echo "report: found $$found"; exit 1; }
+
+## Anonymised paper in review mode, with line numbers
+check-review-mode: paper-anon.pdf
+	@n=$$(pdftotext -layout -f 2 -l 2 $< - | grep -cE '^ *[0-9]+ {2,}'); \
+		echo "report: $$n numbered lines on page 2"; test "$$n" -ge 20
+
+## Anonymised spec builds, with no undefined references or citations
 spec-anon.pdf: $(TEXFILES)
 	$(call anon,spec-anon,PurePy-spec.tex)
 	rm -f $(BUILD_AUX)
 
-## Specification consistent with conformance suite
+## Spec consistent with conformance suite
 check-consistency:
 	uv run --locked python test/consistency.py
 
@@ -122,7 +133,7 @@ PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
 # Release of the mechanisation conforming to this specification
 PUREPY_RELEASE := v$(shell uv version --short --color never)
 
-## Archive holds anonymised specification, mechanisation release at specification's version, and suite wheel
+## Archive holds anonymised spec, mechanisation release at spec's version, and conformance suite wheel
 supplementary.zip: spec-anon.pdf
 	rm -f $@ && rm -rf .submission
 	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
@@ -147,11 +158,12 @@ check-anonymised: supplementary.zip
 check-archived-theories: .check-submission
 	$(MAKE) -C $</mechanisation build ISABELLE=$(ISABELLE)
 
-## Type checker generated from archived mechanisation passes archived suite
+## Type checker generated from archived mechanisation passes archived conformance suite
 check-archived-suite: check-archived-theories
 	$(MAKE) -C .check-submission/mechanisation check-conformance
 
-check-submission: check-targets paper-submission check-page-limit check-anonymised check-archived-suite
+check-submission: check-targets paper-submission check-page-limit check-paper-anonymised check-review-mode \
+	check-anonymised check-archived-suite
 
 # arXiv runs pdflatex without bibtex, so include the .bbl.
 ## Paper sources for arXiv
@@ -173,5 +185,6 @@ check-targets:
 help:
 	@awk '/^## / { d = substr($$0, 4); next } d && /^[a-zA-Z0-9_.-]+:/ { t = $$0; sub(/:.*/, "", t); printf "%-24s %s\n", t, d } { d = "" }' $(MAKEFILE_LIST)
 
-.PHONY: default all help check-targets paper-submission check-page-limit check-anonymised check-archived-theories check-archived-suite check-submission clean \
+.PHONY: default all help check-targets paper-submission check-page-limit check-paper-anonymised check-review-mode \
+	check-anonymised check-archived-theories check-archived-suite check-submission clean \
 	check-consistency check-suite wheel dependencies.svg integrity.txt status.html

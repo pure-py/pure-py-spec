@@ -1,6 +1,6 @@
 # PurePy - A Pure Functional Subset of Python
 
-[![consistency checks](https://github.com/pure-py/pure-py-spec/actions/workflows/consistency-checks.yml/badge.svg)](https://github.com/pure-py/pure-py-spec/actions/workflows/consistency-checks.yml)
+[![status page](https://github.com/pure-py/pure-py-spec/actions/workflows/status.yml/badge.svg)](https://pure-py.github.io/pure-py-spec/status.html)
 
 ## [v0.24.0](https://pure-py.github.io/pure-py-spec/v0.24.0/PurePy-spec.pdf)
 

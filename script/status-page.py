@@ -15,6 +15,7 @@ ORG = "pure-py"
 SPEC_REPO = "pure-py-spec"
 SUBMISSION_WORKFLOW = "submission.yml"
 SUBMISSION_REPORT = "submission-report"
+SUBMISSION_TARGET = "paper-submission"
 ISSUE = re.compile(r"#(\d+)")
 FIELDS = "number,title,url,author,isDraft,updatedAt,reviewDecision,statusCheckRollup"
 FAILED = {"FAILURE", "ERROR", "TIMED_OUT", "CANCELLED", "ACTION_REQUIRED"}
@@ -25,10 +26,15 @@ REVIEW = {
 }
 STYLE = """
 body { font-family: system-ui, sans-serif; max-width: 70em; margin: 2em auto; padding: 0 1em; }
-img { width: 44em; max-width: 100%; }
+img.diagram { width: 44em; max-width: 100%; }
+img.badge { vertical-align: middle; }
+tr.failed td { color: #e00000; }
 table { border-collapse: collapse; }
 th, td { text-align: left; padding: 0.3em 0.6em; border-bottom: 1px solid #ccc; white-space: nowrap; }
 td.title { white-space: normal; }
+table.key { font-size: 0.8em; }
+table.key td { border: none; padding: 0 0.5em; }
+table.key svg { vertical-align: middle; }
 table.integrity td:first-child { width: 4em; }
 """
 
@@ -99,12 +105,36 @@ def integrity(report: str) -> str:
     return "\n".join(f"<h3>{html.escape(rule)}</h3>\n{table(rows)}" for rule, rows in rules if rows)
 
 
+def description(target: str) -> str:
+    """Double-hash comment above target's rule in the Makefile"""
+    lines = pathlib.Path("Makefile").read_text().splitlines()
+    above = next(lines[i - 1] for i, line in enumerate(lines) if line.startswith(f"{target}:"))
+    assert above.startswith("## "), f"{target} has no description"
+    return above.removeprefix("## ")
+
+
+def arrow(colour: str, dashed: bool) -> str:
+    dash = ' stroke-dasharray="6 4"' if dashed else ""
+    return (
+        '<svg width="36" height="10">'
+        f'<line x1="0" y1="5" x2="26" y2="5" stroke="{colour}" stroke-width="1.5"{dash}/>'
+        f'<polygon points="26,1 36,5 26,9" fill="{colour}"/></svg>'
+    )
+
+
+KEY = [
+    (arrow("#333333", dashed=False), "Pin (moved by hand)"),
+    (arrow("#333333", dashed=True), "Follows target"),
+    (arrow("#e00000", dashed=False), "Pin behind latest release"),
+]
+
+
 def submission() -> str:
     """Submission section, from latest completed run on main"""
     listing = subprocess.run(
         ["gh", "run", "list", "--repo", f"{ORG}/{SPEC_REPO}", "--workflow", SUBMISSION_WORKFLOW]
         + ["--branch", "main", "--status", "completed", "--limit", "1"]
-        + ["--json", "databaseId,conclusion,createdAt,url,headSha"],
+        + ["--json", "databaseId,conclusion,createdAt,url"],
         capture_output=True,
         text=True,
         check=False,
@@ -127,12 +157,16 @@ def submission() -> str:
             else []
         )
     when = run["createdAt"][:16].replace("T", " ")
+    badge = f"https://github.com/{ORG}/{SPEC_REPO}/actions/workflows/{SUBMISSION_WORKFLOW}/badge.svg?branch=main"
     heading = (
-        f'<p>Run of <a href="{run["url"]}">{when}</a> UTC on commit {run["headSha"][:7]}: '
-        f"{html.escape(run['conclusion'])}.</p>"
+        f'<p><a href="{run["url"]}"><img class="badge" src="{badge}" alt="{html.escape(run["conclusion"])}"></a>'
+        f" {when} UTC</p>"
     )
     body = "".join(
-        "<tr>" + "".join(f"<td>{html.escape(c)}</td>" for c in row) + "</tr>\n" for row in rows
+        ('<tr class="failed">' if row[2] == "failed" else "<tr>")
+        + "".join(f"<td>{html.escape(c)}</td>" for c in row)
+        + "</tr>\n"
+        for row in rows
     )
     return f"{heading}\n<table>\n<tr><th>Target</th><th>Check</th><th>Result</th><th>Detail</th></tr>\n{body}</table>"
 
@@ -157,16 +191,19 @@ def page(repos: list[str], report: str) -> str:
 <body>
 <h1>PurePy status</h1>
 <p>Updated <time>{updated}</time> UTC.</p>
+<h2>{html.escape(description(SUBMISSION_TARGET))} status</h2>
+{submission()}
 <h2>Dependencies</h2>
-<img src="dependencies.svg" alt="Dependencies between repositories">
+<img class="diagram" src="dependencies.svg" alt="Dependencies between repositories">
+<table class="key">
+{"".join(f"<tr><td>{a}</td><td>{label}</td></tr>" for a, label in KEY)}
+</table>
 <h2>Open pull requests</h2>
 {table(draft=False)}
 <h2>Draft pull requests</h2>
 {table(draft=True)}
 <h2>Project integrity</h2>
 {integrity(report)}
-<h2>Submission</h2>
-{submission()}
 </body>
 </html>
 """
