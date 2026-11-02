@@ -145,7 +145,7 @@ def edge(
         return None
     target = node_id(found, repo)
     if release := RELEASE.match(url_path):
-        label = f"release {release['version']}"
+        label = release["version"]
         if path.name == "pyproject.toml":
             label = f"{dependency_kind(path, match[0])}, {label}"
         if wheel := WHEEL.search(url_path):
