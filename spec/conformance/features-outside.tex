@@ -1,0 +1,15 @@
+\subsection{\added{Features outside \PurePy}}
+\label{sec:features-outside}
+
+\begin{AddedBlock}
+A syntactically valid Python program may use a \emph{feature outside \PurePy}: a form of Python syntax which is not
+in the grammar of \secref{syntax}, or is in the grammar only at some positions or in some forms, or a built-in
+function, standard library module, member of a predefined module or method of a built-in type which is not predefined
+(\secref{modules-programs}). Each feature outside \PurePy is either \emph{excluded by design}, if it is listed in
+\figref{excluded-by-design}, or otherwise \emph{not yet specified}, and so may be included in a later release. The
+figure groups the features excluded by design by the reason for their exclusion, following the sections of the
+informative \annexref{exclusions}, and \figref{not-yet-specified} in the same annex lists the common features not yet
+specified.
+\end{AddedBlock}
+
+\input{spec/fig/excluded-by-design}

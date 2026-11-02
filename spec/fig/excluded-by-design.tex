@@ -1,0 +1,46 @@
+\begin{figure}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\newcommand*{\designgroup}[1]{\rowcolor{grammarheadcolor}\multicolumn{3}{l}{\itshape #1} \\}
+\begin{AddedBlock}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.42\textwidth}>{\raggedright\arraybackslash}p{0.34\textwidth}>{\raggedright\arraybackslash}p{0.14\textwidth}}
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}Feature & Python & Rejected by \\
+\designgroup{Mutable state}
+\pyinline{global} and \pyinline{nonlocal} & Assigns to variable of enclosing scope & Parser \\\rowgap
+\pyinline{del} & Removes binding & Parser \\\rowgap
+Augmented assignment \pyinline{+=}, etc. & Updates in place if type supports it & Parser \\\rowgap
+Walrus operator \pyinline{:=} & Assigns within expression & Parser \\\rowgap
+Item assignment \pyinline{xs[0] = v} & Updates container in place & Parser \\\rowgap
+Attribute as assignment or declaration target, \pyinline{p.x = v} or \pyinline{p.x: int} & Updates object in place & Parser \\\rowgap
+\pyinline{is} and \pyinline{is not}, other than against \pyinline{None}, \pyinline{True} or \pyinline{False} & Compares objects by identity & Parser \\\rowgap
+Built-in \pyinline{id} & Gives identity of object & Type checker \\\rowgap
+Mutating methods of built-in types: \pyinline{append}, \pyinline{extend}, \pyinline{insert}, \pyinline{pop},
+\pyinline{remove}, \pyinline{clear}, \pyinline{sort} and \pyinline{reverse} of \pyinline{list}, and \pyinline{clear},
+\pyinline{pop}, \pyinline{popitem}, \pyinline{setdefault} and \pyinline{update} of \pyinline{dict} & Update value in
+place & Type checker \\\rowgap
+\designgroup{Control flow and effects}
+\pyinline{for} and \pyinline{while} loops, \pyinline{break} and \pyinline{continue} & Iterates by mutating loop state & Parser \\\rowgap
+\pyinline{try}, \pyinline{except}, \pyinline{finally} and \pyinline{raise} & Raises and handles exceptions & Parser \\\rowgap
+\pyinline{with} & Enters and exits context manager & Parser \\\rowgap
+\pyinline{yield}, \pyinline{yield from} and generator expressions & Creates generator, consumed by mutation & Parser \\\rowgap
+\pyinline{async} and \pyinline{await} & Defines and awaits coroutines & Parser \\\rowgap
+Built-ins \pyinline{iter} and \pyinline{next} & Creates and advances iterator & Type checker \\\rowgap
+Built-ins \pyinline{input} and \pyinline{open} & Reads input or opens file & Type checker \\\rowgap
+\designgroup{Load-dependent meaning}
+Import inside function body or branch, or after a statement & Dependencies of module known only as its statements run & Parser \\\rowgap
+Wildcard import \pyinline{from q import *} & Introduces names of \pyinline{q} implicitly & Parser \\\rowgap
+Built-ins \pyinline{eval}, \pyinline{exec}, \pyinline{getattr}, \pyinline{setattr}, \pyinline{delattr},
+\pyinline{globals}, \pyinline{locals}, \pyinline{vars} and \pyinline{__import__} & Resolves or binds names at run time & Type checker \\\rowgap
+\designgroup{Implicit coercions}
+Dictionary type with key type other than \pyinline{str}, or dictionary pattern with key other than string literal & Accepts any hashable key & Parser \\\rowgap
+\designgroup{Type annotations}
+Parameter or return type without annotation & Accepts definition without annotations & Parser \\\rowgap
+Annotation which is not a type expression under the Python typing specification, such as \pyinline{list[int, int]} or \pyinline{Literal[1.5]} & Ignores annotation & Parser \\\rowgap
+\pyinline{Any} and \pyinline{cast} of \pyinline{typing} & Disables static checking of value & Type checker
+\end{tabular}
+\end{AddedBlock}
+\caption{\added{Features outside \PurePy excluded by design}}
+\label{fig:excluded-by-design}
+\end{figure}

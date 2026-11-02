@@ -1,0 +1,36 @@
+\begin{figure}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{AddedBlock}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.24\textwidth}>{\raggedright\arraybackslash}p{0.68\textwidth}}
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}Feature & Examples \\
+Sets & Set literals, set comprehensions, \pyinline{set} and \pyinline{frozenset} \\\rowgap
+Operators & Bitwise operators \pyinline{&}, \pyinline{|}, \filename{\textasciicircum}, \filename{\textasciitilde}, \pyinline{<<} and \pyinline{>>};
+chained comparisons \pyinline{a < b < c}; \pyinline{is} and \pyinline{is not} against \pyinline{None}, \pyinline{True} or
+\pyinline{False} \\\rowgap
+Expressions & Slicing, f-strings, starred expressions, dictionary unpacking \\\rowgap
+Literals & Complex, bytes and ellipsis literals \\\rowgap
+Assignment & Unpacking assignment \pyinline{a, b = t}, several targets \pyinline{a = b = 1}, unpacking in comprehensions \\\rowgap
+Parameters and arguments & Default values, \pyinline{*args}, \pyinline{**kwargs}, keyword-only and positional-only
+parameters, unpacking in argument lists, \pyinline{print} with several arguments or with keyword arguments \\\rowgap
+Function definitions & Decorators \\\rowgap
+Classes & Classes other than dataclasses, methods, class decorators other than \pyinline{@dataclass}, field defaults,
+multiple inheritance, class keyword arguments, enumerations, classes defined outside the module top level, classes as
+values \\\rowgap
+Patterns & Case guards, or-patterns, star patterns, attribute value patterns, complex and bytes literal patterns, rest
+capture in dictionary patterns \\\rowgap
+Types & Bounds and constraints on type parameters, \pyinline{ParamSpec}, \pyinline{TypeVarTuple}, type statements outside
+the module top level, \pyinline{Callable[..., int]}, \pyinline{tuple[int, ...]}, \pyinline{Literal} with several values,
+string annotations \\\rowgap
+Imports & \pyinline{import a as b}, \pyinline{from a import b as c}, several modules in one import, relative imports \\\rowgap
+Printing & \pyinline{print} inside a function or as a value \\\rowgap
+Library & Built-in functions and standard library modules other than those predefined, such as \pyinline{sum} and
+\pyinline{re}; members of predefined modules other than those predefined, such as \pyinline{sys.version}; methods of
+built-in types other than the mutating methods of \figref{excluded-by-design}, such as \pyinline{str.upper}
+\end{tabular}
+\end{AddedBlock}
+\caption{\added{Common features outside \PurePy not yet specified}}
+\label{fig:not-yet-specified}
+\end{figure}
