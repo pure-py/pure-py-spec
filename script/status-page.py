@@ -3,7 +3,6 @@
 
 import datetime
 import html
-import importlib.util
 import json
 import pathlib
 import re
@@ -11,6 +10,8 @@ import subprocess
 import sys
 import tempfile
 from typing import Any
+
+from diagram.edge import BLACK, Edge
 
 ORG = "pure-py"
 SPEC_REPO = "pure-py-spec"
@@ -123,18 +124,12 @@ def arrow(colour: str, dash: int) -> str:
     )
 
 
-def edge_kinds() -> list[Any]:
-    spec = importlib.util.spec_from_file_location(
-        "dependency_diagram", pathlib.Path(__file__).with_name("dependency-diagram.py")
-    )
-    assert spec and spec.loader
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    kinds: list[Any] = module.Edge.kinds
-    return kinds
-
-
-KEY = [(arrow(kind.stroke, kind.dash), kind.key) for kind in edge_kinds()]
+KEY = [
+    row
+    for kind in Edge.kinds
+    for row in [(arrow(BLACK, kind.dash), kind.key)]
+    + [(arrow(colour, kind.dash), text) for text, colour in kind.states]
+]
 
 
 def submission() -> str:
