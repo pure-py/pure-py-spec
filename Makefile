@@ -152,6 +152,8 @@ PUREPY_RELEASE := v$(shell uv version --short --color never)
 
 ## Archive builds, with mechanisation release matching spec version
 supplementary.zip: spec-anon.pdf
+	@git ls-remote --exit-code --tags $(PUREPY_REPO).git $(PUREPY_RELEASE) >/dev/null || \
+		{ echo "report: no mechanisation release for spec $(PUREPY_RELEASE)"; exit 1; }
 	rm -f $@ && rm -rf .submission
 	cp spec-anon.pdf spec.pdf && zip -q -9 $@ spec.pdf && rm spec.pdf
 	git clone -q --depth 1 --branch $(PUREPY_RELEASE) $(PUREPY_REPO).git .submission/src
