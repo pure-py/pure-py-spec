@@ -209,11 +209,11 @@ def d2(repos: list[pathlib.Path]) -> str:
         own = found[repo.name]
         if len(own) == 1 and own[0].name != repo.name:
             lines.append(own[0].name)
-        if version := latest[repo.name]:
-            lines.append(version)
-        label = "\\n".join(lines)
+        version = latest[repo.name]
         if len(own) == 1:
+            label = "\\n".join(lines + ([version] if version else []))
             return f'"{repo.name}": "{label}" {{ class: standalone; icon: {ICONS[own[0].kind]} }}\n'
+        label = f"{repo.name} {version}" if version else repo.name
         inner = "".join(f'  "{p.name}" {{ class: project; icon: {ICONS[p.kind]} }}\n' for p in own)
         return f'"{repo.name}": "{label}" {{\n  class: repository\n{inner}}}\n'
 

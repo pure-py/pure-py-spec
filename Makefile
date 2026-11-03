@@ -135,7 +135,7 @@ wheel: check-targets check-consistency check-suite-python check-suite-purepy
 
 ## Dependency diagram of the organisation's repositories, from clones alongside this repository
 dependencies.svg:
-	uv run --locked python script/dependency-diagram.py .. | d2 --pad 16 --elk-nodeNodeBetweenLayers 30 --elk-edgeNodeBetweenLayers 15 - $@
+	uv run --locked python script/dependency-diagram.py .. | d2 --pad 16 --elk-nodeNodeBetweenLayers 30 --elk-edgeNodeBetweenLayers 15 --elk-padding "[top=40,left=20,bottom=20,right=20]" - $@
 
 ## Project integrity report
 integrity.txt:
