@@ -135,7 +135,7 @@ wheel: check-targets check-consistency check-suite-python check-suite-purepy
 
 ## Dependency diagram of the organisation's repositories, from clones alongside this repository
 dependencies.svg:
-	uv run --locked python script/dependency-diagram.py .. $@
+	PYTHONPATH=script uv run --locked python -m diagram .. $@
 
 ## Project integrity report
 integrity.txt:
