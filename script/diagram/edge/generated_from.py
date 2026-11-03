@@ -1,8 +1,7 @@
 import re
 from collections.abc import Iterator
-from typing import Self
 
-from diagram.edge import Edge
+from diagram.edge import Edge, Style
 from diagram.node.isabelle_project import IsabelleProject
 from diagram.node.python_project import PythonProject
 from diagram.organisation import Organisation
@@ -30,11 +29,10 @@ def recipes(makefile: str) -> list[list[str]]:
 
 
 class GeneratedFrom(Edge[PythonProject, IsabelleProject]):
-    key = "Code generated from target"
-    dash = 2
+    styles = (Style("Code generated from target", dash=2),)
 
     @classmethod
-    def find(cls, org: Organisation) -> Iterator[Self]:
+    def find(cls, org: Organisation) -> Iterator[Edge[PythonProject, IsabelleProject]]:
         for repo in org.repositories:
             makefile = repo.path / "Makefile"
             built = [p for p in org.projects[repo.name] if isinstance(p, IsabelleProject)]

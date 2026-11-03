@@ -1,17 +1,15 @@
 from collections.abc import Iterator
-from typing import Self
 
-from diagram.edge import Edge
+from diagram.edge import Edge, Style
 from diagram.node.isabelle_project import IsabelleProject
 from diagram.organisation import Organisation
 
 
 class ImportsSession(Edge[IsabelleProject, IsabelleProject]):
-    key = "Isabelle session import"
-    dash = 2
+    styles = (Style("Isabelle session import", dash=2),)
 
     @classmethod
-    def find(cls, org: Organisation) -> Iterator[Self]:
+    def find(cls, org: Organisation) -> Iterator[Edge[IsabelleProject, IsabelleProject]]:
         projects = [p for ps in org.projects.values() for p in ps if isinstance(p, IsabelleProject)]
         return (
             cls(importer, imported, "session import")

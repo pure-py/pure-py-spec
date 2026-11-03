@@ -1,6 +1,6 @@
 from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import Any, ClassVar, Self
+from typing import Any, ClassVar
 
 from diagram import register
 from diagram.node import Node
@@ -11,13 +11,18 @@ RED = "#e00000"
 
 
 @dataclass(frozen=True)
+class Style:
+    key: str  # Text in the key of the diagram
+    colour: str = BLACK
+    dash: int = 0
+
+
+@dataclass(frozen=True)
 class Edge[S: Node, T: Node]:
     """Dependency of the source node on the target"""
 
     kinds: ClassVar[list[type["Edge[Any, Any]"]]] = []
-    key: ClassVar[str]
-    dash: ClassVar[int] = 0
-    states: ClassVar[tuple[tuple[str, str], ...]] = ()  # Key text and colour of each state
+    styles: ClassVar[tuple[Style, ...]]  # One for each state of an edge of the kind
     source: S
     target: T
     label: str
@@ -27,11 +32,11 @@ class Edge[S: Node, T: Node]:
         Edge.kinds.append(cls)
 
     @classmethod
-    def find(cls, org: Organisation) -> Iterator[Self]:
+    def find(cls, org: Organisation) -> Iterator["Edge[Any, Any]"]:
         raise NotImplementedError
 
-    def colour(self) -> str:
-        return BLACK
+    def style(self) -> Style:
+        return self.styles[0]
 
 
 register(__name__, __path__)

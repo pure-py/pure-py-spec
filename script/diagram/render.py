@@ -4,7 +4,7 @@ import re
 import subprocess
 import sys
 
-from diagram.edge import BLACK, Edge
+from diagram.edge import Edge
 from diagram.node.repository import Repository
 from diagram.organisation import Organisation
 
@@ -40,19 +40,14 @@ def d2(org: Organisation) -> str:
         key=lambda e: (org.node_id(e.target), org.node_id(e.source), e.label),
     )
     links = "".join(
-        f"{org.node_id(e.source)} -> {org.node_id(e.target)}: {e.label} {{class: {type(e).__name__}"
-        + (f'; style.stroke: "{e.colour()}"' if e.colour() != BLACK else "")
-        + "}\n"
+        f"{org.node_id(e.source)} -> {org.node_id(e.target)}: {e.label} "
+        f'{{ style: {{ stroke: "{e.style().colour}"; stroke-dash: {e.style().dash}; font-size: 17 }} }}\n'
         for e in edges
-    )
-    styles = "".join(
-        f'  {kind.__name__}: {{ style.stroke: "{BLACK}"; style.stroke-dash: {kind.dash}; style.font-size: 17 }}\n'
-        for kind in Edge.kinds
     )
     return f"""vars: {{ d2-config: {{ layout-engine: elk }} }}
 direction: down
 classes: {{
-{styles}  project: {{ width: 230; style.font-size: 16 }}
+  project: {{ width: 230; style.font-size: 16 }}
   standalone: {{ width: 230; style.font-size: 16 }}
   repository: {{ style.font-size: 20 }}
 }}

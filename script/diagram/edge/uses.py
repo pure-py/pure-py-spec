@@ -2,10 +2,11 @@ import pathlib
 import re
 import sys
 import tomllib
+from collections.abc import Iterator
 from dataclasses import dataclass
-from functools import cache
 
 from diagram import ORG
+from diagram.edge import RED, Edge, Style
 from diagram.node import Node
 from diagram.organisation import Organisation
 
@@ -17,15 +18,6 @@ RELEASE = re.compile(r"^/(?:releases/download/)?(?P<version>v\d[\d.]*)/")
 LATEST = re.compile(r"^/latest/")
 ANNOTATION = re.compile(r"\b(?P<kind>pin|tracks): (?P<label>[^#]*?)\s*$")
 WHEEL = re.compile(r"/(?P<package>[A-Za-z0-9_.]+?)-\d[^/]*\.whl$")
-
-
-@dataclass(frozen=True)
-class Reference:
-    source: Node
-    target: Node
-    label: str
-    pinned: bool
-    version: str | None  # Pinned release
 
 
 def package(name: str) -> str:
@@ -45,7 +37,7 @@ def reference(
     lines: list[str],
     index: int,
     match: re.Match[str],
-) -> Reference | None:
+) -> "Uses | None":
     """Dependency implied by a URL in a file; none if a plain link to a repository, issue or pull request.
     A "pin:" or "tracks:" comment on the same or preceding line is interpreted as a label on the dependency."""
     name = match["repo"]
@@ -68,12 +60,14 @@ def reference(
         built = (
             p for p in org.projects[name] if wheel and package(p.name) == package(wheel["package"])
         )
-        return Reference(source, next(built, repo), label, True, release["version"])
+        return Uses(
+            source, next(built, repo), label, True, repo.version not in (None, release["version"])
+        )
     if LATEST.match(url_path):
-        return Reference(source, repo, "latest release", False, None)
+        return Uses(source, repo, "latest release", False)
     annotated = [ANNOTATION.search(line) for line in lines[max(index - 1, 0) : index + 1]]
     if annotation := next((a for a in reversed(annotated) if a), None):
-        return Reference(source, repo, annotation["label"], annotation["kind"] == "pin", None)
+        return Uses(source, repo, annotation["label"], annotation["kind"] == "pin")
     if git:
         sys.exit(
             f"{source.repo}: unannotated reference to {name} at line {index + 1}: {lines[index].strip()}"
@@ -81,9 +75,8 @@ def reference(
     return None
 
 
-@cache
-def references(org: Organisation) -> list[Reference]:
-    found: list[Reference] = []
+def uses(org: Organisation) -> list["Uses"]:
+    found: list[Uses] = []
     for repo in org.repositories:
         for path in repo.files():
             if path.name == "uv.lock":  # Repeats the project file's pins
@@ -100,3 +93,25 @@ def references(org: Organisation) -> list[Reference]:
                 if (r := reference(org, source, path, lines, i, match))
             ]
     return found
+
+
+@dataclass(frozen=True)
+class Uses(Edge[Node, Node]):
+    """Reference by URL to a release of another repository, pinned or following the latest"""
+
+    styles = (
+        Style("Pin (moved by hand)"),
+        Style("Follows target", dash=4),
+        Style("Pin behind latest release", RED),
+    )
+    pinned: bool
+    outdated: bool = False
+
+    @classmethod
+    def find(cls, org: Organisation) -> Iterator[Edge[Node, Node]]:
+        return iter(uses(org))
+
+    def style(self) -> Style:
+        return (
+            self.styles[2] if self.outdated else self.styles[0] if self.pinned else self.styles[1]
+        )

@@ -11,7 +11,7 @@ import sys
 import tempfile
 from typing import Any
 
-from diagram.edge import BLACK, Edge
+from diagram.edge import Edge
 
 ORG = "pure-py"
 SPEC_REPO = "pure-py-spec"
@@ -124,12 +124,7 @@ def arrow(colour: str, dash: int) -> str:
     )
 
 
-KEY = [
-    row
-    for kind in Edge.kinds
-    for row in [(arrow(BLACK, kind.dash), kind.key)]
-    + [(arrow(colour, kind.dash), text) for text, colour in kind.states]
-]
+KEY = [(arrow(style.colour, style.dash), style.key) for kind in Edge.kinds for style in kind.styles]
 
 
 def submission() -> str:
