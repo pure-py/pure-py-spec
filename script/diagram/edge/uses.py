@@ -6,6 +6,7 @@ import sys
 import tomllib
 from collections.abc import Iterator
 from dataclasses import dataclass
+from enum import Enum
 
 from diagram.edge import RED, Edge, Style
 from diagram.node import Node
@@ -62,14 +63,14 @@ def reference(
         built = (
             p for p in org.projects[name] if wheel and package(p.name) == package(wheel["package"])
         )
-        return Uses(
-            source, next(built, repo), label, True, repo.version not in (None, release["version"])
-        )
+        outdated = repo.version not in (None, release["version"])
+        return Uses(source, next(built, repo), label, State.OUTDATED if outdated else State.PINNED)
     if LATEST.match(url_path):
-        return Uses(source, repo, "latest release", False)
+        return Uses(source, repo, "latest release", State.LATEST)
     annotated = [ANNOTATION.search(line) for line in lines[max(index - 1, 0) : index + 1]]
     if annotation := next((a for a in reversed(annotated) if a), None):
-        return Uses(source, repo, annotation["label"], annotation["kind"] == "pin")
+        state = State.PINNED if annotation["kind"] == "pin" else State.LATEST
+        return Uses(source, repo, annotation["label"], state)
     if git:
         sys.exit(
             f"{source.repo}: unannotated reference to {name} at line {index + 1}: {lines[index].strip()}"
@@ -94,23 +95,22 @@ def uses(org: Organisation) -> list[Uses]:
     return found
 
 
+class State(Enum):
+    PINNED = Style("Pin (moved by hand)")
+    LATEST = Style("Follows target", dash=4)
+    OUTDATED = Style("Pin behind latest release", RED)
+
+
 @dataclass(frozen=True)
 class Uses(Edge[Node, Node]):
     """Reference by URL to a pinned or latest release of another repository"""
 
-    styles = (
-        Style("Pin (moved by hand)"),
-        Style("Follows target", dash=4),
-        Style("Pin behind latest release", RED),
-    )
-    pinned: bool
-    outdated: bool = False
+    styles = tuple(state.value for state in State)
+    state: State
 
     @classmethod
     def find(cls, org: Organisation) -> Iterator[Edge[Node, Node]]:
         return iter(uses(org))
 
     def style(self) -> Style:
-        return (
-            self.styles[2] if self.outdated else self.styles[0] if self.pinned else self.styles[1]
-        )
+        return self.state.value
