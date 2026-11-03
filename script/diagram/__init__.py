@@ -38,7 +38,7 @@ def node(org: Organisation, repo: Repository) -> str:
 
 def d2(org: Organisation) -> str:
     edges = sorted(
-        {e for kind in Edge.kinds for e in kind.find(org)},
+        {e for kind in Edge.kinds() for e in kind.find(org)},
         key=lambda e: (org.node_id(e.target), org.node_id(e.source), e.label),
     )
     links = "".join(

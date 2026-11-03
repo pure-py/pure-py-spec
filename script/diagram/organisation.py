@@ -14,7 +14,7 @@ class Organisation:
     @classmethod
     def load(cls, root: pathlib.Path) -> "Organisation":
         repositories = [Repository.load(p) for p in sorted(root.iterdir()) if (p / ".git").exists()]
-        kinds = {kind.file: kind for kind in Project.kinds}
+        kinds = {kind.file: kind for kind in Project.kinds()}
         found = {
             repo.name: [
                 kinds[path.name].recognise(repo, path.relative_to(repo.path))

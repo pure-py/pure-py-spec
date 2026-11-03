@@ -124,7 +124,9 @@ def arrow(colour: str, dash: int) -> str:
     )
 
 
-KEY = [(arrow(style.colour, style.dash), style.key) for kind in Edge.kinds for style in kind.styles]
+KEY = [
+    (arrow(style.colour, style.dash), style.key) for kind in Edge.kinds() for style in kind.styles
+]
 
 
 def submission() -> str:

@@ -1,4 +1,6 @@
+import importlib
 import pathlib
+import pkgutil
 import textwrap
 from dataclasses import dataclass
 from typing import ClassVar
@@ -11,15 +13,18 @@ DESCRIPTION_WIDTH = 26
 
 @dataclass(frozen=True)
 class Project(Node):
-    kinds: ClassVar[list[type["Project"]]] = []
     file: ClassVar[str]
     icon: ClassVar[str]
     description: str
     directory: pathlib.PurePath
 
-    def __init_subclass__(cls, **kwargs: object) -> None:
-        super().__init_subclass__(**kwargs)
-        Project.kinds.append(cls)
+    @classmethod
+    def kinds(cls) -> list[type["Project"]]:
+        """Kinds of project, from the modules of the node package"""
+        package = importlib.import_module("diagram.node")
+        for module in pkgutil.iter_modules(package.__path__):
+            importlib.import_module(f"diagram.node.{module.name}")
+        return cls.__subclasses__()
 
     @classmethod
     def recognise(cls, repo: Repository, path: pathlib.PurePath) -> "Project | None":
