@@ -26,7 +26,7 @@ REVIEW = {
 }
 STYLE = """
 body { font-family: system-ui, sans-serif; max-width: 70em; margin: 2em auto; padding: 0 1em; }
-img.diagram { width: 44em; max-width: 100%; }
+img.diagram { width: 54em; max-width: 100%; }
 img.badge { vertical-align: middle; }
 tr.failed td { color: #e00000; }
 table { border-collapse: collapse; }
