@@ -231,12 +231,12 @@ def d2(repos: list[pathlib.Path]) -> str:
     return f"""vars: {{ d2-config: {{ layout-engine: elk }} }}
 direction: right
 classes: {{
-  pinned: {{ style.stroke: "#333333" }}
-  tracking: {{ style.stroke: "#333333"; style.stroke-dash: 4 }}
-  behind: {{ style.stroke: "#e00000" }}
-  project: {{ width: 200; height: 90; style.font-size: 14 }}
-  standalone: {{ width: 200; style.font-size: 14 }}
-  repository: {{ style.font-size: 18 }}
+  pinned: {{ style.stroke: "#333333"; style.font-size: 17 }}
+  tracking: {{ style.stroke: "#333333"; style.stroke-dash: 4; style.font-size: 17 }}
+  behind: {{ style.stroke: "#e00000"; style.font-size: 17 }}
+  project: {{ width: 230; height: 100; style.font-size: 16 }}
+  standalone: {{ width: 230; style.font-size: 16 }}
+  repository: {{ style.font-size: 20 }}
 }}
 {nodes}{links}"""
 
