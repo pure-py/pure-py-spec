@@ -15,7 +15,7 @@ RED = "#e00000"
 
 @dataclass(frozen=True)
 class Style:
-    meaning: str
+    key_text: str
     colour: str = BLACK
     dash: int = 0
 
