@@ -124,7 +124,6 @@ def arrow(colour: str, dash: int) -> str:
 
 
 def edge_kinds() -> list[Any]:
-    """Kinds of edge registered by the diagram script"""
     spec = importlib.util.spec_from_file_location(
         "dependency_diagram", pathlib.Path(__file__).with_name("dependency-diagram.py")
     )

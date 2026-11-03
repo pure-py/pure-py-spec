@@ -38,7 +38,7 @@ ISABELLE_BUILD = re.compile(r"\bisabelle\s+build\b")
 ICONS = pathlib.Path(__file__).resolve().parent / "icons"
 D2 = ["d2", "--pad", "16", "--elk-nodeNodeBetweenLayers", "30", "--elk-edgeNodeBetweenLayers", "15"]
 D2 += ["--elk-padding", "[top=40,left=20,bottom=20,right=20]"]
-WRAP = 26  # Characters per line of a description
+DESCRIPTION_WIDTH = 26
 
 
 def required(description: str | None, path: pathlib.PurePath) -> str:
@@ -48,8 +48,6 @@ def required(description: str | None, path: pathlib.PurePath) -> str:
 
 @dataclass(frozen=True)
 class Node:
-    """Project recognised from its project file"""
-
     kinds: ClassVar[list[type["Node"]]] = []
     file: ClassVar[str]
     icon: ClassVar[str]
@@ -66,12 +64,12 @@ class Node:
         raise NotImplementedError
 
     def lines(self) -> list[str]:
-        return textwrap.wrap(self.description, WRAP)
+        return textwrap.wrap(self.description, DESCRIPTION_WIDTH)
 
 
 class PythonProject(Node):
-    """Python project with a build system or below the repository root, since a Python project file at the
-    root without one only serves the tests of another kind of project"""
+    """Excludes a project file at the repository root without a build system, which only serves the tests
+    of another kind of project"""
 
     file = "pyproject.toml"
     icon = "python.svg"
@@ -176,14 +174,11 @@ class Organisation:
     latest: dict[str, str | None]
 
     def node_id(self, repo: str, node: Node | None = None) -> str:
-        """Repository, or node within a repository holding several"""
         return (
             f'"{repo}"."{node.name}"' if node and len(self.nodes.get(repo, [])) > 1 else f'"{repo}"'
         )
 
     def owner(self, repo: str, path: pathlib.PurePath) -> Node | None:
-        """Node of a file: the one in the deepest directory containing it, where a node at the repository
-        root owns only its own project file"""
         owners = [
             n
             for n in self.nodes[repo]
@@ -215,7 +210,6 @@ class Edge:
 
 
 def dependency_kind(pyproject: pathlib.Path, url: str) -> str:
-    """Runtime or dev dependency, for Python package taken from a release asset"""
     project = tomllib.loads(pyproject.read_text()).get("project", {})
     runtime = any(url in dep for dep in project.get("dependencies", []))
     return "runtime dependency" if runtime else "dev dependency"
@@ -229,10 +223,8 @@ def reference(
     index: int,
     match: re.Match[str],
 ) -> tuple[bool, str, str, str, str | None] | None:
-    """Pin or tracking dependency implied by a URL in a file, as whether pinned, target, target repository,
-    label and pinned release; none if a plain link to a repository, issue or pull request, which is a
-    reference rather than a dependency. A "pin:" or "tracks:" comment on the same or preceding line is
-    interpreted as a label on the dependency."""
+    """Dependency implied by a URL in a file; none if a plain link to a repository, issue or pull request.
+    A "pin:" or "tracks:" comment on the same or preceding line is interpreted as a label on the dependency."""
     repo = match["repo"]
     url_path = match["path"]
     if repo is None:
@@ -271,8 +263,6 @@ def reference(
 
 
 def references(org: Organisation, pinned: bool) -> Iterator[tuple[str, str, str, str, str | None]]:
-    """Source, target, target repository, label and pinned release of each pin, or each tracking
-    dependency, in the files of the organisation"""
     for repo in org.repos:
         for path in tracked_files(repo):
             if path.name == "uv.lock":  # Repeats the project file's pins
@@ -310,15 +300,11 @@ class Tracking(Edge):
 
 
 class PinBehind(Edge):
-    """Found as a pin"""
-
     key = "Pin behind latest release"
     stroke = "#e00000"
 
 
 class SessionImport(Edge):
-    """Isabelle session building on a session of another repository"""
-
     key = "Isabelle session import"
     dash = 2
 
@@ -342,7 +328,6 @@ class SessionImport(Edge):
 
 
 def recipes(makefile: str) -> list[list[str]]:
-    """Recipe lines of each rule of a Makefile, with variables expanded"""
     text = makefile.replace("\\\n", " ")
     variables = {m["name"]: m["value"].strip() for m in MAKE_VARIABLE.finditer(text)}
 
@@ -360,8 +345,6 @@ def recipes(makefile: str) -> list[list[str]]:
 
 
 class GeneratedCode(Edge):
-    """Python project with source written by a Makefile recipe after an Isabelle build in the same repository"""
-
     key = "Code generated from target"
     dash = 2
 
@@ -393,7 +376,6 @@ class GeneratedCode(Edge):
 
 def d2(org: Organisation) -> str:
     def node(repo: pathlib.Path) -> str:
-        """Repository, drawn as its node when it holds one, otherwise containing its nodes"""
         lines = [repo.name]
         own = org.nodes[repo.name]
         if len(own) == 1 and own[0].name != repo.name:
@@ -454,7 +436,7 @@ def main() -> None:
     # Italic label in white, so the italic font embedded by D2 has every glyph of the descriptions
     source = d2(org) + (
         f'glyphs: "{glyphs}" {{ near: bottom-right; shape: text; style: {{ italic: true; bold: false;'
-        " font-size: 8; font-color: \"#FFFFFF\" } }\n"
+        ' font-size: 8; font-color: "#FFFFFF" } }\n'
     )
     drawn = subprocess.run(
         [*D2, "-", "-"], input=source, capture_output=True, text=True, check=False
