@@ -3,6 +3,7 @@
 
 import datetime
 import html
+import importlib.util
 import json
 import pathlib
 import re
@@ -113,20 +114,28 @@ def description(target: str) -> str:
     return above.removeprefix("## ")
 
 
-def arrow(colour: str, dashed: bool) -> str:
-    dash = ' stroke-dasharray="6 4"' if dashed else ""
+def arrow(colour: str, dash: int) -> str:
+    pattern = f' stroke-dasharray="{dash + 2} {dash}"' if dash else ""
     return (
         '<svg width="36" height="10">'
-        f'<line x1="0" y1="5" x2="26" y2="5" stroke="{colour}" stroke-width="1.5"{dash}/>'
+        f'<line x1="0" y1="5" x2="26" y2="5" stroke="{colour}" stroke-width="1.5"{pattern}/>'
         f'<polygon points="26,1 36,5 26,9" fill="{colour}"/></svg>'
     )
 
 
-KEY = [
-    (arrow("#333333", dashed=False), "Pin (moved by hand)"),
-    (arrow("#333333", dashed=True), "Follows target"),
-    (arrow("#e00000", dashed=False), "Pin behind latest release"),
-]
+def edge_kinds() -> list[Any]:
+    """Kinds of edge registered by the diagram script"""
+    spec = importlib.util.spec_from_file_location(
+        "dependency_diagram", pathlib.Path(__file__).with_name("dependency-diagram.py")
+    )
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    kinds: list[Any] = module.Edge.kinds
+    return kinds
+
+
+KEY = [(arrow(kind.stroke, kind.dash), kind.key) for kind in edge_kinds()]
 
 
 def submission() -> str:
