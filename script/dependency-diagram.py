@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""Diagram of dependencies between the organisation's repositories, drawn by D2 as SVG. Each kind of node is a
-subclass of Node, recognising a project from its project file, and each kind of edge a subclass of Edge,
-finding edges of its kind across the organisation; defining a subclass registers the kind."""
+"""Dependency diagram of the organisation's repositories, as SVG"""
 
 import html
 import json
