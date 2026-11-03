@@ -8,8 +8,8 @@ from diagram.node.repository import Repository
 
 
 class PythonProject(Project):
-    """Excludes a project file at the repository root without a build system, which only serves the tests
-    of another kind of project"""
+    """Project file at the repository root ignored without a build system, since it then only installs
+    test tools for another kind of project"""
 
     file = "pyproject.toml"
     icon = "python.svg"
