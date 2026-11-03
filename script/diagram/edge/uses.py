@@ -80,13 +80,10 @@ def reference(
 def uses(org: Organisation) -> list[Uses]:
     found: list[Uses] = []
     for repo in org.repositories:
-        for path in repo.files():
+        for path in repo.text_files():
             if path.name == "uv.lock":  # Repeats the project file's pins
                 continue
-            try:
-                lines = path.read_text().splitlines()
-            except (UnicodeDecodeError, OSError):
-                continue
+            lines = path.read_text().splitlines()
             source = org.owner(repo, path.relative_to(repo.path))
             found += [
                 r

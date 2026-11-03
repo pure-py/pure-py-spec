@@ -27,8 +27,14 @@ class Repository(Node):
             path.name, path.name, path, view.stdout.strip() if view.returncode == 0 else None
         )
 
-    def files(self) -> list[pathlib.Path]:
-        names = subprocess.run(
-            ["git", "-C", self.path, "ls-files", "-z"], capture_output=True, check=True
+    def text_files(self) -> list[pathlib.Path]:
+        entries = subprocess.run(
+            ["git", "-C", self.path, "ls-files", "--eol", "-z"], capture_output=True, check=True
         ).stdout
-        return [self.path / name for name in names.decode().split("\0") if name]
+        return [
+            self.path / name
+            for eol, name in (
+                entry.split("\t", 1) for entry in entries.decode().split("\0") if entry
+            )
+            if not eol.startswith("i/-text")
+        ]

@@ -20,7 +20,7 @@ class Organisation:
         found = {
             repo.name: [
                 kinds[path.name].recognise(repo, path.relative_to(repo.path))
-                for path in repo.files()
+                for path in repo.text_files()
                 if path.name in kinds
             ]
             for repo in repositories
