@@ -10,6 +10,7 @@ on:
     branches: [main]
     paths:
       - script/dependency-diagram.py
+      - script/diagram/**
       - script/status-page.py
       - .github/workflows/status.yml
 
