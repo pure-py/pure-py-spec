@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import importlib
 import pathlib
 import pkgutil
@@ -19,7 +21,7 @@ class Project(Node):
     directory: pathlib.PurePath
 
     @classmethod
-    def kinds(cls) -> list[type["Project"]]:
+    def kinds(cls) -> list[type[Project]]:
         """Kinds of project, from the modules of the node package"""
         package = importlib.import_module("diagram.node")
         for module in pkgutil.iter_modules(package.__path__):
@@ -27,7 +29,7 @@ class Project(Node):
         return cls.__subclasses__()
 
     @classmethod
-    def recognise(cls, repo: Repository, path: pathlib.PurePath) -> "Project | None":
+    def recognise(cls, repo: Repository, path: pathlib.PurePath) -> Project | None:
         raise NotImplementedError
 
     def lines(self) -> list[str]:

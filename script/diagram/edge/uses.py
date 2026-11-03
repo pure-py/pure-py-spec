@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pathlib
 import re
 import sys
@@ -37,7 +39,7 @@ def reference(
     lines: list[str],
     index: int,
     match: re.Match[str],
-) -> "Uses | None":
+) -> Uses | None:
     """Dependency implied by a URL in a file; none if a plain link to a repository, issue or pull request.
     A "pin:" or "tracks:" comment on the same or preceding line is interpreted as a label on the dependency."""
     name = match["repo"]
@@ -75,7 +77,7 @@ def reference(
     return None
 
 
-def uses(org: Organisation) -> list["Uses"]:
+def uses(org: Organisation) -> list[Uses]:
     found: list[Uses] = []
     for repo in org.repositories:
         for path in repo.files():

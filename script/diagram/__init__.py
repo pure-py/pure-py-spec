@@ -1,5 +1,7 @@
 """Dependency diagram of the organisation's repositories, as SVG"""
 
+from __future__ import annotations
+
 import html
 import pathlib
 import re

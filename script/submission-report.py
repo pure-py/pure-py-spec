@@ -8,6 +8,8 @@ to make. Exits with failure if any target failed. With --check instead of a targ
 target with a recipe is described, except the special and internal ones starting with a dot, and that every
 workflow reporting on a target is named by its description."""
 
+from __future__ import annotations
+
 import os
 import pathlib
 import re

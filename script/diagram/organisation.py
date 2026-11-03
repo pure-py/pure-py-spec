@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pathlib
 from dataclasses import dataclass
 
@@ -12,7 +14,7 @@ class Organisation:
     projects: dict[str, list[Project]]
 
     @classmethod
-    def load(cls, root: pathlib.Path) -> "Organisation":
+    def load(cls, root: pathlib.Path) -> Organisation:
         repositories = [Repository.load(p) for p in sorted(root.iterdir()) if (p / ".git").exists()]
         kinds = {kind.file: kind for kind in Project.kinds()}
         found = {

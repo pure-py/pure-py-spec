@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 import concurrent.futures
 import contextlib
@@ -104,7 +106,7 @@ def expectation(python: PythonOutcome, purepy: PurePyOutcome) -> Expectation:
     return Expectation(exit, error_expected, python)
 
 
-def run(cmd: list[str], cwd: pathlib.Path | None = None) -> "subprocess.CompletedProcess[str]":
+def run(cmd: list[str], cwd: pathlib.Path | None = None) -> subprocess.CompletedProcess[str]:
     return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, check=False)
 
 

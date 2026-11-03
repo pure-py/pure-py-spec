@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import importlib
 import pkgutil
 from collections.abc import Iterator
@@ -28,14 +30,14 @@ class Edge[S: Node, T: Node]:
     label: str
 
     @classmethod
-    def kinds(cls) -> list[type["Edge[Any, Any]"]]:
+    def kinds(cls) -> list[type[Edge[Any, Any]]]:
         """Kinds of edge, from the modules of this package"""
         for module in pkgutil.iter_modules(__path__):
             importlib.import_module(f"{__name__}.{module.name}")
         return cls.__subclasses__()
 
     @classmethod
-    def find(cls, org: Organisation) -> Iterator["Edge[Any, Any]"]:
+    def find(cls, org: Organisation) -> Iterator[Edge[Any, Any]]:
         raise NotImplementedError
 
     def style(self) -> Style:

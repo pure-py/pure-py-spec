@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pathlib
 import subprocess
 from dataclasses import dataclass
@@ -13,7 +15,7 @@ class Repository(Node):
     version: str | None  # Latest release
 
     @classmethod
-    def load(cls, path: pathlib.Path) -> "Repository":
+    def load(cls, path: pathlib.Path) -> Repository:
         view = subprocess.run(
             ["gh", "release", "view", "--repo", f"{ORG}/{path.name}", "--json", "tagName"]
             + ["--jq", ".tagName"],

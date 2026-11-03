@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Status page of the organisation"""
 
+from __future__ import annotations
+
 import datetime
 import html
 import json
