@@ -84,7 +84,7 @@ paper-anon.pdf: $(TEXFILES)
 PAGE_LIMIT := 25
 ## Anonymised paper within page limit, references excluded
 check-page-limit: paper-anon.pdf
-	@page=$$(cat paper-anon.references); echo "report: references begin on page $$page, limit $(PAGE_LIMIT) pages"; \
+	@page=$$(cat paper-anon.references); echo "report: references begin on p. $$page, limit $(PAGE_LIMIT) pages"; \
 		test "$$page" -le $(PAGE_LIMIT)
 
 ## Anonymised paper free of author and project names (text and metadata)
@@ -97,14 +97,14 @@ check-paper-anonymised: paper-anon.pdf
 				echo "$$text" | grep -oiE "$$pattern" | sort -u | sed "s/\$$/	$$page/"; \
 			done) || exit 1; \
 		found=$$(echo "$$hits" | awk -F'\t' '$$2 == "metadata" { m[$$1] } $$2 ~ /^[0-9]+$$/ { p[$$1] = p[$$1] (p[$$1] ? ", " : "") $$2; n[$$1]++ } \
-			END { for (k in p) printf "%s on page%s %s; ", k, (n[k] > 1 ? "s" : ""), p[k]; for (k in m) printf "%s in metadata; ", k }' | sed 's/; $$//'); \
+			END { for (k in p) printf "%s on %s %s; ", k, (n[k] > 1 ? "pp." : "p."), p[k]; for (k in m) printf "%s in metadata; ", k }' | sed 's/; $$//'); \
 		test -z "$$found" || { echo "report: $$found"; exit 1; }
 
 ## Anonymised paper in review mode, with line numbers
 check-review-mode: paper-anon.pdf
 	@text=$$(pdftotext -layout -f 2 -l 2 $< -) || exit 1; \
 		n=$$(echo "$$text" | grep -cE '^ *[0-9]+ {2,}'); \
-		echo "report: $$n numbered lines on page 2"; test "$$n" -ge 20
+		echo "report: $$n numbered lines on p. 2"; test "$$n" -ge 20
 
 ## Anonymised spec builds, with no undefined references or citations
 spec-anon.pdf: $(TEXFILES)
