@@ -229,7 +229,7 @@ def d2(repos: list[pathlib.Path]) -> str:
         for e in sorted(edges(found, repo), key=lambda e: (e.target, e.label))
     )
     return f"""vars: {{ d2-config: {{ layout-engine: elk }} }}
-direction: right
+direction: down
 classes: {{
   pinned: {{ style.stroke: "#333333"; style.font-size: 17 }}
   tracking: {{ style.stroke: "#333333"; style.stroke-dash: 4; style.font-size: 17 }}

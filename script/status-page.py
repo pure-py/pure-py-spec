@@ -26,12 +26,12 @@ REVIEW = {
 }
 STYLE = """
 body { font-family: system-ui, sans-serif; max-width: 70em; margin: 2em auto; padding: 0 1em; }
-img.diagram { width: 55em; max-width: 100%; }
+img.diagram { max-width: 100%; }
 img.badge { vertical-align: middle; }
 tr.failed td { color: #e00000; }
 table { border-collapse: collapse; }
 th, td { text-align: left; padding: 0.3em 0.6em; border-bottom: 1px solid #ccc; white-space: nowrap; }
-td.title { white-space: normal; }
+td.title, table.submission td:nth-child(4) { white-space: normal; }
 table.key { font-size: 0.8em; }
 table.key td { border: none; padding: 0 0.5em; }
 table.key svg { vertical-align: middle; }
@@ -168,7 +168,7 @@ def submission() -> str:
         + "</tr>\n"
         for row in rows
     )
-    return f"{heading}\n<table>\n<tr><th>Target</th><th>Check</th><th>Result</th><th>Detail</th></tr>\n{body}</table>"
+    return f'{heading}\n<table class="submission">\n<tr><th>Target</th><th>Check</th><th>Result</th><th>Detail</th></tr>\n{body}</table>'
 
 
 def page(repos: list[str], report: str) -> str:
