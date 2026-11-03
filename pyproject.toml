@@ -24,5 +24,12 @@ strict = true
 line-length = 100
 extend-exclude = ["src/purepy_conformance/conformance-suite"]
 
+# Annotations unevaluated in every module, so no type needs quoting
+[tool.ruff.lint]
+extend-select = ["I002"]
+
+[tool.ruff.lint.isort]
+required-imports = ["from __future__ import annotations"]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/purepy_conformance"]
