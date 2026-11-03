@@ -127,12 +127,14 @@ def arrow(colour: str, dash: int) -> str:
 
 
 KEY = [
-    (arrow(style.colour, style.dash), style.key_text) for kind in Edge.kinds() for style in kind.styles
+    (arrow(style.colour, style.dash), style.key_text)
+    for kind in Edge.kinds()
+    for style in kind.styles
 ]
 
 
 def submission() -> str:
-    """Submission section, from latest completed run on main"""
+    """Submission section built from the latest completed run on main"""
     listing = subprocess.run(
         ["gh", "run", "list", "--repo", f"{ORG}/{SPEC_REPO}", "--workflow", SUBMISSION_WORKFLOW]
         + ["--branch", "main", "--status", "completed", "--limit", "1"]

@@ -1,4 +1,4 @@
-"""Dependency diagram of the organisation's repositories, as SVG"""
+"""SVG dependency diagram of the organisation's repositories"""
 
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ def label(lines: list[str]) -> str:
 
 
 def node(org: Organisation, repo: Repository) -> str:
-    """Repository, drawn as its project when it holds one, otherwise containing its projects"""
+    """Repository drawn as its project if it holds one project and as a container of its projects otherwise"""
     own = org.projects[repo.name]
     version = [repo.version] if repo.version else []
     if len(own) == 1:

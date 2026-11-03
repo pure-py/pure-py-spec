@@ -99,7 +99,7 @@ def uses(org: Organisation) -> list[Uses]:
 
 @dataclass(frozen=True)
 class Uses(Edge[Node, Node]):
-    """Reference by URL to a release of another repository, pinned or following the latest"""
+    """Reference by URL to a pinned or latest release of another repository"""
 
     styles = (
         Style("Pin (moved by hand)"),

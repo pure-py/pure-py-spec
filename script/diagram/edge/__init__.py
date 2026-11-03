@@ -31,7 +31,7 @@ class Edge[S: Node, T: Node]:
 
     @classmethod
     def kinds(cls) -> list[type[Edge[Any, Any]]]:
-        """Kinds of edge, from the modules of this package"""
+        """Kinds of edge defined in the modules of this package"""
         for module in pkgutil.iter_modules(__path__):
             importlib.import_module(f"{__name__}.{module.name}")
         return cls.__subclasses__()

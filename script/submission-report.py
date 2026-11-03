@@ -77,7 +77,7 @@ def main() -> None:
 
     @cache
     def run(target: str) -> str:
-        """Outcome of a target, after those of its prerequisites, reported if the target is described"""
+        """Run a target after its prerequisites and report the outcome if the target is described"""
         if target not in graph:
             return "passed"
         rule = graph[target]

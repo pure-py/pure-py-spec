@@ -22,7 +22,7 @@ class Project(Node):
 
     @classmethod
     def kinds(cls) -> list[type[Project]]:
-        """Kinds of project, from the modules of the node package"""
+        """Kinds of project defined in the modules of the node package"""
         package = importlib.import_module("diagram.node")
         for module in pkgutil.iter_modules(package.__path__):
             importlib.import_module(f"diagram.node.{module.name}")
