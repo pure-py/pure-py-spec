@@ -22,7 +22,7 @@ class Style:
 
 @dataclass(frozen=True)
 class Edge[S: Node, T: Node]:
-    """Dependency of the source node on the target"""
+    """Dependency of source on target"""
 
     styles: ClassVar[tuple[Style, ...]]  # One for each state of an edge of the kind
     source: S
