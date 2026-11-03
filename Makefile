@@ -91,13 +91,13 @@ check-page-limit: paper-anon.pdf
 check-paper-anonymised: paper-anon.pdf
 	@names=$$(grep -o '^\\author{[^}]*}' paper.tex | sed -e 's/^\\author{//' -e 's/}$$//' | paste -sd '|' -); \
 		pattern="pure-?py|$$names"; meta=$$(pdfinfo $<) || exit 1; \
-		found=$$(echo "$$meta" | grep -oiE "$$pattern" | sort -u | sed 's/$$/ in metadata/'); \
-		for page in $$(seq 1 $$(echo "$$meta" | sed -n 's/^Pages: *//p')); do \
-			text=$$(pdftotext -f $$page -l $$page $< -) || exit 1; \
-			found="$$found$$(echo "$$text" | grep -oiE "$$pattern" | sort -u | sed "s/\$$/	$$page/")"$$'\n'; \
-		done; \
-		found=$$(echo "$$found" | awk -F'\t' 'NF == 2 { p[$$1] = p[$$1] (p[$$1] ? ", " : "") $$2; n[$$1]++ } NF == 1 && $$1 != "" { m[$$1] } \
-			END { for (k in p) printf "%s on page%s %s; ", k, (n[k] > 1 ? "s" : ""), p[k]; for (k in m) printf "%s; ", k }' | sed 's/; $$//'); \
+		hits=$$(echo "$$meta" | grep -oiE "$$pattern" | sort -u | sed 's/$$/	metadata/'; \
+			for page in $$(seq 1 $$(echo "$$meta" | sed -n 's/^Pages: *//p')); do \
+				text=$$(pdftotext -f $$page -l $$page $< -) || exit 1; \
+				echo "$$text" | grep -oiE "$$pattern" | sort -u | sed "s/\$$/	$$page/"; \
+			done) || exit 1; \
+		found=$$(echo "$$hits" | awk -F'\t' '$$2 == "metadata" { m[$$1] } $$2 ~ /^[0-9]+$$/ { p[$$1] = p[$$1] (p[$$1] ? ", " : "") $$2; n[$$1]++ } \
+			END { for (k in p) printf "%s on page%s %s; ", k, (n[k] > 1 ? "s" : ""), p[k]; for (k in m) printf "%s in metadata; ", k }' | sed 's/; $$//'); \
 		test -z "$$found" || { echo "report: $$found"; exit 1; }
 
 ## Anonymised paper in review mode, with line numbers
