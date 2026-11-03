@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""D2 diagram of dependencies between the organisation's repositories"""
+"""Diagram of dependencies between the organisation's repositories, drawn by D2 as SVG"""
 
+import html
 import json
 import pathlib
 import re
 import subprocess
 import sys
+import textwrap
 import tomllib
 from dataclasses import dataclass
 
@@ -19,6 +21,10 @@ LATEST = re.compile(r"^/latest/")
 ANNOTATION = re.compile(r"\b(?P<kind>pin|tracks): (?P<label>[^#]*?)\s*$")
 WHEEL = re.compile(r"/(?P<package>[A-Za-z0-9_.]+?)-\d[^/]*\.whl$")
 SESSION = re.compile(r'^session\s+"?(?P<name>[\w.-]+)"?', re.MULTILINE)
+DESCRIPTION = re.compile(r'^\s*description\s+"(?P<text>[^"]*)"', re.MULTILINE)
+D2 = ["d2", "--pad", "16", "--elk-nodeNodeBetweenLayers", "30", "--elk-edgeNodeBetweenLayers", "15"]
+D2 += ["--elk-padding", "[top=40,left=20,bottom=20,right=20]"]
+WRAP = 26  # Characters per line of a description
 ICONS = {
     kind: pathlib.Path(__file__).resolve().parent / "icons" / file
     for kind, file in [
@@ -33,6 +39,7 @@ ICONS = {
 class Project:
     kind: str
     name: str
+    description: str
     directory: pathlib.PurePath
     file: str
 
@@ -59,15 +66,23 @@ def project(repo: pathlib.Path, path: pathlib.PurePath) -> Project | None:
         return None
     text = (repo / path).read_text()
     if path.name == "svelte.config.js":
-        name = json.loads((repo / path.parent / "package.json").read_text())["name"]
-        return Project("SvelteKit", name, path.parent, path.name)
+        package = json.loads((repo / path.parent / "package.json").read_text())
+        return described("SvelteKit", package["name"], package.get("description"), path)
     if path.name == "ROOT" and (session := SESSION.search(text)):
-        return Project("Isabelle", session["name"], path.parent, path.name)
+        entry = SESSION.split(text[session.end() :], maxsplit=1)[0]
+        description = DESCRIPTION.search(entry)
+        return described("Isabelle", session["name"], description and description["text"], path)
     if path.name == "pyproject.toml":
         config = tomllib.loads(text)
         if "build-system" in config or path.parent != pathlib.PurePath("."):
-            return Project("Python", config["project"]["name"], path.parent, path.name)
+            meta = config["project"]
+            return described("Python", meta["name"], meta.get("description"), path)
     return None
+
+
+def described(kind: str, name: str, description: str | None, path: pathlib.PurePath) -> Project:
+    assert description, f"{path}: {kind} project {name} has no description"
+    return Project(kind, name, description, path.parent, path.name)
 
 
 def projects(repo: pathlib.Path) -> list[Project]:
@@ -211,10 +226,13 @@ def d2(repos: list[pathlib.Path]) -> str:
             lines.append(own[0].name)
         version = latest[repo.name]
         if len(own) == 1:
-            label = "\\n".join(lines + ([version] if version else []))
+            label = "\\n".join(lines + ([version] if version else []) + wrapped(own[0]))
             return f'"{repo.name}": "{label}" {{ class: standalone; icon: {ICONS[own[0].kind]} }}\n'
         label = f"{repo.name} {version}" if version else repo.name
-        inner = "".join(f'  "{p.name}" {{ class: project; icon: {ICONS[p.kind]} }}\n' for p in own)
+        inner = "".join(
+            f'  "{p.name}": "{"\\n".join([p.name, *wrapped(p)])}" {{ class: project; icon: {ICONS[p.kind]} }}\n'
+            for p in own
+        )
         return f'"{repo.name}": "{label}" {{\n  class: repository\n{inner}}}\n'
 
     def link(e: Edge) -> str:
@@ -234,17 +252,44 @@ classes: {{
   pinned: {{ style.stroke: "#333333"; style.font-size: 17 }}
   tracking: {{ style.stroke: "#333333"; style.stroke-dash: 4; style.font-size: 17 }}
   behind: {{ style.stroke: "#e00000"; style.font-size: 17 }}
-  project: {{ width: 230; height: 100; style.font-size: 16 }}
+  project: {{ width: 230; style.font-size: 16 }}
   standalone: {{ width: 230; style.font-size: 16 }}
   repository: {{ style.font-size: 20 }}
 }}
 {nodes}{links}"""
 
 
+def wrapped(p: Project) -> list[str]:
+    return textwrap.wrap(p.description, WRAP)
+
+
+def italicise(svg: str, lines: set[str]) -> str:
+    """Description lines of node labels in the italic font, which D2 can't set within a label"""
+    return re.sub(
+        r"(<tspan[^>]*)>([^<]*)</tspan>",
+        lambda m: (
+            f'{m[1]} class="text-italic">{m[2]}</tspan>' if html.unescape(m[2]) in lines else m[0]
+        ),
+        svg,
+    )
+
+
 def main() -> None:
-    (root,) = map(pathlib.Path, sys.argv[1:])
+    root, output = map(pathlib.Path, sys.argv[1:])
     repos = sorted(path for path in root.iterdir() if (path / ".git").exists())
-    sys.stdout.write(d2(repos))
+    lines = {line for repo in repos for p in projects(repo) for line in wrapped(p)}
+    glyphs = "".join(sorted({c for line in lines for c in line if not c.isspace()}))
+    # Hidden italic label, so the italic font embedded by D2 has every glyph of the descriptions
+    source = d2(repos) + (
+        f'glyphs: "{glyphs}" {{ near: bottom-right; shape: text; style: {{ italic: true; bold: false;'
+        " font-size: 8; opacity: 0 } }\n"
+    )
+    drawn = subprocess.run(
+        [*D2, "-", "-"], input=source, capture_output=True, text=True, check=False
+    )
+    if drawn.returncode != 0:
+        sys.exit(drawn.stderr)
+    output.write_text(italicise(drawn.stdout, lines))
 
 
 if __name__ == "__main__":

@@ -38,7 +38,7 @@ jobs:
         shell: bash  # Fails the step when the script fails, since bash then sets pipefail
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 script/dependency-diagram.py repos | d2 --pad 16 --elk-nodeNodeBetweenLayers 30 --elk-edgeNodeBetweenLayers 15 --elk-padding "[top=40,left=20,bottom=20,right=20]" - dependencies.svg
+        run: python3 script/dependency-diagram.py repos dependencies.svg
 
       - name: Check issues and project board
         id: integrity
