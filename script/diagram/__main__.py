@@ -1,3 +1,3 @@
-from diagram.render import main
+from diagram import main
 
 main()

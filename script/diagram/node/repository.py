@@ -2,8 +2,9 @@ import pathlib
 import subprocess
 from dataclasses import dataclass
 
-from diagram import ORG
 from diagram.node import Node
+
+ORG = "pure-py"
 
 
 @dataclass(frozen=True)

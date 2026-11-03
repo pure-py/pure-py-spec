@@ -5,9 +5,9 @@ import tomllib
 from collections.abc import Iterator
 from dataclasses import dataclass
 
-from diagram import ORG
 from diagram.edge import RED, Edge, Style
 from diagram.node import Node
+from diagram.node.repository import ORG
 from diagram.organisation import Organisation
 
 PAGES = f"{ORG}.github.io"

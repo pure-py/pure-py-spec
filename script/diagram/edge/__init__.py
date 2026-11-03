@@ -2,9 +2,9 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 from typing import Any, ClassVar
 
-from diagram import register
 from diagram.node import Node
 from diagram.organisation import Organisation
+from diagram.registry import register
 
 BLACK = "#333333"
 RED = "#e00000"

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from diagram import register
+from diagram.registry import register
 
 
 @dataclass(frozen=True)
