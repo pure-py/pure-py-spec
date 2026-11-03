@@ -15,7 +15,7 @@ RED = "#e00000"
 
 @dataclass(frozen=True)
 class Style:
-    key: str  # Text in the key of the diagram
+    meaning: str
     colour: str = BLACK
     dash: int = 0
 
