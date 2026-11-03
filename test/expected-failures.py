@@ -5,6 +5,8 @@ path within the suite, each followed by a tab and the issue for the change, as O
 in a slash stands for every test under it. Fail also if a listed issue is closed, since the implementation has
 then caught up and the test still fails."""
 
+from __future__ import annotations
+
 import argparse
 import pathlib
 import re

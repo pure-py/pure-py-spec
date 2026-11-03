@@ -8,6 +8,8 @@ to make. Exits with failure if any target failed. With --check instead of a targ
 target with a recipe is described, except the special and internal ones starting with a dot, and that every
 workflow reporting on a target is named by its description."""
 
+from __future__ import annotations
+
 import os
 import pathlib
 import re
@@ -75,7 +77,7 @@ def main() -> None:
 
     @cache
     def run(target: str) -> str:
-        """Outcome of a target, after those of its prerequisites, reported if the target is described"""
+        """Run a target after its prerequisites and report the outcome if the target is described"""
         if target not in graph:
             return "passed"
         rule = graph[target]

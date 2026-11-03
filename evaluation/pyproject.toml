@@ -1,5 +1,6 @@
 [project]
 name = "purepy-evaluation"
+description = "experiments"
 version = "0.2.0"
 requires-python = ">=3.12,<3.13"
 dependencies = [

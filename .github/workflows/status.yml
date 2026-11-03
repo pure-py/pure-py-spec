@@ -9,7 +9,7 @@ on:
   push:
     branches: [main]
     paths:
-      - script/dependency-diagram.py
+      - script/diagram/**
       - script/status-page.py
       - .github/workflows/status.yml
 
@@ -35,10 +35,9 @@ jobs:
         run: curl -fsSL https://d2lang.com/install.sh | sh -s -- --version v0.9.0
 
       - name: Draw diagram
-        shell: bash  # Fails the step when the script fails, since bash then sets pipefail
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 script/dependency-diagram.py repos | d2 --pad 16 - dependencies.svg
+        run: PYTHONPATH=script python3 -m diagram repos dependencies.svg
 
       - name: Check issues and project board
         id: integrity

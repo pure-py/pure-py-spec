@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Status page of the organisation"""
 
+from __future__ import annotations
+
 import datetime
 import html
 import json
@@ -10,6 +12,8 @@ import subprocess
 import sys
 import tempfile
 from typing import Any
+
+from diagram.edge import Edge
 
 ORG = "pure-py"
 SPEC_REPO = "pure-py-spec"
@@ -26,12 +30,12 @@ REVIEW = {
 }
 STYLE = """
 body { font-family: system-ui, sans-serif; max-width: 70em; margin: 2em auto; padding: 0 1em; }
-img.diagram { width: 44em; max-width: 100%; }
+img.diagram { width: 32em; max-width: 100%; }
 img.badge { vertical-align: middle; }
 tr.failed td { color: #e00000; }
 table { border-collapse: collapse; }
 th, td { text-align: left; padding: 0.3em 0.6em; border-bottom: 1px solid #ccc; white-space: nowrap; }
-td.title { white-space: normal; }
+td.title, table.submission td:nth-child(4) { white-space: normal; }
 table.key { font-size: 0.8em; }
 table.key td { border: none; padding: 0 0.5em; }
 table.key svg { vertical-align: middle; }
@@ -113,24 +117,24 @@ def description(target: str) -> str:
     return above.removeprefix("## ")
 
 
-def arrow(colour: str, dashed: bool) -> str:
-    dash = ' stroke-dasharray="6 4"' if dashed else ""
+def arrow(colour: str, dash: int) -> str:
+    pattern = f' stroke-dasharray="{dash + 2} {dash}"' if dash else ""
     return (
         '<svg width="36" height="10">'
-        f'<line x1="0" y1="5" x2="26" y2="5" stroke="{colour}" stroke-width="1.5"{dash}/>'
+        f'<line x1="0" y1="5" x2="26" y2="5" stroke="{colour}" stroke-width="1.5"{pattern}/>'
         f'<polygon points="26,1 36,5 26,9" fill="{colour}"/></svg>'
     )
 
 
 KEY = [
-    (arrow("#333333", dashed=False), "Pin (moved by hand)"),
-    (arrow("#333333", dashed=True), "Follows target"),
-    (arrow("#e00000", dashed=False), "Pin behind latest release"),
+    (arrow(style.colour, style.dash), style.key_text)
+    for kind in Edge.kinds()
+    for style in kind.styles
 ]
 
 
 def submission() -> str:
-    """Submission section, from latest completed run on main"""
+    """Submission section built from the latest completed run on main"""
     listing = subprocess.run(
         ["gh", "run", "list", "--repo", f"{ORG}/{SPEC_REPO}", "--workflow", SUBMISSION_WORKFLOW]
         + ["--branch", "main", "--status", "completed", "--limit", "1"]
@@ -168,7 +172,7 @@ def submission() -> str:
         + "</tr>\n"
         for row in rows
     )
-    return f"{heading}\n<table>\n<tr><th>Target</th><th>Check</th><th>Result</th><th>Detail</th></tr>\n{body}</table>"
+    return f'{heading}\n<table class="submission">\n<tr><th>Target</th><th>Check</th><th>Result</th><th>Detail</th></tr>\n{body}</table>'
 
 
 def page(repos: list[str], report: str) -> str:
