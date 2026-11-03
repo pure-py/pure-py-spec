@@ -25,8 +25,6 @@ KEYWORDS |= {"document_theories", "document_files", "export_files", "export_clas
 
 @dataclass(frozen=True)
 class IsabelleProject(Project):
-    """Isabelle sessions of a ROOT file. The project takes its name from the first session."""
-
     file = "ROOT"
     icon = "isabelle.png"
     sessions: tuple[str, ...]
