@@ -33,8 +33,8 @@ $\Sigma \vdash_{\mathsf{mod}} q : \Gamma \binding \Sigma'$ & module $q$ checks w
 $\vdash \mathcal{M}$ & program $\mathcal{M}$ is well-formed & \figref{typing-module}
    \\[2mm]
 \metaGroup{Evaluation} \\
-$\vdash v : \theta$ & value $v$ is well-formed at context entry $\theta$ & \figref{well-formed-value} \\
-$\vdash \rho : \Gamma$ & environment $\rho$ is well-formed at context $\Gamma$ & \figref{well-formed-env} \\
+$\vdash v : \theta$ & \replaced{value $v$ is well-typed at context entry $\theta$}{value $v$ is well-formed at context entry $\theta$ } & \figref{value-typing} \\
+$\vdash \rho : \Gamma$ & \replaced{environment $\rho$ is well-typed at context $\Gamma$}{environment $\rho$ is well-formed at context $\Gamma$ } & \figref{env-typing} \\
 $\rho, s \Rightarrow o$ & statement $s$ evaluates to outcome $o$ & \figref{eval-block-outcome} \\
 $q, \rho, t \Rightarrow o$ & top-level statement $t$ of module $q$ evaluates to outcome $o$ & \figref{eval-top-level} \\
 $\rho, e \Rightarrow r$ & expression $e$ evaluates to result $r$ & \figref{eval-result} \\

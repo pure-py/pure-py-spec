@@ -145,8 +145,8 @@
   \vdash v : \PU{\tau}
 }
 \end{mathpar}
-\subcaption{Value $v$ is well-formed at context entry $\theta$}
-\label{fig:well-formed-value}
+\subcaption{\replaced{Value $v$ is well-typed at context entry $\theta$}{Value $v$ is well-formed at context entry $\theta$ }}
+\label{fig:value-typing}
 \end{subfigure}
 
 \vspace{2mm}
@@ -172,9 +172,9 @@
   \vdash \set{\bind{x}{v}} \override \rho : \set{\bind{x}{\theta}} \override \Gamma
 }
 \end{mathpar}
-\subcaption{Environment $\rho$ is well-formed at context $\Gamma$}
-\label{fig:well-formed-env}
+\subcaption{\replaced{Environment $\rho$ is well-typed at context $\Gamma$}{Environment $\rho$ is well-formed at context $\Gamma$ }}
+\label{fig:env-typing}
 \end{subfigure}
-\caption{Value and environment well-formedness}
-\label{fig:well-formed-values}
+\caption{Value and environment \replaced{typing}{well-formedness }}
+\label{fig:value-env-typing}
 \end{figure}
