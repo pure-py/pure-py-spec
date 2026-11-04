@@ -233,10 +233,10 @@ absent, which excludes print statements from function bodies (\ruleName{print}).
 A variable declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
 (\ruleName{declare}); an assignment $\exAssign{x}{e}$ requires $x$ to be a declared but unassigned variable, and
 checks $e$ against its declared type (\ruleName{assign}); the form $\exAssign{x\exAnnot{\psi}}{e}$ declares and
-assigns $x$ at once (\ruleName{declare-assign}). \Replaced{Names introduced by declarations, function definitions (\ruleName{defs}) or pattern variables
-(\ruleName{check-var}) must be unbound in the context. The rules for function definitions and modules check the
-body under the context $\scopeS(\seq{y}, s)$ (\S\ref{aux:scope}), in which each variable of the scope is unbound.
-The rules do not detect two bindings of a name in different branches of a conditional or cases of a match, since no
+assigns $x$ at once (\ruleName{declare-assign}). \Replaced{Names introduced by declarations (\ruleName{declare}, \ruleName{declare-assign}), function definitions
+(\ruleName{defs}) or pattern variables (\ruleName{check-var}) must be unbound in the context. Each variable of the
+scope starts unbound, since the rules for function definitions and modules check the body under the context
+$\scopeS(\seq{y}, s)$ (\S\ref{aux:scope}), so a name is introduced at most once on any path. The rules do not detect two bindings of a name in different branches of a conditional or cases of a match, since no
 context holds both. The function $\scopeS$ is therefore undefined for scopes binding a name twice, by parameter,
 import, declaration or pattern, unless both bindings are patterns. The condition keeps well-typed programs within
 those accepted by mypy, which rejects redeclarations (\secref{mypy-restrictions}).}{A declaration does not check
