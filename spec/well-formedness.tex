@@ -233,10 +233,15 @@ absent, which excludes print statements from function bodies (\ruleName{print}).
 A variable declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
 (\ruleName{declare}); an assignment $\exAssign{x}{e}$ requires $x$ to be a declared but unassigned variable, and
 checks $e$ against its declared type (\ruleName{assign}); the form $\exAssign{x\exAnnot{\psi}}{e}$ declares and
-assigns $x$ at once (\ruleName{declare-assign}). A declaration does not check
+assigns $x$ at once (\ruleName{declare-assign}). \Replaced{A declaration requires its name to be unbound, as a function
+definition does (\ruleName{defs}) and a pattern variable does (\ruleName{check-var}). The rules for function definitions and
+modules introduce the variables of the scope as unbound, using the function $\scopeS(\seq{y}, s)$ (\S\ref{aux:scope}),
+which also rejects a scope declaring a name twice, or both declaring a name and binding it by a pattern, even on
+paths which do not both complete; the rules alone would accept such a scope, and mypy rejects it
+(\secref{mypy-restrictions}).}{A declaration does not check
 whether its name is already declared; that check is made once for the whole scope, when the rules for function
 definitions and modules introduce the variables of the scope as unbound, using the function $\scopeS(\seq{y}, s)$
-(\S\ref{aux:scope}).
+(\S\ref{aux:scope}). }
 
 The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str} (\ruleName{assert}, \ruleName{assert-msg}). An assertion of the literal \pyinline{False} has outcome $\Returns$, like a \pyinline{return}
@@ -268,7 +273,9 @@ definition against its type scheme.
 For a definition $\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$,
 the auxiliary judgements $\Sigma; \Gamma \vdash d \synth \pi$ and $\Sigma; \Gamma \vdash d \checks \pi$ synthesise the type
 scheme from the annotations (\ruleName{def-signature}) and check the body $s$ (\ruleName{def-body}). Both rules extend the
-context with $\TypeVar$ entries for the type parameters $\seq{\alpha}$. A type scheme without type parameters is identical to its \pyinline{Callable} type, so the \ruleName{defs} rule binds the name of a
+context with $\TypeVar$ entries for the type parameters $\seq{\alpha}$\Added{, which may not rebind type variables in
+scope, $\tyvars(\Gamma)$ (\S\ref{aux:tyvars}): a nested definition reusing a type parameter of an enclosing one would
+read the variables of the enclosing scope at its own parameter, and mypy also rejects the redeclaration}. A type scheme without type parameters is identical to its \pyinline{Callable} type, so the \ruleName{defs} rule binds the name of a
 function without type parameters as a variable of that type. The type schemes of functions with type parameters are instantiated
 at a call, by the argument types (\ruleName{callee-scheme}), and when checked against a \pyinline{Callable} type, by that
 type (\ruleName{var-scheme}). Since annotations denote types, not type schemes, declarations and
@@ -280,7 +287,8 @@ prefers a locally bound name to one visible in an enclosing scope. A variable of
 enclosing scope referenced by the body must be definitely assigned at the point at which the function is defined,
 whereas Python resolves the reference only when the body runs. As with any scope, the names declared in the function, including
 the parameters $\seq{x}$, must be distinct from one another and from any pattern variables in $s$. The function names of the mutual def region are
-declared in the enclosing scope rather than in the function, and must be distinct from the other names declared in that scope.
+declared in the enclosing scope rather than in the function, \Replaced{are distinct and unbound there (\ruleName{defs}),
+and}{and} must be distinct from the other names declared in that scope.
 
 The body $s$ is checked with the
 return type denoted by $\psi$, and must have static outcome $\Returns$ unless that type is equivalent to \pyinline{None},
