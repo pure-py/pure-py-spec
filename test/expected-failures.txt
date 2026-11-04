@@ -1,11 +1,1 @@
-python-succeeds/agrees/binop_union_left.py	pure-py/isabelle-purepy#25
-python-succeeds/agrees/binop_union_right.py	pure-py/isabelle-purepy#25
-python-succeeds/agrees/bool_chain_and.py	pure-py/isabelle-purepy#25
-python-succeeds/agrees/bool_chain_or.py	pure-py/isabelle-purepy#25
-python-succeeds/excluded-for-now/	pure-py/isabelle-purepy#25
-python-succeeds/parser-rejects/	pure-py/isabelle-purepy#25
-python-succeeds/typing-rejects/any_not_defined.py	pure-py/isabelle-purepy#25
-python-succeeds/typing-rejects/attr_builtin_method.py	pure-py/isabelle-purepy#25
-python-succeeds/typing-rejects/builtin_getattr.py	pure-py/isabelle-purepy#25
-python-succeeds/typing-rejects/builtin_id.py	pure-py/isabelle-purepy#25
-python-succeeds/typing-rejects/builtin_iter.py	pure-py/isabelle-purepy#25
+python-succeeds/typing-rejects/type_param_redeclared.py	pure-py/pure-py-spec#327
