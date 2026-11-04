@@ -277,10 +277,9 @@ definition against its type scheme.
 For a definition $\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$,
 the auxiliary judgements $\Sigma; \Gamma \vdash d \synth \pi$ and $\Sigma; \Gamma \vdash d \checks \pi$ synthesise the type
 scheme from the annotations (\ruleName{def-signature}) and check the body $s$ (\ruleName{def-body}). Both rules extend the
-context with $\TypeVar$ entries for the type parameters $\seq{\alpha}$\Added{, which must not be type variables already
-in scope ($\tyvars(\Gamma)$, \S\ref{aux:tyvars}), since a type variable in scope may occur in the types of existing
-entries, and a second binding of the same name would capture those occurrences; mypy also rejects the
-redeclaration}. A type scheme without type parameters is identical to its \pyinline{Callable} type, so the \ruleName{defs} rule binds the name of a
+context with $\TypeVar$ entries for the type parameters $\seq{\alpha}$\Added{, which must not intersect with the type
+variables already in scope ($\tyvars(\Gamma)$, \S\ref{aux:tyvars}), which may occur in the types of existing entries;
+a second binding of the same name would capture those occurrences}. A type scheme without type parameters is identical to its \pyinline{Callable} type, so the \ruleName{defs} rule binds the name of a
 function without type parameters as a variable of that type. The type schemes of functions with type parameters are instantiated
 at a call, by the argument types (\ruleName{callee-scheme}), and when checked against a \pyinline{Callable} type, by that
 type (\ruleName{var-scheme}). Since annotations denote types, not type schemes, declarations and
