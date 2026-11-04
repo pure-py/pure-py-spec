@@ -237,8 +237,7 @@ assigns $x$ at once (\ruleName{declare-assign}). \Replaced{Names introduced by d
 function definitions
 (\ruleName{defs}) or pattern variables (\ruleName{check-var}) must be unbound in the context. Variables start unbound,
 since the rules for function definitions and modules check the body under the context
-$\scopeS(\seq{y}, s)$ (\S\ref{aux:scope}), so a name is introduced at most once on any path. The rules are
-unable to reject two bindings of a name in different branches of a conditional or cases of a match, since no context
+$\scopeS(\seq{y}, s)$ (\S\ref{aux:scope}). The rules are unable to reject two bindings of a name in different branches of a conditional or cases of a match, since no context
 holds both. The condition therefore falls to the function $\scopeS$, which is undefined for scopes
 binding a name twice, by parameter, import, declaration or pattern, unless the name is bound by two patterns. Under
 mypy a redeclaration is an error (\secref{mypy-restrictions}), so the condition keeps well-typed programs within
