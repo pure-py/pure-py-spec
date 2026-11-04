@@ -19,3 +19,7 @@ description: PurePy-specific additions to the technical-authoring, coding-conven
 
 - Rebuild the paper after every change to verify that it builds without errors.
 - Put primes outside `\vec`, not inside: `\vec{e}'`, not `\vec{e'}`.
+
+## Conformance suite
+
+- Before pushing a change to the suite, run it against the mechanisation built from the `isabelle-purepy` branch of the same issue, with no expected failures; the pre-push hook in `script/hooks` does this and refuses the push on any failure.
