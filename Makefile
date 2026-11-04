@@ -133,18 +133,6 @@ check-suite-purepy:
 wheel: check-targets check-consistency check-suite-python check-suite-purepy
 	rm -rf dist && uv build --wheel
 
-## Dependency diagram of the organisation's repositories, from clones alongside this repository
-dependencies.svg:
-	PYTHONPATH=script uv run --locked python -m diagram .. $@
-
-## Project integrity report
-integrity.txt:
-	-script/check-project-integrity.sh pure-py pure-py-spec 1 "In progress,Awaiting Review" > $@
-
-## Status page
-status.html: dependencies.svg integrity.txt
-	uv run --locked python script/status-page.py .. integrity.txt > $@
-
 # tracks: tag of same version
 PUREPY_REPO := https://github.com/pure-py/isabelle-purepy
 # Release of the mechanisation conforming to this specification
@@ -207,4 +195,4 @@ help:
 
 .PHONY: default all help check-targets paper-submission check-page-limit check-paper-anonymised check-review-mode \
 	check-anonymised check-archived-theories check-archived-suite check-submission clean \
-	check-consistency check-suite-python check-suite-purepy wheel dependencies.svg integrity.txt status.html
+	check-consistency check-suite-python check-suite-purepy wheel

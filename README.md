@@ -1,6 +1,6 @@
 # PurePy - A Pure Functional Subset of Python
 
-[![status page](https://github.com/pure-py/pure-py-spec/actions/workflows/status.yml/badge.svg)](https://pure-py.github.io/pure-py-spec/status.html)
+[![status page](https://github.com/pure-py/org-workflow/actions/workflows/status.yml/badge.svg)](https://pure-py.github.io/org-workflow/status.html)
 
 ## [v0.24.3](https://pure-py.github.io/pure-py-spec/v0.24.3/PurePy-spec.pdf)
 
@@ -23,7 +23,7 @@ semantics.
 - `graduality.tex`, `graduality/`: draft notes on gradual typing, built as a separate document, outside 1.0 specification and paper
 - `src/purepy_conformance/`: conformance suite and its runner, `purepy-conformance` command, packaged together
 - `test/`: consistency of specification and suite; expected failures of latest mechanisation release
-- `script/`: status page with project board integrity check, run hourly by CI
+- `script/`: report on the checks of a make target, run on the submission by CI on request
 
 Each section has separate prose in the two documents, and material shared by both lives under `spec/` and is
 input by each. Within a shared source, `\paperonly{...}` and `\speconly{...}` restrict a phrase to one document.
