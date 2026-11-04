@@ -45,6 +45,14 @@ make wheel
 The reference implementation is the latest release of the mechanisation in the `isabelle-purepy` repository;
 `make check-suite-purepy` runs the suite against it.
 
+A push of commits that change the suite first runs the suite against the mechanisation built from the
+`isabelle-purepy` clone beside this one, on the branch of the same issue or else on `main`, and is refused if any
+test fails. Enable the hook once per clone:
+
+```bash
+git config core.hooksPath script/hooks
+```
+
 An implementation runs the suite with the `purepy-conformance` command of the installed package, providing a type
 checker and interpreter (default `python3`), each as a command taking the path of a module. The type checker
 checks every test, and rejects a program by exit status 5 if the program uses a feature excluded from this version,
