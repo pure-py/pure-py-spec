@@ -1,0 +1,5 @@
+\tyvars(\Gamma) &{}= \textstyle\bigcup \set{\tyvars(\bind{x}{\theta}) \mid \bind{x}{\theta} \in \Gamma} \clausegap
+\tyvars(\bind{x}{\TypeVar}) &{}= \set{x} \\*
+\tyvars(\bind{x}{\tau}) = \tyvars(\bind{x}{\DU{\tau}}) = \tyvars(\bind{x}{\PU{\tau}}) &{}= \fv(\tau) \\*
+\tyvars(\bind{x}{\scheme{\seq{\alpha}}{\tau}}) = \tyvars(\bind{x}{\PU{\scheme{\seq{\alpha}}{\tau}}}) &{}= \fv(\tau) \setminus \set{\seq{\alpha}} \\*
+\tyvars(\bind{x}{\theta}) &{}= \varnothing && \quad (\text{otherwise})
