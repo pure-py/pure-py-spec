@@ -60,7 +60,8 @@ results carrying a sequence of values in place of a value.
 \subsection{Expressions and statements}
 \label{sec:eval-expressions}
 
-A value is well-formed at a context entry, and an environment at a context (\specfigref{value-env-typing}).
+\Replaced{Value typing relates a value to a context entry, and environment typing relates an environment to a
+context}{A value is well-formed at a context entry, and an environment at a context } (\specfigref{value-env-typing}).
 For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any statement $s$ with
 $\Gamma \vdash s : R$, the statement evaluation judgement $\rho, s \Rightarrow o$ says that $s$ evaluates
 to outcome $o$ in $\rho$ (\specfigrefTwo{eval-block-outcome}{eval-block-fails}). An \pyinline{if} or
