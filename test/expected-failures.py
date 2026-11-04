@@ -3,7 +3,7 @@
 are exactly those listed in test/expected-failures.txt: tests changed ahead of the implementation, one per line by
 path within the suite, each followed by a tab and the issue for the change, as OWNER/REPO#N. A directory ending
 in a slash stands for every test under it. Fail also if a listed issue is closed, since the implementation has
-then caught up and the test still fails."""
+then caught up and the test still fails. With --no-expected-failures, fail on any failing test."""
 
 from __future__ import annotations
 
@@ -61,13 +61,14 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--type-checker", default="purepy --check")
     parser.add_argument("--jobs", type=int)
+    parser.add_argument("--no-expected-failures", action="store_true")
     args = parser.parse_args()
     runner = Runner(shlex.split(args.type_checker), None, False, True)
     with suite() as path:
         runner.run_suite(path, args.jobs)
     runner.summary()
     failed = [failure.split(" (", 1)[0] for failure in runner.failed]
-    listed = expected_failures()
+    listed = [] if args.no_expected_failures else expected_failures()
     unexpected = [test for test in failed if not any(covers(entry, test) for entry, _ in listed)]
     stale = [entry for entry, _ in listed if not any(covers(entry, test) for test in failed)]
     closed = sorted(
