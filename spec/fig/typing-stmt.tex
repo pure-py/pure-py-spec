@@ -12,7 +12,7 @@
 \and
 \inferrule*[lab={\ruleName{declare}}]
 {
-  \added{\Gamma(x) = \Unbound} \\
+  \Gamma(x) = \Unbound \\
   \Sigma; \Gamma \vdash \psi \synth \tau
 }
 {
@@ -30,7 +30,7 @@
 \and
 \inferrule*[lab={\ruleName{declare-assign}}]
 {
-  \added{\Gamma(x) = \Unbound} \\
+  \Gamma(x) = \Unbound \\
   \Sigma; \Gamma \vdash \psi \synth \tau \\
   \Sigma; \Gamma \vdash e \checks \tau
 }
