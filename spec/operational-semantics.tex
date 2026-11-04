@@ -60,8 +60,9 @@ results carrying a sequence of values in place of a value.
 \subsection{Expressions and statements}
 \label{sec:eval-expressions}
 
-\Replaced{The value typing judgement $\vdash v : \theta$ says that value $v$ has context entry $\theta$, and the
-environment typing judgement $\vdash \rho : \Gamma$ says that environment $\rho$ has context $\Gamma$}{A value is
+\Replaced{The value typing judgement $\vdash v : \theta$ says that value $v$ is well-typed at context entry $\theta$,
+and the environment typing judgement $\vdash \rho : \Gamma$ says that environment $\rho$ is well-typed at context
+$\Gamma$, meaning every value in $\rho$ is well-typed at the corresponding entry in $\Gamma$}{A value is
 well-formed at a context entry, and an environment at a context } (\specfigref{value-env-typing}).
 For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any statement $s$ with
 $\Gamma \vdash s : R$, the statement evaluation judgement $\rho, s \Rightarrow o$ says that $s$ evaluates
