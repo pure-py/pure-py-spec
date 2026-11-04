@@ -19,11 +19,8 @@
 .mypy_cache/
 .venv/
 __pycache__/
-dependencies.svg
 dist/
-integrity.txt
 paper-anon.references
-status.html
 submission.tsv
 tex/anon-name.tex
 tex/mypy-version.tex

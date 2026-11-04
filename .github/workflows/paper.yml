@@ -40,9 +40,7 @@ jobs:
               - '!.claude/**'
               - '!**/README.md'
               - '!.github/workflows/bump-version.yml'
-              - '!.github/workflows/check-project-integrity.yml'
               - '!.github/workflows/consistency-checks.yml'
-              - '!.github/workflows/status.yml'
             evaluation:
               - 'evaluation/**'
               - '.github/workflows/paper.yml'
