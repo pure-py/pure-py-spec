@@ -241,8 +241,8 @@ $\scopeS(\seq{y}, s)$ (\S\ref{aux:scope}). The rules are unable to reject two bi
 holds both. The condition therefore falls to the function $\scopeS$, which is undefined for scopes
 binding a name twice, by parameter, import, declaration or pattern, unless the name is bound by two patterns. Under
 mypy a redeclaration is an error (\secref{mypy-restrictions}), so the condition keeps well-typed programs within
-those accepted by mypy. The cases of a match commonly capture the same name, so a name bound only by patterns is
-allowed.}{A declaration does not check
+those accepted by mypy. The exemption for patterns allows the cases of a match to capture the same name, which is
+also permitted by mypy.}{A declaration does not check
 whether its name is already declared; that check is made once for the whole scope, when the rules for function
 definitions and modules introduce the variables of the scope as unbound, using the function $\scopeS(\seq{y}, s)$
 (\S\ref{aux:scope}). }
