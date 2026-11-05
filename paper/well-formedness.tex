@@ -111,6 +111,13 @@ branches with $\merge_{\Sigma}$, merging in $\Assigns{\varnothing}$ when there i
 A call statement with a callee synthesising a union is typed
 once per disjunct (\ruleName{call-stmt-union}), following \ruleName{call-union} for a call expression.
 
+The \ruleName{defs} rule (\specfigrefTwo{typing-stmt-ctd}{typing-def}) checks each definition of a mutual def region against
+the type scheme synthesised from its annotations, in a context in which each function name is definitely assigned
+(\secref{mutual-recursion}). The body is checked with the declared return type, and must have static outcome $\Returns$
+unless that type is equivalent to \pyinline{None}, so a function that declares a result definitely returns one. A return
+type such as $\tyUnion{\tyInt}{\tyNone}$ does not exempt the body from returning, nor permit a bare \pyinline{return}, for
+compatibility with mypy (\secref{python-compatibility}).
+
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
 auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\specfigref{typing-cases}), which threads
 a \emph{remaining type}, starting from $\sigma$, and a \emph{residual} $L$ of shapes, starting from the shapes of $\sigma$ (\figref{shapes}),
@@ -125,13 +132,6 @@ outcome of the path on which the scrutinee is not matched by any of the cases:
 \end{mathpar}
 The remaining type, the residual, reachability and exhaustiveness are the subject of
 \secref{well-formedness-patterns}.
-
-The \ruleName{defs} rule (\specfigrefTwo{typing-stmt-ctd}{typing-def}) checks each definition of a mutual def region against
-the type scheme synthesised from its annotations, in a context in which each function name is definitely assigned
-(\secref{mutual-recursion}). The body is checked with the declared return type, and must have static outcome $\Returns$
-unless that type is equivalent to \pyinline{None}, so a function that declares a result definitely returns one. A return
-type such as $\tyUnion{\tyInt}{\tyNone}$ does not exempt the body from returning, nor permit a bare \pyinline{return}, for
-compatibility with mypy (\secref{python-compatibility}).
 
 \subsection{Pattern matching}
 \label{sec:exhaustiveness}
