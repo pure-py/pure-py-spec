@@ -11,10 +11,10 @@ import purepy_conformance
 from purepy_conformance import (
     CLASSIFICATION_PLACEHOLDER,
     ERROR_EXPECTED,
-    MAIN,
     PurePyOutcome,
     PythonOutcome,
     Results,
+    main_module,
     run,
     suite,
     tests,
@@ -66,7 +66,7 @@ def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
             m for f in sorted((ROOT / "spec").rglob("*.tex")) for m in RULE_NAME.findall(current(f))
         }
         for test in tests(suite_dir):
-            path = test / MAIN if test.is_dir() else test
+            path = main_module(test)
             dirs = test.relative_to(suite_dir).parts
             cites = dirs[1] not in (
                 PurePyOutcome.PARSER_REJECTS,
@@ -85,7 +85,7 @@ def check_classification(r: Results, suite_dir: pathlib.Path) -> None:
     """Check classification placeholder on expected errors for excluded features"""
     with r.test("classification of excluded features"):
         for test in tests(suite_dir):
-            path = test / MAIN if test.is_dir() else test
+            path = main_module(test)
             error = path.with_suffix(ERROR_EXPECTED)
             if not error.exists():
                 continue
@@ -106,10 +106,11 @@ def check_classification(r: Results, suite_dir: pathlib.Path) -> None:
 
 
 def check_lint(r: Results) -> None:
-    with r.test("consistency script and runner pass mypy and ruff"):
+    with r.test("test scripts and runner pass mypy and ruff"):
         sources = [
             str(TEST / "check-consistency.py"),
             str(TEST / "expected-failures.py"),
+            str(TEST / "mechanisation-worktree.py"),
             inspect.getfile(purepy_conformance),
         ]
         for tool in (
@@ -132,7 +133,7 @@ def main() -> None:
         check_classification(consistency, suite_dir)
         check_lint(consistency)
     consistency.summary()
-    sys.exit(1 if consistency.failed else 0)
+    sys.exit(1 if len(consistency.failed) > 0 else 0)
 
 
 if __name__ == "__main__":
