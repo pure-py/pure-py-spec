@@ -146,7 +146,7 @@ matched by any of the earlier cases. } The residual is an ordered set of \emph{s
 set of values of a single type, \replaced{starting}{and starts } from the shapes of $\sigma$; the remaining type is coarser, a type rather
 than a set of shapes, \replaced{starting}{and starts } from $\sigma$ itself. \deleted{Two auxiliary functions narrow a type $\tau$ by a pattern $p$: $\matchedAs{\Sigma}(\Gamma, \tau, p)$ is
 the type to which $\tau$ is narrowed if $p$ matches, and $\remaining{\Sigma}(\Gamma, \tau, p)$ is the type remaining if
-$p$ fails. }Each case's pattern is checked against the remaining type, binding its pattern variables, and matched
+$p$ fails. }Each case's pattern is checked against the remaining type, binding \replaced{any}{its } pattern variables, and matched
 against the residual. Reachability is decided by the
 residual: a case is \emph{reachable} if its pattern matches at least one shape of the residual, and a match with an
 unreachable case is ill-formed. For a reachable case, the body is checked under the bindings and its outcome merged
