@@ -7,5 +7,5 @@ attribute must resolve to a definitely assigned member and an object attribute m
 and a constructor call or constructor pattern must match the arity of the class exactly, which rules out the
 \pyinline{TypeError} raised by Python for excess arguments or sub-patterns. The semantics gives $\errName$,
 $\errAttr$ and $\errType$ to the runtime errors ruled out by typing, and $\errExcluded$ to the statically excluded
-behaviours (\secref{no-coercions}); type soundness, the conjecture that no run of a well-formed program aborts with
+behaviours (\secref{no-coercions}); type soundness, the \replaced{theorem}{conjecture } that no run of a well-formed program aborts with
 one of these kinds, is stated in \secref{metatheory}.
