@@ -183,7 +183,7 @@ $\kappa \neq \errUndef$, a run of the implementation on $\mathcal{M}$ with argum
 $\seq{v}$ in order, each as by Python's \pyinline{str} followed by a newline, and reports termination kind $\kappa$.
 \end{specdefinition}
 
-\noindent The form in which an implementation reports the termination kind is not prescribed. \added{An implementation also conforms if it meets this definition with the result of \pyinline{**} on floats being the nearest float below or above the exact power, not necessarily the nearer of the two. Python implementations conform, since they compute \pyinline{**} on floats with functions such as \pyinline{pow} in C and \pyinline{Math.pow} in Java, which return one of these two floats.}
+\noindent The form in which an implementation reports the termination kind is not prescribed. \added{An implementation also conforms if it meets this definition with the result of \pyinline{**} on floats being the nearest float below or above the exact power, not necessarily the nearer of the two. Python implementations conform, since they compute \pyinline{**} on floats with functions such as \pyinline{pow} in C and \pyinline{Math.pow} in Java, which have this behaviour.}
 
 \specinput{spec/fig/eval-modules}
 
