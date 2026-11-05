@@ -20,6 +20,25 @@ BAD = "def truncate_number(number: float) -> float:\n    for i in range(0, 1):\n
 
 
 class EvaluationTests(unittest.TestCase):
+    def test_python_version_matches_project_setting(self):
+        current = e.sys.version_info[:3]
+        versions = [current[:2], current, (current[0], current[1] + 1),
+                    (*current[:2], current[2] + 1)]
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            for required in versions:
+                python_version = ".".join(str(part) for part in required)
+                (root / ".python-version").write_text(python_version + "\n")
+                matches = current[:len(required)] == required
+                expected = ("prompt validation" if matches else
+                            f"the pipeline requires Python {python_version} and the pinned PurePy wheel")
+                with self.subTest(version=python_version), patch.object(e, "ROOT", root / "evaluation"), \
+                        patch.object(e, "version", return_value=e.CHECKER_VERSION), \
+                        patch.object(e, "validate_prompt_examples", side_effect=RuntimeError("prompt validation")):
+                    with self.assertRaises(RuntimeError) as error:
+                        e.validate_backend(None, definition="")
+                    self.assertEqual(str(error.exception), expected)
+
     def test_evalplus_reads_verified_files_in_both_orders(self):
         from evalplus.data import humaneval, mbpp
         modules = {"humaneval-plus": humaneval, "mbpp-plus": mbpp}

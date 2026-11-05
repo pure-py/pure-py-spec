@@ -317,8 +317,10 @@ def validate_prompt_examples(definition):
 
 
 def validate_backend(benchmark, definition=None):
-    if sys.version_info[:2] != (3, 12) or version("purepy") != CHECKER_VERSION:
-        raise RuntimeError("the pipeline requires Python 3.12 and the pinned PurePy wheel")
+    python_version = (ROOT.parent / ".python-version").read_text().strip()
+    required = tuple(int(part) for part in python_version.split("."))
+    if sys.version_info[:len(required)] != required or version("purepy") != CHECKER_VERSION:
+        raise RuntimeError(f"the pipeline requires Python {python_version} and the pinned PurePy wheel")
     validate_prompt_examples(DEFINITION_PATH.read_text() if definition is None else definition)
     rejected = check("def probe(x: int) -> int:\n    for i in range(0, x):\n        pass\n    return x\n")
     if rejected.passed is not False:

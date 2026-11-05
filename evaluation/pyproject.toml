@@ -2,7 +2,6 @@
 name = "purepy-evaluation"
 description = "experiments"
 version = "0.2.0"
-requires-python = ">=3.12,<3.13"
 dependencies = [
     "purepy @ https://github.com/pure-py/pure-py-spec/releases/download/v0.22.3/purepy-0.22.3-py3-none-any.whl#sha256=cd59f9e8656d2b617954caaf60bdb89d91ccc9cbee830d63977e8abf8a857c27",
     "matplotlib==3.10.7",

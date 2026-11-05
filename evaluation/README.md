@@ -1,7 +1,8 @@
 # PurePy Evaluation
 
-The pipeline uses Python 3.12 and the PurePy v0.22.3 release wheel pinned by
-hash in `pyproject.toml`; dependencies are fixed in `uv.lock`.
+The pipeline uses the Python version in the repository's `.python-version` and
+the PurePy v0.22.3 release wheel pinned by hash in `pyproject.toml`; dependencies
+are fixed in `uv.lock`.
 
 ## Run
 
@@ -118,7 +119,8 @@ different feature.
 Runs with matched tasks and protocol can be compared across models:
 
 ```bash
-uv run --locked python evaluation.py compare results/RUN1/MODEL1.json results/RUN2/MODEL2.json --output results/comparison.json
+uv run --locked --python "$(cat ../.python-version)" python evaluation.py compare \
+  results/RUN1/MODEL1.json results/RUN2/MODEL2.json --output results/comparison.json
 ```
 
 The comparison groups runs by benchmark, tasks, prompts, checker, repair budget
@@ -132,7 +134,7 @@ a known parameter count.
 The plot alone can be rendered from any result file:
 
 ```bash
-uv run --locked python evaluation.py figure results/RUN/MODEL.json --output figure.pdf
+uv run --locked --python "$(cat ../.python-version)" python evaluation.py figure results/RUN/MODEL.json --output figure.pdf
 ```
 
 The paper's evaluation section includes `paper/fig/evaluation-generation.pdf`,
@@ -156,6 +158,6 @@ See `harbor/README.md` for the viewer and GPU runs.
 ## Validate
 
 ```bash
-uv run --locked python -m unittest discover -s tests -v
+uv run --locked --python "$(cat ../.python-version)" python -m unittest discover -s tests -v
 bash scripts/check-figure.sh results/RUN/MODEL.tex
 ```

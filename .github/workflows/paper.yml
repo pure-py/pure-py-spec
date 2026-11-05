@@ -43,6 +43,7 @@ jobs:
               - '!.github/workflows/consistency-checks.yml'
             evaluation:
               - 'evaluation/**'
+              - '.python-version'
               - '.github/workflows/paper.yml'
 
   documents:
@@ -98,7 +99,7 @@ jobs:
         uses: astral-sh/setup-uv@v10.2.0
         with:
           version: "0.11.13"
-          python-version: "3.12"
+          python-version-file: .python-version
           enable-cache: true
 
       - name: Install Linux sandbox
@@ -109,7 +110,7 @@ jobs:
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Install dependencies
-        run: uv sync --locked
+        run: uv sync --locked --python "$(cat ../.python-version)"
 
       - name: Run pipeline with local model on every benchmark
         env:
