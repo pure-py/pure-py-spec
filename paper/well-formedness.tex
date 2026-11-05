@@ -118,9 +118,9 @@ unless that type is equivalent to \pyinline{None}, so a function that declares a
 type such as $\tyUnion{\tyInt}{\tyNone}$ does not exempt the body from returning, nor permit a bare \pyinline{return}, for
 compatibility with mypy (\secref{python-compatibility}).
 
-A \pyinline{match} scrutinee synthesises a type $\sigma$, \replaced{against which the cases $\seq{b}$ are checked by an
-auxiliary judgement, which merges their outcomes into $S$ and gives a final remaining type and residual
-(\secref{well-formedness-patterns}).}{and its cases $\seq{b}$ are checked in turn by the
+A \pyinline{match} scrutinee synthesises a type $\sigma$\replaced{. An auxiliary judgement checks the cases $\seq{b}$ against
+$\sigma$, merges their outcomes into $S$ and gives a final remaining type and residual
+(\secref{well-formedness-patterns}).}{, and its cases $\seq{b}$ are checked in turn by the
 auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\specfigref{typing-cases}), which threads
 a \emph{remaining type}, starting from $\sigma$, and a \emph{residual} $L$ of shapes, starting from the shapes of $\sigma$ (\figref{shapes}),
 through the cases, merging their outcomes into $S$. } The \ruleName{match} rule applies when the final remaining type is $\tyNever$, meaning the match is
