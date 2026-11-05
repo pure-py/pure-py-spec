@@ -2,5 +2,5 @@
 \label{sec:conformance-suite}
 
 The conformance suite pairs each test with the verdict given by Python itself, and runs on CPython,
-GraalPy, and Pyodide. A test in \filename{python-raises/typing-rejects/}, for example, is a program which raises an exception other than \pyinline{SyntaxError} under Python and is rejected by the \PurePy type checker; the directory of a test names the row of \figref{taxonomy} for the outcome under Python, followed by the column for the outcome under \PurePy. \todo{Reference interpreter, needed
+GraalPy, and Pyodide. A test in \filename{python-raises/typing-rejects/}, for example, is a program which raises an exception other than \pyinline{SyntaxError} under Python and is rejected by the \PurePy type checker; the directory of a test names the row of \figref{taxonomy} for the outcome under Python, followed by the column for the outcome under \PurePy. \speconly{\added{A test which fails because of a behaviour of mypy or of a Python implementation reported as a bug is accepted as failing; \figref{reported-bugs} lists these behaviours.} }\todo{Reference interpreter, needed
 to detect dynamically excluded operations (\issue{64}).}

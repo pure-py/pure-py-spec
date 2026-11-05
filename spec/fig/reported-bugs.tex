@@ -1,0 +1,13 @@
+\begin{figure}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.28\textwidth}>{\raggedright\arraybackslash}p{0.08\textwidth}>{\raggedright\arraybackslash}p{0.34\textwidth}>{\raggedright\arraybackslash}p{0.22\textwidth}}
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}Construct & \added{Tool} & Behaviour & Report \\
+Match on Boolean literal scrutinee, with cases covering its value & \added{mypy} & Reports a missing return, ignoring the Boolean value known from literals & \href{https://github.com/python/mypy/issues/22202}{python/mypy\#22202} \\
+\added{\pyinline{//} on floats} & \added{GraalPy} & \added{Quotient one too large, as for \pyinline{1.0 // 0.1}} & \added{\href{https://github.com/oracle/graalpython/issues/1274}{oracle/graalpython\#1274}}
+\end{tabular}
+\caption{Behaviours reported as bugs\replaced{, with disagreement accepted by conformance suite}{ in mypy }}
+\label{fig:reported-bugs}
+\end{figure}
