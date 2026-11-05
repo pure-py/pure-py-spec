@@ -141,7 +141,7 @@ The remaining type, the residual, reachability and exhaustiveness are the subjec
 
 \replaced{For a \pyinline{match} with scrutinee type $\sigma$, case checking}{To check a \pyinline{match} with scrutinee type $\sigma$, the auxiliary judgement }
 $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\specfigref{typing-cases}) threads a remaining type
-$\tau$ and a \replaced{\emph{residual}}{residual } $L$ through the cases\replaced{. Both are over-approximations of the values of $\sigma$ left unmatched by the earlier cases.}{, both over-approximations of the values of $\sigma$ which are not
+$\tau$ and a \replaced{\emph{residual}}{residual } $L$ through the cases\replaced{. Both are over-approximations of the values of $\sigma$ left unmatched by earlier cases.}{, both over-approximations of the values of $\sigma$ which are not
 matched by any of the earlier cases. } The residual is an ordered set of \emph{shapes} \replaced{(\specfigref{shapes-syntax})}{(\figref{shapes}) }, each denoting a
 set of values of a single type, and starts from the shapes of $\sigma$; the remaining type is coarser, a type rather
 than a set of shapes, and starts from $\sigma$ itself. \deleted{Two auxiliary functions narrow a type $\tau$ by a pattern $p$: $\matchedAs{\Sigma}(\Gamma, \tau, p)$ is
