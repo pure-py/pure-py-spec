@@ -154,7 +154,7 @@ does not exempt the body from returning, nor permit a bare \pyinline{return}, fo
 \end{DeletedBlock}
 \begin{AddedBlock}
 The \ruleName{defs} rule (\specfigrefTwo{typing-stmt-ctd}{typing-def}) checks each definition of a mutual def region against
-the type scheme synthesised from its annotations, in a context in which every name of the region is definitely assigned
+the type scheme synthesised from its annotations, in a context in which each function name is definitely assigned
 (\secref{mutual-recursion}). The body is checked with the declared return type, and must have static outcome $\Returns$
 unless that type is equivalent to \pyinline{None}, so a function that declares a result definitely returns one. A return
 type such as $\tyUnion{\tyInt}{\tyNone}$ does not exempt the body from returning, nor permit a bare \pyinline{return}, for
