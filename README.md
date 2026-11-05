@@ -47,7 +47,7 @@ The reference implementation is the latest release of the mechanisation in the `
 
 A push of commits that change the suite first runs the suite against the mechanisation built from the
 `isabelle-purepy` clone beside this one, on the branch of the same issue or else on `main`, and is refused if any
-test fails. Enable the hook once per clone:
+test fails other than those listed in `test/expected-failures.txt`. Enable the hook once per clone:
 
 ```bash
 git config core.hooksPath script/hooks

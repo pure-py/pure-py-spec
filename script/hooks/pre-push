@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Before pushing commits that change the conformance suite, run the suite against the mechanisation of the same
-issue, allowing no failures. The mechanisation is the worktree of the isabelle-purepy clone beside the main clone of
+issue, allowing only the failures listed in test/expected-failures.txt. The mechanisation is the worktree of the isabelle-purepy clone beside the main clone of
 this repository whose branch has the issue number of the pushed branch, or the worktree on main if no branch has it.
 Refuse the push if the suite fails or an assumption of the check is violated."""
 
@@ -61,8 +61,7 @@ def check(clone: pathlib.Path, branch: str, sha: str) -> None:
     if subprocess.run(["make", "build"], cwd=tree).returncode != 0:
         fail(f"build of the mechanisation in {tree} failed")
     checker = f"uv run --project {shlex.quote(str(tree))} purepy --check"
-    suite = ["uv", "run", "--locked", "python", "test/expected-failures.py", "--no-expected-failures",
-             "--type-checker", checker]
+    suite = ["uv", "run", "--locked", "python", "test/expected-failures.py", "--type-checker", checker]
     if subprocess.run(suite).returncode != 0:
         fail(f"suite of {branch} fails against the mechanisation in {tree}")
 

@@ -22,4 +22,4 @@ description: PurePy-specific additions to the technical-authoring, coding-conven
 
 ## Conformance suite
 
-- Before pushing a change to the suite, run it against the mechanisation built from the `isabelle-purepy` branch of the same issue, with no expected failures; the pre-push hook in `script/hooks` does this and refuses the push on any failure.
+- Before pushing a change to the suite, run it against the mechanisation built from the `isabelle-purepy` branch of the same issue; a test ahead of the mechanisation is listed in `test/expected-failures.txt` against the open issue for the mechanisation change. The pre-push hook in `script/hooks` does this and refuses the push on any other failure.
