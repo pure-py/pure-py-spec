@@ -79,7 +79,7 @@
  & $(\tyList{\tyObject}, \tyInt)$ & $\val{\exList{\bigconcat{\seq{v}^n}}}$ where $v = \exList{\seq{v}}$ and $n = \max(v', 0)$ \\
  & $(\tyInt, \tyList{\tyObject})$ & $\val{\exList{\bigconcat{\seq{v}^n}}}$ where $v' = \exList{\seq{v}}$ and $n = \max(v, 0)$ \\
 \opsep
-\pyinline{/} & $(\tyInt, \tyInt)$ & $\flFinite(v / v')$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
+\pyinline{/} & $(\tyInt, \tyInt)$ & $\floatOp(v / v')$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
  & $(\tyFloat, \tyFloat)$ & $\val{v / v'}$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
 \opsep
 \pyinline{//} & $(\tyInt, \tyInt)$ & $\val{\lfloor v / v' \rfloor}$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
