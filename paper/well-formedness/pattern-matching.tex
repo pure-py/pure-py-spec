@@ -71,7 +71,7 @@ $\shapeAny{\tau}{\varnothing}$ denotes every value of $\tau$. The first case spl
 $\shapeAny{\pyinline{C}}{\varnothing}$ into the constructor shapes
 $\shapeAny{\patConstr{\pyinline{C}}{\shapeAny{\tyTuple{\tyInt, \tyInt}}{\varnothing}}}{\varnothing}$ and
 $\shapeAny{\patConstr{\pyinline{C}}{\shapeAny{\tyNone}{\varnothing}}}{\varnothing}$, which denote the values of
-\pyinline{C} with a tuple field and with a \pyinline{None} field, and matches the shape with the \pyinline{None}
+\pyinline{C} with a tuple field and with a \pyinline{None} field, and then matches the shape with the \pyinline{None}
 field.}{the rest shape of \pyinline{C}. The first case splits it into a shape of
 \pyinline{C} with a tuple field and a shape of \pyinline{C} with a \pyinline{None} field, and matches the
 shape with the \pyinline{None} field. } The second case matches the shape with the tuple field, leaving the
