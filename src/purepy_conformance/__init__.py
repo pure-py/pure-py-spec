@@ -27,7 +27,7 @@ ARGS = ".args"  # command-line arguments, one per line
 
 HELPERS = "helpers"
 MAIN = "main.py"
-BUG = "-bug"  # suffix of a directory of tests failing under a reported bug of the tool named
+BUG = "-bug"  # Directory suffix for tests of reported bugs
 MYPY = "mypy"
 
 
