@@ -106,10 +106,6 @@ so they can be passed where \pyinline{Callable} types are expected.
 \begin{DeletedBlock}
 \input{spec/well-formedness/outcome-override-merge}
 \end{DeletedBlock}
-\begin{AddedBlock}
-Override and merge lift to static outcomes (Definition~\specnum{def:outcome-override-merge}), with $\Returns$ as zero for
-$\override$ and as unit for $\merge_{\Sigma}$.
-\end{AddedBlock}
 
 The statement judgement $\Sigma; \Gamma; \zeta \vdash s : R$ says that under $\Gamma$ and
 optional return type $\zeta$, statement $s$ has static outcome $R$ (\specfigref{typing-stmt}); every rule passes $\zeta$ down unchanged.

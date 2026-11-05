@@ -4,4 +4,6 @@ outcome is $\Returns$ when the statement \emph{definitely returns} or definitely
 Otherwise it is $\Assigns{\Delta}$, where $\Delta$ is a context with an entry for each variable declared or assigned
 by the statement (Definition~\ref{def:context}), recording whether the variable is definitely assigned, definitely
 unassigned or possibly unassigned after the statement.
-\end{specdefinition}
+\end{specdefinition}\paperonly{ \added{Override and merge lift to static outcomes
+(Definition~\specnum{def:outcome-override-merge}), with $\Returns$ as zero for $\override$ and as unit for
+$\merge_{\Sigma}$.}}
