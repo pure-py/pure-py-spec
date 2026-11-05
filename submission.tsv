@@ -1,7 +1,0 @@
-check-consistency	Suite tests each cite a rule of the specification, rule names unique, Python version agreed, runner linted	passed	
-paper-anon.pdf	Paper builds anonymised, with references resolved	passed	
-spec-anon.pdf	Specification builds anonymised, with references resolved	passed	
-supplementary.zip	Archive built: anonymised specification, mechanisation release at the specification's version, suite wheel	passed	mechanisation v0.23.2; suite 6 commits since v0.23.2
-check-anonymised	Archive free of project names, in file names and contents	passed	
-check-archived-theories	Archived proofs check and archived type checker generates	passed	
-check-archived-suite	Archived type checker passes archived suite	failed	
