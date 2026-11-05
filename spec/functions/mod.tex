@@ -1,4 +1,7 @@
-\modOp(n, n') &{}= \text{a NaN} && \quad \text{if } \NaN(n), \NaN(n') \text{ or } n \text{ infinite} \\*
-\modOp(n, n') &{}= n && \quad \text{if } n' \text{ infinite and } n \text{ zero or of the sign of } n' \\*
+\modOp(n, n') &{}= \nan && \quad \text{if } \NaN(n), \NaN(n') \text{ or } n \text{ infinite} \\*
+\modOp(n, n') &{}= n && \quad \text{if } n' \text{ infinite and } n \text{ nonzero, of the sign of } n' \\*
 \modOp(n, n') &{}= n' && \quad \text{if } n' \text{ infinite and } n \text{ nonzero, of the opposite sign} \\*
-\modOp(n, n') &{}= \fl(n - (n' \times \lfloor n / n' \rfloor)) && \quad \text{otherwise}
+\modOp(n, n') &{}= 0.0 && \quad \text{if } n' = \infty \text{ and } n \text{ zero} \\*
+\modOp(n, n') &{}= -0.0 && \quad \text{if } n' = -\infty \text{ and } n \text{ zero} \\*
+\modOp(n, n') &{}= -0.0 && \quad \text{if } n_1 = 0 \text{ and } n' < 0 \\*
+\modOp(n, n') &{}= n_1 && \quad \text{otherwise}
