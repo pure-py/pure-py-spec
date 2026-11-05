@@ -66,9 +66,15 @@ def f(c: C) -> int:
 \end{listingcol}
 \end{listingrow*}
 
-\noindent The residual starts as \replaced{a shape denoting every value of \pyinline{C}}{the rest shape of \pyinline{C} }. The first case splits it into a shape of
+\noindent The residual starts as \replaced{$\set{\shapeAny{\pyinline{C}}{\varnothing}}$, where a \emph{rest shape}
+$\shapeAny{\tau}{\varnothing}$ denotes every value of $\tau$. The first case splits
+$\shapeAny{\pyinline{C}}{\varnothing}$ into the constructor shapes
+$\shapeAny{\patConstr{\pyinline{C}}{\shapeAny{\tyTuple{\tyInt, \tyInt}}{\varnothing}}}{\varnothing}$ and
+$\shapeAny{\patConstr{\pyinline{C}}{\shapeAny{\tyNone}{\varnothing}}}{\varnothing}$, which denote the values of
+\pyinline{C} with a tuple field and with a \pyinline{None} field, and matches the shape with the \pyinline{None}
+field.}{the rest shape of \pyinline{C}. The first case splits it into a shape of
 \pyinline{C} with a tuple field and a shape of \pyinline{C} with a \pyinline{None} field, and matches the
-shape with the \pyinline{None} field. The second case matches the shape with the tuple field, leaving the
+shape with the \pyinline{None} field. } The second case matches the shape with the tuple field, leaving the
 empty residual, so a third case would be unreachable.
 Neither case matches every value of \pyinline{C}, however, so the remaining type is still \pyinline{C},
 \ruleName{match-partial} applies, and the function is rejected as not always returning, following mypy. If
