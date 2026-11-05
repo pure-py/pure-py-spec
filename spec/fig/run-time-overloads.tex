@@ -40,9 +40,9 @@
 \small
 \centering
 \newcommand*{\opsep}{\arrayrulecolor{gray!30}\hline}
-\added{\begin{tabular}{>{\raggedright\arraybackslash}p{0.08\textwidth}>{\raggedright\arraybackslash}p{0.31\textwidth}>{\raggedright\arraybackslash}p{0.46\textwidth}>{\raggedright\arraybackslash}p{0.02\textwidth}}
+\added{\begin{tabular}{>{\raggedright\arraybackslash}p{0.08\textwidth}>{\raggedright\arraybackslash}p{0.31\textwidth}>{\raggedright\arraybackslash}p{0.48\textwidth}}
 \arrayrulecolor{gray!60}\hline
-\rowcolor{grammarheadcolor}$\odot$ & $(\tau_1, \tau_2)$ & $\hat{\odot}(v, v')$ & \\
+\rowcolor{grammarheadcolor}$\odot$ & $(\tau_1, \tau_2)$ & $\hat{\odot}(v, v')$ \\
 \pyinline{==} & $(\tyObject, \tyObject)$ & $\val{\pyinline{False}}$ if $v = v' = \nan$; $\eqOp{\Sigma}(v, v')$ otherwise \\
 \opsep
 \pyinline{!=} & $(\tyObject, \tyObject)$ & $\val{\pyinline{True}}$ if $v = v' = \nan$ or $\eqOp{\Sigma}(v, v') = \val{\pyinline{False}}$; $\val{\pyinline{False}}$ if $\eqOp{\Sigma}(v, v') = \val{\pyinline{True}}$; $\eqOp{\Sigma}(v, v')$ otherwise \\
@@ -83,28 +83,23 @@
  & $(\tyFloat, \tyFloat)$ & $\val{v / v'}$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
 \opsep
 \pyinline{//} & $(\tyInt, \tyInt)$ & $\val{\lfloor v / v' \rfloor}$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
- & $(\tyFloat, \tyFloat)$ & $\val{\floorDiv(v, v')}$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise & $\dagger$ \\
+ & $(\tyFloat, \tyFloat)$ & $\val{\floorDiv(v, v')}$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
 \opsep
 \pyinline{\%} & $(\tyInt, \tyInt)$ & $\val{v - (v' \times \lfloor v / v' \rfloor)}$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
- & $(\tyFloat, \tyFloat)$ & $\val{\modOp(v, v')}$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise & $\dagger$ \\
+ & $(\tyFloat, \tyFloat)$ & $\val{\modOp(v, v')}$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
 \opsep
 \pyinline{**} & $(\tyInt, \tyInt)$ & $\val{v^{v'}}$ if $v' \geq 0$; $\aborts{\errZeroDiv}$ if $v = 0$ and $v' < 0$; as at $(\tyFloat, \tyInt)$ otherwise \\
- & $(\tyFloat, \tyInt)$ & $\aborts{\errZeroDiv}$ if $v = 0$ and $v' < 0$; $\aborts{\errUndef}$ if $v$ finite and $\fl(v^{v'})$ infinite; $\val{v^{v'}}$ otherwise & $\ddagger$
+ & $(\tyFloat, \tyInt)$ & $\aborts{\errZeroDiv}$ if $v = 0$ and $v' < 0$; $\aborts{\errUndef}$ if $v$ finite and $\fl(v^{v'})$ infinite; $\val{v^{v'}}$ otherwise
 \end{tabular}}
 
 \vspace{3mm}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.08\textwidth}>{\raggedright\arraybackslash}p{0.31\textwidth}>{\raggedright\arraybackslash}p{0.46\textwidth}>{\raggedright\arraybackslash}p{0.02\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.08\textwidth}>{\raggedright\arraybackslash}p{0.31\textwidth}>{\raggedright\arraybackslash}p{0.48\textwidth}}
 \arrayrulecolor{gray!60}\hline
-\rowcolor{grammarheadcolor}$\ominus$ & $\tau$ & $\hat{\ominus}(v)$ & \\
-\pyinline{not} & $\tyBool$ & $\val{\pyinline{False}}$ if $v = \pyinline{True}$; $\val{\pyinline{True}}$ otherwise & \\
-\pyinline{+} & $\tyFloat$ & $\val{v}$ & \\
+\rowcolor{grammarheadcolor}$\ominus$ & $\tau$ & $\hat{\ominus}(v)$ \\
+\pyinline{not} & $\tyBool$ & $\val{\pyinline{False}}$ if $v = \pyinline{True}$; $\val{\pyinline{True}}$ otherwise \\
+\pyinline{+} & $\tyFloat$ & $\val{v}$ \\
 \pyinline{-} & $\tyFloat$ & $\val{-v}$
 \end{tabular}
-\vspace{1mm}
-\begin{minipage}{0.88\textwidth}\footnotesize
-\added{$\dagger$ Defined by $\floorDiv$ and $\modOp$ (\S\ref{aux:floordiv}), in agreement with CPython and the Python Language Reference, \S6.7}\\
-\added{$\ddagger$ Precision left to the implementation; IEEE 754 recommends a correctly rounded power function but does not require one}
-\end{minipage}
-\caption{Run-time overloads of operators\added{, with IEEE 754 float arithmetic unless marked}}
+\caption{Run-time overloads of operators}
 \label{fig:run-time-overloads}
 \end{figure}
