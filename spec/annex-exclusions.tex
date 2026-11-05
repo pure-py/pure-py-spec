@@ -13,6 +13,16 @@ exclusion takes effect, and lists the common Python features excluded from this 
 \section{Behaviours excluded by design}
 \label{sec:excluded-by-design}
 
+\subsection{Soft keywords as identifiers}
+\label{sec:soft-keywords}
+
+\begin{AddedBlock}
+Python's soft keywords \pyinline{match}, \pyinline{case}, \pyinline{type} and \pyinline{_} are keywords only in
+\pyinline{match}, \pyinline{case} and \pyinline{type} statements and wildcard patterns, and identifiers elsewhere. In
+\PurePy they are not identifiers at all (\secref{lexical}), so that whether a word is a keyword does not depend on
+where it occurs.
+\end{AddedBlock}
+
 \subsection{Mutable state}
 \label{sec:no-mutable-state}
 
@@ -37,17 +47,6 @@ exclusion takes effect, and lists the common Python features excluded from this 
 \label{sec:runtime-errors}
 
 \input{spec/exclusions/prevented-errors}
-
-\subsection{Reserved words}
-\label{sec:reserved-words}
-
-\begin{AddedBlock}
-Python's soft keywords \pyinline{match}, \pyinline{case}, \pyinline{type} and \pyinline{_} are keywords only in
-\pyinline{match}, \pyinline{case} and \pyinline{type} statements and wildcard patterns, and identifiers elsewhere; for
-example, a Python program may bind a variable named \pyinline{type}. In \PurePy they are not identifiers at all
-(\secref{lexical}), so that whether a word is a keyword does not depend on where it occurs; \pyinline{_} is then only
-the wildcard pattern.
-\end{AddedBlock}
 
 \section{Features excluded from this version}
 \label{sec:excluded-from-version}
