@@ -33,9 +33,9 @@ to sequential composition of static outcomes:
 \emph{Termination kinds} $\kappa$ record how a run ends; all but $\errUndef$ and $\errExcluded$ are named after the exceptions raised by the same program
 under Python in the same circumstances, except that $\errExit{0}$ also records a run which completes normally. A variable read before its assignment aborts with $\errName$ where
 Python raises \pyinline{UnboundLocalError}, a subclass of \pyinline{NameError}; distinguishing the two would require
-the environment to record whether unbound variables belong to functions or modules. Two termination kinds record operations \replaced{which Python executes without an error, or with an outcome which is not specified by the Python language reference and which differs between implementations}{which Python executes without an error }. A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, one which the type system cannot rule out
+the environment to record whether unbound variables belong to functions or modules. \deleted{Two termination kinds record operations which Python executes without an error. }A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, one which the type system cannot rule out
 and \PurePy leaves undefined, such as a
-comparison of two functions (\secref{no-coercions}). \added{Dynamically excluded operations include those with an outcome which is not specified by the language reference and which differs between implementations; an overflowing power is at present the only such operation.} A run aborts with $\errExcluded$ when it reaches an operation
+comparison of two functions (\secref{no-coercions}). \added{Dynamically excluded operations include those with an outcome which is not specified by the Python language reference and which differs between implementations; an overflowing power is at present the only such operation.} A run aborts with $\errExcluded$ when it reaches an operation
 ruled out by the type system, such as a condition which evaluates to a non-Boolean.
 Attribute references, dictionary keys and constructor patterns headed by a built-in class, when ruled out by the type
 system, also abort with $\errExcluded$, even though Python sometimes rejects them; to be more precise here would require the
