@@ -911,11 +911,10 @@
 {
   \rho, e \Rightarrow \val{v} \\
   \iterOp(v) = v_1 \cons \ldots \cons v_n \\
-  \added{\matchOp{\Sigma}(\rho, p, v_i) = \matchOk{\rho'_i} \quad (\forall i)} \\
-  \rho \override \replaced{\rho'_i}{\set{\bind{x}{v_i}} }, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i)
+  \rho \override \set{\bind{x}{v_i}}, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i)
 }
 {
-  \rho, \qualGenerator{\replaced{p}{x }}{e} \cons \seq{g} \Rightarrow \val{\seq{\rho}_1 \mathbin{\concat} \ldots \mathbin{\concat} \seq{\rho}_n}
+  \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \val{\seq{\rho}_1 \mathbin{\concat} \ldots \mathbin{\concat} \seq{\rho}_n}
 }
 \and
 \inferrule*[lab={\ruleName{eval-qual-generator-fail}}]
@@ -923,7 +922,7 @@
   \rho, e \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \qualGenerator{\replaced{p}{x }}{e} \cons \seq{g} \Rightarrow \aborts{\kappa}
+  \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \aborts{\kappa}
 }
 \and
 \inferrule*[lab={\ruleName{eval-qual-generator-nonseq}}]
@@ -932,19 +931,18 @@
   \iterOp(v) \text{ undefined}
 }
 {
-  \rho, \qualGenerator{\replaced{p}{x }}{e} \cons \seq{g} \Rightarrow \aborts{\errType}
+  \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \aborts{\errType}
 }
 \and
 \inferrule*[lab={\ruleName{eval-qual-generator-fail-body}}]
 {
   \rho, e \Rightarrow \val{v} \\
   \iterOp(v) = v_1 \cons \ldots \cons v_n \\
-  \added{\matchOp{\Sigma}(\rho, p, v_i) = \matchOk{\rho'_i} \quad (\forall i \leq j)} \\
-  \rho \override \replaced{\rho'_i}{\set{\bind{x}{v_i}} }, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i < j) \\
-  \rho \override \replaced{\rho'_j}{\set{\bind{x}{v_j}} }, \seq{g} \Rightarrow \aborts{\kappa}
+  \rho \override \set{\bind{x}{v_i}}, \seq{g} \Rightarrow \val{\seq{\rho}_i} \quad (\forall i < j) \\
+  \rho \override \set{\bind{x}{v_j}}, \seq{g} \Rightarrow \aborts{\kappa}
 }
 {
-  \rho, \qualGenerator{\replaced{p}{x }}{e} \cons \seq{g} \Rightarrow \aborts{\kappa}
+  \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \aborts{\kappa}
 }
 \end{mathpar}
 \caption{Comprehension qualifiers $\seq{g}$ evaluate to result $r$ under environment $\rho : \Gamma$}
