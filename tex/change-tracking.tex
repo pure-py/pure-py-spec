@@ -42,7 +42,10 @@
   \newcommand{\Added}[1]{\leavevmode\protect\cbstart\added{#1}\protect\cbend\xspace}
   \newcommand{\Deleted}[1]{\leavevmode\protect\cbstart\deleted{#1}\protect\cbend\xspace}
   \newcommand{\Replaced}[2]{\leavevmode\protect\cbstart\replaced{#1}{#2\ }\protect\cbend\xspace}
-  \newenvironment{DeletedBlock}{\par\cbstart\color{deletedcolor}\codeinmarkuptrue\renewcommand*{\codecolor}{deletedcolor}}{\cbend\par}
+  % A float is typeset away from the block, so a deleted figure takes the colour and change bar itself.
+  \newenvironment{DeletedBlock}{\par\cbstart\color{deletedcolor}\codeinmarkuptrue\renewcommand*{\codecolor}{deletedcolor}%
+    \let\deletedFigure\figure\let\endDeletedFigure\endfigure
+    \renewenvironment{figure}[1][tbp]{\deletedFigure[##1]\cbstart\color{deletedcolor}}{\cbend\endDeletedFigure}}{\cbend\par}
   \newenvironment{AddedBlock}{\par\cbstart\color{addedcolor}\codeinmarkuptrue\renewcommand*{\codecolor}{addedcolor}}{\cbend\par}
 \fi
 
