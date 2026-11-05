@@ -270,9 +270,7 @@ class Runner(Results):
         return failures if self.runtime is None else under_bug("run", failures, path, self.runtime)
 
     def run_test(self, suite: pathlib.Path, test: pathlib.Path) -> list[str]:
-        """Run a test and return its failures. Within the suite, a test's path starts with its Python outcome
-        and its PurePy outcome, as in python-succeeds/agrees/.../name.py, or .../name/main.py for a program of
-        several modules."""
+        """Run test, taking Python and PurePy outcomes from first two directories of path within suite"""
         dirs = test.relative_to(suite).parts[:-1]
         python_outcome, purepy = PythonOutcome(dirs[0]), PurePyOutcome(dirs[1])
         exit, error_expected = TYPE_CHECKER_VERDICT[purepy]
@@ -290,7 +288,7 @@ class Runner(Results):
         ]
 
     def run_suite(self, suite: pathlib.Path, jobs: int | None) -> None:
-        """Tests run in parallel on jobs threads (default: one per core), reported in order."""
+        """Run tests in parallel on jobs threads, one per core by default, and report results in order"""
         found = list(tests(suite))
         with concurrent.futures.ThreadPoolExecutor(jobs) as pool:
             results = pool.map(lambda test: self.run_test(suite, test), found)
