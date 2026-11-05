@@ -89,7 +89,7 @@
  & $(\tyFloat, \tyFloat)$ & $\val{\modOp(v, v')}$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
 \opsep
 \pyinline{**} & $(\tyInt, \tyInt)$ & $\val{v^{v'}}$ if $v' \geq 0$; $\aborts{\errZeroDiv}$ if $v = 0$ and $v' < 0$; as at $(\tyFloat, \tyInt)$ otherwise \\
- & $(\tyFloat, \tyInt)$ & $\aborts{\errZeroDiv}$ if $v = 0$ and $v' < 0$; $\aborts{\errUndef}$ if $v$ finite and $\fl(v^{v'})$ infinite; $\val{v^{v'}}$ otherwise
+ & $(\tyFloat, \tyInt)$ & $\aborts{\errZeroDiv}$ if $v = 0$ and $v' < 0$; $\aborts{\errUndef}$ if $v$ finite and $\fl(v^{v'})$ infinite; $\val{\fl(v^{v'})}$ otherwise
 \end{tabular}}
 
 \vspace{3mm}

@@ -151,7 +151,7 @@ pattern's class\paperonly{:}\speconly{.}
 Since an object records its class by name, the class test of $\matchOp{\Sigma}$ is a comparison of
 fully-qualified names.
 
-\subsection{Modules and programs}
+\subsection{Modules and programs}\label{sec:eval-programs}
 
 \speconly{Module and program evaluation are defined in \figref{eval-modules}.}\paperonly{Module and program evaluation
 are defined in full in \specfigref{eval-modules}.} A program runs each module body once, after its imports have loaded,
@@ -183,7 +183,7 @@ $\kappa \neq \errUndef$, a run of the implementation on $\mathcal{M}$ with argum
 $\seq{v}$ in order, each as by Python's \pyinline{str} followed by a newline, and reports termination kind $\kappa$.
 \end{specdefinition}
 
-\noindent The form in which an implementation reports the termination kind is not prescribed.
+\noindent The form in which an implementation reports the termination kind is not prescribed. \added{An implementation also conforms if it meets this definition with the result of \pyinline{**} on floats rounded to either of the two floats nearest the exact power, rather than to the nearest float; Python implementations compute \pyinline{**} on floats with the power function of the platform, which is not correctly rounded in general.}
 
 \specinput{spec/fig/eval-modules}
 
