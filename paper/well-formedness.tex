@@ -117,7 +117,7 @@ once per disjunct (\ruleName{call-stmt-union}), following \ruleName{call-union} 
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
 auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\specfigref{typing-cases}), which threads
-a remaining type, starting from $\sigma$, and a residual $L$ of shapes, starting from the shapes of $\sigma$ (\figref{shapes}),
+a \replaced{\emph{remaining type}}{remaining type }, starting from $\sigma$, and a \replaced{\emph{residual}}{residual } $L$ of shapes, starting from the shapes of $\sigma$ (\figref{shapes}),
 through the cases, merging their outcomes into $S$. The \ruleName{match} rule applies when the final remaining type is $\tyNever$, meaning the match is
 exhaustive; the \ruleName{match-partial} rule applies otherwise and also merges in $\Assigns{\varnothing}$, the
 outcome of the path on which the scrutinee is not matched by any of the cases:
@@ -166,8 +166,8 @@ compatibility with mypy (\secref{python-compatibility}).
 \label{sec:well-formedness-patterns}
 
 To check a \pyinline{match} with scrutinee type $\sigma$, the auxiliary judgement
-$\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\specfigref{typing-cases}) threads a \emph{remaining type}
-$\tau$ and a \emph{residual} $L$ through the cases, both over-approximations of the values of $\sigma$ which are not
+$\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\specfigref{typing-cases}) threads a \replaced{remaining type}{\emph{remaining type} }
+$\tau$ and a \replaced{residual}{\emph{residual} } $L$ through the cases, both over-approximations of the values of $\sigma$ which are not
 matched by any of the earlier cases. The residual is an ordered set of \emph{shapes} (\figref{shapes}), each denoting a
 set of values of a single type, and starts from the shapes of $\sigma$; the remaining type is coarser, a type rather
 than a set of shapes, and starts from $\sigma$ itself. Two auxiliary functions narrow a type $\tau$ by a pattern $p$: $\matchedAs{\Sigma}(\Gamma, \tau, p)$ is
