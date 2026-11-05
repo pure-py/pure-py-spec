@@ -1,6 +1,7 @@
 \floorDiv(n, n') &{}= \text{a NaN} && \quad \text{if } \NaN(n), \NaN(n') \text{ or } n \text{ infinite} \\*
 \floorDiv(n, n') &{}= -1.0 && \quad \text{if } n' \text{ infinite and } n \text{ nonzero, of the opposite sign} \\*
 \floorDiv(n, n') &{}= 0.0 && \quad \text{if } n' \text{ infinite and } n \text{ zero or of the sign of } n' \\*
-\floorDiv(n, n') &{}= \lceil n_3 - \tfrac{1}{2} \rceil && \quad \text{otherwise, where } n_1 = n - (n' \times \trunc(n / n')), \\*
-&&& \quad \phantom{\text{otherwise, }} n_2 = \fl(\fl(n - n_1) / n'), \text{ and } n_3 = \fl(n_2 - 1) \\*
-&&& \quad \phantom{\text{otherwise, }} \text{if } n_1 \neq 0 \text{ has the opposite sign to } n', \text{ and } n_2 \text{ otherwise}
+\floorDiv(n, n') &{}= n_3 && \quad \text{if } n_3 \text{ infinite} \\*
+\floorDiv(n, n') &{}= \lceil n_3 - \tfrac{1}{2} \rceil && \quad \text{otherwise} \\*
+&&& \quad \text{where } n_1 = n - (n' \times \trunc(n / n')), \; n_2 = \fl(\fl(n - n_1) / n'), \\*
+&&& \quad \phantom{\text{where }} n_3 = \fl(n_2 - 1) \text{ if } n_1 \neq 0 \text{ has the opposite sign to } n', \text{ and } n_3 = n_2 \text{ otherwise}
