@@ -149,7 +149,7 @@ the type to which $\tau$ is narrowed if $p$ matches, and $\remaining{\Sigma}(\Ga
 $p$ fails. }Each case's pattern is checked against the remaining type, binding \replaced{any}{its } pattern variables, and matched
 against the residual. Reachability is decided by the
 residual: a case is \emph{reachable} if its pattern matches at least one shape of the residual, and a match with an
-unreachable case is ill-formed. For a reachable case, the body is checked under the bindings and its outcome merged
+unreachable case is ill-formed. For a reachable case, the body is checked under the \added{pattern }bindings and its outcome merged
 into $S$; the shapes left after matching and the type remaining if the pattern fails become the residual and remaining
 type for the case that follows\replaced{ (\ruleName{match-case}, \ruleName{match-cases}).}{: }
 \begin{DeletedBlock}
