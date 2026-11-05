@@ -165,8 +165,9 @@ the final remaining type, which the \ruleName{match} rule requires to be $\tyNev
 applying otherwise. The remaining type thus determines exhaustiveness as well as the types of pattern variables. } The Python typing
 specification leaves narrowing largely unspecified,\footnote{\url{https://typing.python.org/en/latest/spec/narrowing.html}}
 so the remaining type emulates the narrowing of a match scrutinee observed in mypy
-(\secref{python-compatibility}), which subtracts a class \added{from the type of the scrutinee }only for a
-constructor pattern that matches every value of the class, and a tuple only through one refutable component, i.e.~one whose pattern can fail to match a value of the component's type.
+(\secref{python-compatibility}), which subtracts a class \added{from the type of the scrutinee }only \replaced{when a
+constructor pattern matches}{for a
+constructor pattern that matches } every value of the class, and a tuple only through one refutable component, i.e.~one whose pattern can fail to match a value of the component's type.
 
 \input{paper/well-formedness/pattern-matching}
 
