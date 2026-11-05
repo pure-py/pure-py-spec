@@ -103,6 +103,8 @@ so they can be passed where \pyinline{Callable} types are expected.
 
 \input{spec/well-formedness/static-outcome}
 
+\input{spec/well-formedness/outcome-override-merge}
+
 The statement judgement $\Sigma; \Gamma; \zeta \vdash s : R$ says that under $\Gamma$ and
 optional return type $\zeta$, statement $s$ has static outcome $R$ (\specfigref{typing-stmt}); every rule passes $\zeta$ down unchanged.
 A sequence $\exSeq{s}{s'}$ types $s$, then types $s'$ under $\Gamma$ overridden by the context assigned
