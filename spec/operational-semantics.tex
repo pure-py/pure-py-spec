@@ -63,12 +63,10 @@ results carrying a sequence of values in place of a value.
 The value typing judgement $\vdash v : \theta$ says that value $v$ is well-typed at context entry $\theta$,
 and the environment typing judgement $\vdash \rho : \Gamma$ says that environment $\rho$ is well-typed at context
 $\Gamma$, meaning every value in $\rho$ is well-typed at the corresponding entry in $\Gamma$ (\specfigref{value-env-typing}).
-\Added{Values typed at a type scheme are also typed at the instances of the scheme at closed types
-(\ruleName{val-inst}), matching the instantiation of names bound at a scheme by the \ruleName{var-scheme} rule.}
-\Replaced{The statement evaluation judgement $\rho, s \Rightarrow o$ says that $s$ evaluates
-to outcome $o$ in $\rho$}{For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any statement $s$ with
-$\Gamma \vdash s : R$, the statement evaluation judgement $\rho, s \Rightarrow o$ says that $s$ evaluates
-to outcome $o$ in $\rho$ } (\specfigrefTwo{eval-block-outcome}{eval-block-fails}). An \pyinline{if} or
+Values typed at a type scheme are also typed at the instances of the scheme at closed types
+(\ruleName{val-inst}), matching the instantiation of names bound at a scheme by the \ruleName{var-scheme} rule.
+The statement evaluation judgement $\rho, s \Rightarrow o$ says that $s$ evaluates
+to outcome $o$ in $\rho$ (\specfigrefTwo{eval-block-outcome}{eval-block-fails}). An \pyinline{if} or
 \pyinline{assert} statement aborts with $\errExcluded$ when a condition evaluates to a non-Boolean\speconly{ (\ruleName{eval-if-nonbool}, \ruleName{eval-if-else-nonbool}, \ruleName{eval-assert-nonbool},
 \ruleName{eval-assert-msg-nonbool})}, and a failing \pyinline{assert} statement also aborts with $\errExcluded$ when
 its message is not a string\speconly{ (\ruleName{eval-assert-msg-nonstr})}. Top-level statements
@@ -80,10 +78,8 @@ the scope of sequential-composition effects, so as black boxes functions are alw
 the result of a call\speconly{; if the statement completes without returning, the result is $\val{\pyinline{None}}$.}\paperonly{:}
 \paperinput{paper/operational-semantics/result}
 
-\Replaced{The expression evaluation judgement $\rho, e \Rightarrow r$ (\specfigrefTwo{eval-result}{eval-fails}) says that $e$ evaluates to
-result $r$ in $\rho$}{For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any expression $e$ with $\Gamma \vdash e \synth
-\tau$, the expression evaluation judgement $\rho, e \Rightarrow r$ (\specfigrefTwo{eval-result}{eval-fails}) says that $e$ evaluates to
-result $r$ in $\rho$ }, where $r$ is either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). A variable
+The expression evaluation judgement $\rho, e \Rightarrow r$ (\specfigrefTwo{eval-result}{eval-fails}) says that $e$ evaluates to
+result $r$ in $\rho$, where $r$ is either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). A variable
 not bound in $\rho$, or bound to $\Unbound$, aborts with $\errName$\speconly{ (\ruleName{eval-var-unknown},
 \ruleName{eval-var-unbound})}. Function calls and constructor calls share one syntactic form, as do subscripting a container and applying a class to
 type arguments; the semantics distinguishes them by the value of the callee or subject. A call whose

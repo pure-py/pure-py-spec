@@ -81,14 +81,14 @@
   \vdash v : \tau
 }
 \and
-\added{\inferrule*[lab={\ruleName{val-inst}}]
+\inferrule*[lab={\ruleName{val-inst}}]
 {
   \vdash v : \scheme{\seq{\alpha}}{\sigma} \\
   \fv(\tau_i) = \varnothing \quad (\forall i)
 }
 {
   \vdash v : \subst{\seq{\tau}}{\seq{\alpha}}{\sigma}
-}}
+}
 \and
 \inferrule*[lab={\ruleName{val-prim}}]
 {
@@ -148,11 +148,11 @@
 \and
 \inferrule*[lab={\ruleName{val-pu}}]
 {
-  v = \Unbound \text{ or } \vdash v : \replaced{\theta}{\tau } \\
-  \added{\theta \in \set{\tau, \scheme{\seq{\alpha}}{\tau}}}
+  v = \Unbound \text{ or } \vdash v : \theta \\
+  \theta \in \set{\tau, \scheme{\seq{\alpha}}{\tau}}
 }
 {
-  \vdash v : \PU{\replaced{\theta}{\tau }}
+  \vdash v : \PU{\theta}
 }
 \end{mathpar}
 \subcaption{Value $v$ is well-typed at context entry $\theta$}

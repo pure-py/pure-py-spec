@@ -3,14 +3,14 @@
 \small
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.23\textwidth}>{\raggedright\arraybackslash}p{0.55\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}}
 \arrayrulecolor{gray!60}\hline
-\rowcolor{grammarheadcolor}Python error & \replaced{Mechanism}{Ruled out when } & See \\
-\pyinline{NameError}, \pyinline{UnboundLocalError} & \replaced{Variable use permitted only where definitely assigned; fields and base class required to name earlier type definitions}{Always: a variable may be referenced only where it is definitely assigned, and the fields and base class of a class may name only earlier type definitions. } & \figref{typing-stmt}, \figref{typing-synth}, \figref{typing-top-level} \\\rowgap
-\pyinline{ModuleNotFoundError} & \replaced{Import target required to be a program module}{Always: an import requires its target to be a module of the program. } & \figref{typing-import-prefix} \\\rowgap
-\pyinline{ImportError} & \replaced{Each imported name required to be a member of the source module; import cycles rejected, where Python may run or fail depending on entry point}{Always: a from-import requires each imported name to be a member of the source module, and import cycles are rejected. (A Python cycle may run or fail, depending on where the cycle is entered.) } & \figref{typing-imports}, \figref{typing-module} \\\rowgap
-\pyinline{AttributeError} & \replaced{Module attribute required to be definitely assigned; object attribute required to be a field of the class}{Always: a module attribute must resolve to a definitely assigned member, and an object attribute must be a field of the class. } & \figref{typing-synth} \\\rowgap
-\pyinline{TypeError} & \replaced{Operator overload required at operand types}{The operation is a constructor call or constructor pattern, which must match the arity of the class exactly. (Only excess sub-patterns are a Python error; a pattern with fewer sub-patterns is excluded even though Python permits it.) } & \figref{typing-synth}\deleted{, \figref{typing-pat-shape}} \\\rowgap
-& \added{Callee required to be a function or class, with arguments matching parameters or fields} & \added{\figref{typing-synth}} \\\rowgap
-& \added{Constructor pattern required to match class arity; Python permits fewer sub-patterns} & \added{\figref{typing-pat-shape}}
+\rowcolor{grammarheadcolor}Python error & Mechanism & See \\
+\pyinline{NameError}, \pyinline{UnboundLocalError} & Variable use permitted only where definitely assigned; fields and base class required to name earlier type definitions & \figref{typing-stmt}, \figref{typing-synth}, \figref{typing-top-level} \\\rowgap
+\pyinline{ModuleNotFoundError} & Import target required to be a program module & \figref{typing-import-prefix} \\\rowgap
+\pyinline{ImportError} & Each imported name required to be a member of the source module; import cycles rejected, where Python may run or fail depending on entry point & \figref{typing-imports}, \figref{typing-module} \\\rowgap
+\pyinline{AttributeError} & Module attribute required to be definitely assigned; object attribute required to be a field of the class & \figref{typing-synth} \\\rowgap
+\pyinline{TypeError} & Operator overload required at operand types & \figref{typing-synth} \\\rowgap
+& Callee required to be a function or class, with arguments matching parameters or fields & \figref{typing-synth} \\\rowgap
+& Constructor pattern required to match class arity; Python permits fewer sub-patterns & \figref{typing-pat-shape}
 \end{tabular}
 \caption{Python errors prevented by well-formedness}
 \label{fig:prevented-errors}
