@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import inspect
 import pathlib
 import re
 import sys
 import tomllib
 
-import purepy_conformance
 from purepy_conformance import (
     CLASSIFICATION_PLACEHOLDER,
     ERROR_EXPECTED,
@@ -21,7 +19,6 @@ from purepy_conformance import (
 )
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-TEST = ROOT / "test"
 PYTHON_VERSION = (ROOT / ".python-version").read_text().strip()
 
 RULE_NAME = re.compile(r"\\ruleName\{([a-z0-9-]+)\}")
@@ -106,19 +103,9 @@ def check_classification(r: Results, suite_dir: pathlib.Path) -> None:
 
 
 def check_lint(r: Results) -> None:
-    with r.test("test scripts and runner pass mypy and ruff"):
-        sources = [
-            str(TEST / "check-consistency.py"),
-            str(TEST / "expected-failures.py"),
-            str(TEST / "mechanisation-worktree.py"),
-            inspect.getfile(purepy_conformance),
-        ]
-        for tool in (
-            ["mypy", "--strict", "--python-version", PYTHON_VERSION],
-            ["ruff", "check"],
-            ["ruff", "format", "--check"],
-        ):
-            proc = run([*tool, *sources])
+    with r.test("Python sources pass mypy and ruff"):
+        for tool in (["mypy"], ["ruff", "check"], ["ruff", "format", "--check"]):
+            proc = run(tool, cwd=ROOT)
             if proc.returncode != 0:
                 r.fail((proc.stdout + proc.stderr).strip()[:400])
                 break
