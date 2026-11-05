@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""Print the worktree of the isabelle-purepy clone beside this one on a branch of the issue of the current branch,
-or nothing if there is none. Fail if there are several."""
+"""Print isabelle-purepy worktree for current issue, if any"""
 
 from __future__ import annotations
 

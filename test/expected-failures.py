@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""Run the conformance suite against a type checker, with diagnostics checked, and fail unless the failing tests
-are exactly those listed in test/expected-failures.txt: tests changed ahead of the implementation, one per line by
-path within the suite, each followed by a tab and the issue for the change, as OWNER/REPO#N. A directory ending
-in a slash stands for every test under it. Fail also if a listed issue is closed, since the implementation has
-then caught up and the test still fails. With --no-expected-failures, fail on any failing test."""
+"""Run suite against type checker, and fail unless failing tests are exactly expected failures listed against open issues"""
 
 from __future__ import annotations
 
