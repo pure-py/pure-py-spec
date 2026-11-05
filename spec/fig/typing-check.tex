@@ -121,11 +121,12 @@
 {
   \Sigma; \Gamma \vdash e \synth \tau \\
   \elemTy{\Sigma}(\tau) = \sigma \\
-  \Sigma; \Gamma \override \set{\bind{x}{\sigma}} \vdash \seq{g} : \Delta \\
-  x \notin \captures(\seq{g})
+  \added{\Delta' = \set{\bind{x}{\sigma} \mid x \in \binds(p)}} \\
+  \Sigma; \Gamma \override \replaced{\Delta'}{\set{\bind{x}{\sigma}} } \vdash \seq{g} : \Delta \\
+  \replaced{\binds(p) \cap \captures(\seq{g}) = \varnothing}{x \notin \captures(\seq{g}) }
 }
 {
-  \Sigma; \Gamma \vdash \qualGenerator{x}{e} \cons \seq{g} : \set{\bind{x}{\sigma}} \override \Delta
+  \Sigma; \Gamma \vdash \qualGenerator{\replaced{p}{x }}{e} \cons \seq{g} : \replaced{\Delta'}{\set{\bind{x}{\sigma}} } \override \Delta
 }
 \end{mathpar}
 \subcaption{Comprehension qualifiers $\seq{g}$ are well-formed and bind $\Delta$}

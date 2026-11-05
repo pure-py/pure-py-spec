@@ -35,7 +35,9 @@ Key type other than \pyinline{str}, such as \pyinline{dict[int, str]} & Accept a
 \designgroup{Optional and gradual typing}
 Parameter or return type without annotation & Accept definition without annotations & Syntactic \\\rowgap
 Annotation which is not a type, such as \pyinline{1} or \pyinline{list[int, int]} & Ignore annotation & Syntactic \\\rowgap
-\pyinline{Any} and \pyinline{cast} of \pyinline{typing} & Disable static checking of value & Static
+\pyinline{Any} and \pyinline{cast} of \pyinline{typing} & Disable static checking of value & Static \\\rowgap
+\designgroup{\added{Reserved words}}
+\added{Soft keywords \pyinline{match}, \pyinline{case}, \pyinline{type} and \pyinline{_} as identifiers} & \added{Reserve each only in its statement or pattern position} & \added{Syntactic}
 \end{tabular}
 \caption{Python features excluded by design}
 \label{fig:excluded-by-design}
