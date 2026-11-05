@@ -126,6 +126,30 @@ def runtime(interpreter: list[str]) -> Runtime:
     return {"CPython": Runtime.CPYTHON, "GraalVM": Runtime.GRAALPY}[implementation]
 
 
+def output_mismatch(path: pathlib.Path, proc: subprocess.CompletedProcess[str]) -> list[str]:
+    """Differences of a run from the exit status and output expected of the test at path"""
+    status_path = path.with_suffix(STATUS_EXPECTED)
+    status = int(status_path.read_text()) if status_path.exists() else 0
+    if proc.returncode != status:
+        return [f"run: exit {proc.returncode}, expected {status}: {proc.stderr.strip()}"]
+    if proc.stdout != path.with_suffix(EXPECTED).read_text():
+        return ["run: output mismatch"]
+    return []
+
+
+def exception_mismatch(path: pathlib.Path, proc: subprocess.CompletedProcess[str]) -> list[str]:
+    """Differences of a run from the exception and output expected of the test at path"""
+    name = path.with_suffix(EXCEPTION_EXPECTED).read_text().strip()
+    if proc.returncode == 0:
+        return [f"run: expected {name} but script succeeded"]
+    if name not in proc.stderr:
+        return [f"run: expected {name}, got: {proc.stderr.strip()}"]
+    output = path.with_suffix(OUTPUT_EXPECTED)
+    if proc.stdout != (output.read_text() if output.exists() else ""):
+        return ["run: output before the exception mismatch"]
+    return []
+
+
 class Results:
     def __init__(self) -> None:
         self.passed = 0
@@ -172,9 +196,7 @@ class Runner(Results):
         self.type_checker = type_checker
         self.interpreter = interpreter  # None: tests not run
         self.python_mode = python_mode  # Suite checked against Python and mypy
-        self.check_messages = (
-            check_messages  # Diagnostics checked against those of reference type checker
-        )
+        self.check_messages = check_messages  # Diagnostics checked against reference type checker
         self.type_checked = 0
         self.run_only = 0
         self.runtime = runtime(interpreter) if interpreter else None
@@ -223,55 +245,30 @@ class Runner(Results):
     def interpret(self, path: pathlib.Path, outcome: PythonOutcome, undefined: bool) -> list[str]:
         if self.interpreter is None:
             return []
-        succeeds = outcome == PythonOutcome.SUCCEEDS
         expected = path.with_suffix(EXPECTED)
         exception = path.with_suffix(EXCEPTION_EXPECTED)
         both = expected.exists() and exception.exists()
         if both and not undefined or not (expected.exists() or exception.exists()):
             return [f"run: needs exactly one of {expected.name} and {exception.name}"]
-        if not both and succeeds != expected.exists():
+        if not both and (outcome == PythonOutcome.SUCCEEDS) != expected.exists():
             return [f"run: misfiled, has {expected.name if expected.exists() else exception.name}"]
+        name = exception.read_text().strip() if exception.exists() else None
+        if name is not None and (outcome == PythonOutcome.REJECTS) != name.startswith(SYNTAX_ERROR):
+            return [f"run: misfiled, expects {name}"]
         args_path = path.with_suffix(ARGS)
         args = args_path.read_text().splitlines() if args_path.exists() else []
         proc = run([*self.interpreter, path.name, *args], cwd=path.parent)
-        failures = self.mismatch(path, outcome, undefined, both, proc)
+        succeeds = proc.returncode == 0 if both else outcome == PythonOutcome.SUCCEEDS
+        failures = (
+            []
+            if undefined and proc.returncode == Exit.UNDEFINED
+            else output_mismatch(path, proc)
+            if succeeds
+            else exception_mismatch(path, proc)
+        )
         if self.runtime is None or f"{self.runtime}{BUG}" not in path.parts:
             return failures
         return [] if failures else [f"run: passes, but filed as a reported {self.runtime} bug"]
-
-    def mismatch(
-        self,
-        path: pathlib.Path,
-        outcome: PythonOutcome,
-        undefined: bool,
-        both: bool,
-        proc: subprocess.CompletedProcess[str],
-    ) -> list[str]:
-        """Differences of a run from the outcome expected of the test at path"""
-        expected = path.with_suffix(EXPECTED)
-        exception = path.with_suffix(EXCEPTION_EXPECTED)
-        if undefined and proc.returncode == Exit.UNDEFINED:
-            return []
-        succeeds = proc.returncode == 0 if both else outcome == PythonOutcome.SUCCEEDS
-        if succeeds:
-            status_path = path.with_suffix(STATUS_EXPECTED)
-            status = int(status_path.read_text()) if status_path.exists() else 0
-            if proc.returncode != status:
-                return [f"run: exit {proc.returncode}, expected {status}: {proc.stderr.strip()}"]
-            if proc.stdout != expected.read_text():
-                return ["run: output mismatch"]
-            return []
-        name = exception.read_text().strip()
-        if (outcome == PythonOutcome.REJECTS) != name.startswith(SYNTAX_ERROR):
-            return [f"run: misfiled, expects {name}"]
-        if proc.returncode == 0:
-            return [f"run: expected {name} but script succeeded"]
-        if name not in proc.stderr:
-            return [f"run: expected {name}, got: {proc.stderr.strip()}"]
-        output = path.with_suffix(OUTPUT_EXPECTED)
-        if proc.stdout != (output.read_text() if output.exists() else ""):
-            return ["run: output before the exception mismatch"]
-        return []
 
     def run_test(self, suite: pathlib.Path, test: pathlib.Path) -> list[str]:
         """Run a test and return its failures. Within the suite, a test's path starts with its Python outcome
