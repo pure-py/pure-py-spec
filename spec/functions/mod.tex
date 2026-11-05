@@ -1,9 +1,9 @@
 \modOp(n, n') &{}= \nan && \quad \text{if } n \in \set{\nan, \infVal, -\infVal} \text{ or } n' = \nan \\*
-\modOp(n, n') &{}= n && \quad \text{if } n' = \infVal \text{ and } n > 0 \\*
-\modOp(n, n') &{}= n && \quad \text{if } n' = -\infVal \text{ and } n < 0 \\*
-\modOp(n, n') &{}= n' && \quad \text{if } n' = \infVal \text{ and } n < 0 \\*
-\modOp(n, n') &{}= n' && \quad \text{if } n' = -\infVal \text{ and } n > 0 \\*
+\modOp(n, n') &{}= n && \quad \text{if } n' = \infVal \text{ and } x > 0 \\*
+\modOp(n, n') &{}= n && \quad \text{if } n' = -\infVal \text{ and } x < 0 \\*
+\modOp(n, n') &{}= n' && \quad \text{if } n' = \infVal \text{ and } x < 0 \\*
+\modOp(n, n') &{}= n' && \quad \text{if } n' = -\infVal \text{ and } x > 0 \\*
 \modOp(n, n') &{}= 0.0 && \quad \text{if } n' = \infVal \text{ and } n \text{ zero} \\*
 \modOp(n, n') &{}= -0.0 && \quad \text{if } n' = -\infVal \text{ and } n \text{ zero} \\*
-\modOp(n, n') &{}= -0.0 && \quad \text{if } n_1 = 0 \text{ and } n' < 0 \\*
+\modOp(n, n') &{}= -0.0 && \quad \text{if } n_1 = 0.0 \text{ and } x' < 0 \\*
 \modOp(n, n') &{}= n_1 && \quad \text{otherwise}

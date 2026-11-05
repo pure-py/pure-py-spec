@@ -51,16 +51,16 @@
 \opsep
 \pyinline{not in} & $(\tyObject, \tyObject)$ & $\val{\pyinline{True}}$ if $\inOp{\Sigma}(v, v') = \val{\pyinline{False}}$; $\val{\pyinline{False}}$ if $\inOp{\Sigma}(v, v') = \val{\pyinline{True}}$; $\inOp{\Sigma}(v, v')$ otherwise \\
 \opsep
-\pyinline{<} & $(\tyFloat, \tyFloat)$ & $\val{\pyinline{True}}$ if $v < v'$; $\val{\pyinline{False}}$ otherwise \\
+\pyinline{<} & $(\tyFloat, \tyFloat)$ & $\val{\pyinline{True}}$ if $\realOf(v) < \realOf(v')$; $\val{\pyinline{False}}$ otherwise \\
  & $(\tyStr, \tyStr)$ & $\val{\pyinline{True}}$ if $v < v'$; $\val{\pyinline{False}}$ otherwise \\
 \opsep
-\pyinline{<=} & $(\tyFloat, \tyFloat)$ & $\val{\pyinline{True}}$ if $v \leq v'$; $\val{\pyinline{False}}$ otherwise \\
+\pyinline{<=} & $(\tyFloat, \tyFloat)$ & $\val{\pyinline{True}}$ if $\realOf(v) \leq \realOf(v')$; $\val{\pyinline{False}}$ otherwise \\
  & $(\tyStr, \tyStr)$ & $\val{\pyinline{True}}$ if $v \leq v'$; $\val{\pyinline{False}}$ otherwise \\
 \opsep
-\pyinline{>} & $(\tyFloat, \tyFloat)$ & $\val{\pyinline{True}}$ if $v > v'$; $\val{\pyinline{False}}$ otherwise \\
+\pyinline{>} & $(\tyFloat, \tyFloat)$ & $\val{\pyinline{True}}$ if $\realOf(v) > \realOf(v')$; $\val{\pyinline{False}}$ otherwise \\
  & $(\tyStr, \tyStr)$ & $\val{\pyinline{True}}$ if $v > v'$; $\val{\pyinline{False}}$ otherwise \\
 \opsep
-\pyinline{>=} & $(\tyFloat, \tyFloat)$ & $\val{\pyinline{True}}$ if $v \geq v'$; $\val{\pyinline{False}}$ otherwise \\
+\pyinline{>=} & $(\tyFloat, \tyFloat)$ & $\val{\pyinline{True}}$ if $\realOf(v) \geq \realOf(v')$; $\val{\pyinline{False}}$ otherwise \\
  & $(\tyStr, \tyStr)$ & $\val{\pyinline{True}}$ if $v \geq v'$; $\val{\pyinline{False}}$ otherwise \\
 \opsep
 \pyinline{+} & $(\tyInt, \tyInt)$ & $\val{v + v'}$ \\
@@ -80,16 +80,16 @@
  & $(\tyInt, \tyList{\tyObject})$ & $\val{\exList{\bigconcat{\seq{v}^n}}}$ where $v' = \exList{\seq{v}}$ and $n = \max(v, 0)$ \\
 \opsep
 \pyinline{/} & $(\tyInt, \tyInt)$ & $\floatOp(v / v')$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
- & $(\tyFloat, \tyFloat)$ & $\val{v / v'}$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
+ & $(\tyFloat, \tyFloat)$ & $\val{v / v'}$ if $\realOf(v') \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
 \opsep
 \pyinline{//} & $(\tyInt, \tyInt)$ & $\val{\lfloor v / v' \rfloor}$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
- & $(\tyFloat, \tyFloat)$ & $\val{\floorDiv(v, v')}$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
+ & $(\tyFloat, \tyFloat)$ & $\val{\floorDiv(v, v')}$ if $\realOf(v') \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
 \opsep
 \pyinline{\%} & $(\tyInt, \tyInt)$ & $\val{v - (v' \times \lfloor v / v' \rfloor)}$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
- & $(\tyFloat, \tyFloat)$ & $\val{\modOp(v, v')}$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
+ & $(\tyFloat, \tyFloat)$ & $\val{\modOp(v, v')}$ if $\realOf(v') \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
 \opsep
 \pyinline{**} & $(\tyInt, \tyInt)$ & $\val{v^{v'}}$ if $v' \geq 0$; $\aborts{\errZeroDiv}$ if $v = 0$ and $v' < 0$; as at $(\tyFloat, \tyInt)$ otherwise \\
- & $(\tyFloat, \tyInt)$ & $\aborts{\errZeroDiv}$ if $v = 0$ and $v' < 0$; $\aborts{\errUndef}$ if $v$ finite and $\fl(v^{v'})$ infinite; $\val{\fl(v^{v'})}$ otherwise
+ & $(\tyFloat, \tyInt)$ & $\aborts{\errZeroDiv}$ if $\realOf(v) = 0$ and $v' < 0$; $\aborts{\errUndef}$ if $v$ finite and $\fl(\realOf(v)^{v'})$ infinite; $\val{\fl(\realOf(v)^{v'})}$ otherwise
 \end{tabular}}
 
 \vspace{3mm}
