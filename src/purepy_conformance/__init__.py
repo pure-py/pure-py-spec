@@ -63,7 +63,6 @@ def excluded(feature: str, classification: Classification) -> str:
 # Placeholder for classification at end of expected error for excluded feature
 CLASSIFICATION = "{classification}"
 
-# Classification of an excluded feature, for each PurePy outcome which rejects a program
 CLASSIFICATION_OF: dict[PurePyOutcome, Classification] = {
     PurePyOutcome.PARSER_REJECTS: Classification.BY_DESIGN,
     PurePyOutcome.TYPING_REJECTS: Classification.BY_DESIGN,
