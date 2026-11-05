@@ -129,6 +129,15 @@ check-suite-purepy:
 	@test -n "$(PUREPY_LATEST_WHEEL)" || { echo "no release of the mechanisation found"; exit 1; }
 	uv run --locked python test/expected-failures.py --type-checker "uvx --from $(PUREPY_LATEST_WHEEL) purepy --check"
 
+## Mechanisation of the current issue, or else the latest release, passes the suite except for listed expected failures
+check-suite-mechanisation:
+	@tree=$$(uv run --locked python test/mechanisation.py) || exit 1; \
+	if [ -z "$$tree" ]; then $(MAKE) check-suite-purepy; else \
+		test -z "$$(git -C "$$tree" status --porcelain)" || { echo "uncommitted changes in $$tree"; exit 1; }; \
+		$(MAKE) -C "$$tree" build && \
+		uv run --locked python test/expected-failures.py --type-checker "uv run --project $$tree purepy --check"; \
+	fi
+
 ## Wheel of the conformance suite and runner
 wheel: check-targets check-consistency check-suite-python check-suite-purepy
 	rm -rf dist && uv build --wheel
@@ -195,4 +204,4 @@ help:
 
 .PHONY: default all help check-targets paper-submission check-page-limit check-paper-anonymised check-review-mode \
 	check-anonymised check-archived-theories check-archived-suite check-submission clean \
-	check-consistency check-suite-python check-suite-purepy wheel
+	check-consistency check-suite-python check-suite-purepy check-suite-mechanisation wheel

@@ -1,15 +1,8 @@
 #!/usr/bin/env python3
-"""Before pushing commits that change the conformance suite, run the suite against the mechanisation of the same
-issue, or against the latest release of the mechanisation when there is none, allowing only the failures listed in
-test/expected-failures.txt. The mechanisation of the issue is the worktree of the isabelle-purepy clone beside the
-main clone of this repository whose branch has the issue number of the pushed branch. Refuse the push if the suite
-fails or an assumption of the check is violated."""
+"""Refuse a push of commits which change the conformance suite unless make check-suite-mechanisation passes."""
 
 from __future__ import annotations
 
-import pathlib
-import re
-import shlex
 import subprocess
 import sys
 
@@ -21,8 +14,8 @@ def fail(message: str) -> None:
     sys.exit(f"pre-push: {message}")
 
 
-def git(*args: str, cwd: pathlib.Path | None = None) -> str:
-    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, check=True).stdout.strip()
+def git(*args: str) -> str:
+    return subprocess.run(["git", *args], capture_output=True, text=True, check=True).stdout.strip()
 
 
 def changes_suite(sha: str) -> bool:
@@ -31,56 +24,20 @@ def changes_suite(sha: str) -> bool:
     return any(path.startswith(SUITE) for path in paths)
 
 
-def worktrees(clone: pathlib.Path) -> list[tuple[pathlib.Path, str]]:
-    """Path and branch of each worktree of clone, with an empty branch for a detached worktree"""
-    entries = [dict(line.split(" ", 1) for line in entry.splitlines() if " " in line)
-               for entry in git("worktree", "list", "--porcelain", cwd=clone).split("\n\n")]
-    return [(pathlib.Path(entry["worktree"]), entry.get("branch", "").removeprefix("refs/heads/")) for entry in entries]
-
-
-def mechanisation(clone: pathlib.Path, branch: str) -> pathlib.Path | None:
-    """Worktree of clone on a branch of the issue of branch, if any"""
-    issue = re.match(r"\d+-", branch)
-    if not issue or not (clone / ".git").is_dir():
-        return None
-    matching = [path for path, name in worktrees(clone) if name.startswith(issue[0])]
-    if len(matching) > 1:
-        fail(f"several worktrees of {clone} on branches of issue {issue[0][:-1]}: {', '.join(map(str, matching))}")
-    return matching[0] if matching else None
-
-
-def check(clone: pathlib.Path, branch: str, sha: str) -> None:
+def check(branch: str, sha: str) -> None:
     if sha != git("rev-parse", "HEAD"):
         fail(f"{branch} not checked out here at the pushed commit")
     if git("status", "--porcelain"):
         fail("uncommitted changes here")
-    tree = mechanisation(clone, branch)
-    if tree is None:
-        print(f"pre-push: suite of {branch} against the latest release of the mechanisation", file=sys.stderr)
-        if subprocess.run(["make", "check-suite-purepy"]).returncode != 0:
-            fail(f"suite of {branch} fails against the latest release of the mechanisation")
-        return
-    if git("status", "--porcelain", cwd=tree):
-        fail(f"uncommitted changes in {tree}")
-    print(f"pre-push: suite of {branch} against the mechanisation in {tree}", file=sys.stderr)
-    if subprocess.run(["make", "build"], cwd=tree).returncode != 0:
-        fail(f"build of the mechanisation in {tree} failed")
-    checker = f"uv run --project {shlex.quote(str(tree))} purepy --check"
-    suite = ["uv", "run", "--locked", "python", "test/expected-failures.py", "--type-checker", checker]
-    if subprocess.run(suite).returncode != 0:
-        fail(f"suite of {branch} fails against the mechanisation in {tree}")
+    if subprocess.run(["make", "check-suite-mechanisation"]).returncode != 0:
+        fail(f"suite of {branch} fails against the mechanisation")
 
 
 def main() -> None:
     pushes = [line.split() for line in sys.stdin.read().splitlines()]
-    branches = [(ref.removeprefix("refs/heads/"), sha) for ref, sha, _, _ in pushes
-                if ref.startswith("refs/heads/") and sha != DELETED and changes_suite(sha)]
-    if not branches:
-        return
-    spec = pathlib.Path(git("rev-parse", "--path-format=absolute", "--git-common-dir")).parent
-    clone = spec.parent / "isabelle-purepy"
-    for branch, sha in branches:
-        check(clone, branch, sha)
+    for ref, sha, _, _ in pushes:
+        if ref.startswith("refs/heads/") and sha != DELETED and changes_suite(sha):
+            check(ref.removeprefix("refs/heads/"), sha)
 
 
 if __name__ == "__main__":

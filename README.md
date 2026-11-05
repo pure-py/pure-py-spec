@@ -45,9 +45,10 @@ make wheel
 The reference implementation is the latest release of the mechanisation in the `isabelle-purepy` repository;
 `make check-suite-purepy` runs the suite against it.
 
-A push of commits that change the suite first runs the suite against the mechanisation built from the
-`isabelle-purepy` clone beside this one on the branch of the same issue, or against the latest release when that
-clone has no such branch, and is refused if any test fails other than those listed in `test/expected-failures.txt`. Enable the hook once per clone:
+`make check-suite-mechanisation` runs the suite against the mechanisation built from the `isabelle-purepy` clone
+beside this one on the branch of the same issue, or against the latest release when that clone has no such branch,
+and fails if any test fails other than those listed in `test/expected-failures.txt`. A push of commits that change
+the suite is refused unless this check passes. Enable the hook once per clone:
 
 ```bash
 git config core.hooksPath script/hooks
