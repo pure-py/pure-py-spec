@@ -129,9 +129,9 @@ check-suite-purepy:
 	@test -n "$(PUREPY_LATEST_WHEEL)" || { echo "no release of the mechanisation found"; exit 1; }
 	uv run --locked python test/expected-failures.py --type-checker "uvx --from $(PUREPY_LATEST_WHEEL) purepy --check"
 
-## Mechanisation of the current issue, or else the latest release, passes the suite except for listed expected failures
+## Suite against the isabelle-purepy branch of the same issue, or else the latest release
 check-suite-mechanisation:
-	@tree=$$(uv run --locked python test/mechanisation.py) || exit 1; \
+	@tree=$$(uv run --locked python test/mechanisation-worktree.py) || exit 1; \
 	if [ -z "$$tree" ]; then $(MAKE) check-suite-purepy; else \
 		test -z "$$(git -C "$$tree" status --porcelain)" || { echo "uncommitted changes in $$tree"; exit 1; }; \
 		$(MAKE) -C "$$tree" build && \

@@ -111,19 +111,22 @@ def run(cmd: list[str], cwd: pathlib.Path | None = None) -> subprocess.Completed
     return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, check=False)
 
 
-def runtime(interpreter: list[str]) -> str:
-    """Runtime run by interpreter, named as in a directory of reported bugs: cpython, graalpy or pyodide"""
-    proc = run(
-        [
-            *interpreter,
-            "-c",
-            "import platform, sys; print(platform.python_implementation(), sys.platform)",
-        ]
-    )
-    implementation, system = proc.stdout.split()
+class Runtime(StrEnum):
+    """Python runtime, named as in a directory of reported bugs"""
+
+    CPYTHON = "cpython"
+    GRAALPY = "graalpy"
+    PYODIDE = "pyodide"
+
+
+RUNTIME_QUERY = "import platform, sys; print(platform.python_implementation(), sys.platform)"
+
+
+def runtime(interpreter: list[str]) -> Runtime:
+    implementation, system = run([*interpreter, "-c", RUNTIME_QUERY]).stdout.split()
     if system == "emscripten":
-        return "pyodide"
-    return {"GraalVM": "graalpy"}.get(implementation, implementation.lower())
+        return Runtime.PYODIDE
+    return {"CPython": Runtime.CPYTHON, "GraalVM": Runtime.GRAALPY}[implementation]
 
 
 class Results:
