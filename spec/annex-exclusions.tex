@@ -7,8 +7,9 @@ This annex is informative and imposes no requirements; the exclusions which it d
 the syntax, well-formedness rules or semantics of \PurePy, and their classification follows from
 \secref{excluded-features}. It summarises the Python behaviours excluded by \PurePy{} by design
 (\secref{excluded-by-design}) with the stage at which each
-exclusion takes effect, and lists the common Python features excluded from this version
-(\secref{excluded-from-version}).
+exclusion takes effect, \replaced{lists}{and lists } the common Python features excluded from this version
+(\secref{excluded-from-version})\added{, and lists the Python runtime errors which well-formedness prevents
+(\secref{runtime-errors})}.
 
 \section{Behaviours excluded by design}
 \label{sec:excluded-by-design}
@@ -43,14 +44,14 @@ where it occurs.
 
 \input{spec/exclusions/mypy-restrictions}
 
-\subsection{Runtime errors}
-\label{sec:runtime-errors}
-
-\input{spec/exclusions/prevented-errors}
-
 \section{Features excluded from this version}
 \label{sec:excluded-from-version}
 
 \figref{excluded-from-version} lists common Python features excluded from this version (\secref{excluded-features}).
 
 \input{spec/fig/excluded-from-version}
+
+\section{\replaced{Runtime errors prevented by well-formedness}{Runtime errors }}
+\label{sec:runtime-errors}
+
+\input{spec/exclusions/prevented-errors}
