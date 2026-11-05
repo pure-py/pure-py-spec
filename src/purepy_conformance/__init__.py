@@ -142,7 +142,7 @@ def under_bug(stage: str, failures: list[str], test: pathlib.Path, tool: str) ->
 
 
 def output_mismatch(path: pathlib.Path, proc: subprocess.CompletedProcess[str]) -> list[str]:
-    """Differences of a run from the exit status and output expected of the test at path"""
+    """Check that run proc of test at path gave expected exit status and output"""
     status_path = path.with_suffix(STATUS_EXPECTED)
     status = int(status_path.read_text()) if status_path.exists() else 0
     if proc.returncode != status:
@@ -153,7 +153,7 @@ def output_mismatch(path: pathlib.Path, proc: subprocess.CompletedProcess[str]) 
 
 
 def exception_mismatch(path: pathlib.Path, proc: subprocess.CompletedProcess[str]) -> list[str]:
-    """Differences of a run from the exception and output expected of the test at path"""
+    """Check that run proc of test at path printed expected output, then raised expected exception"""
     name = path.with_suffix(EXCEPTION_EXPECTED).read_text().strip()
     if proc.returncode == 0:
         return [f"run: expected {name} but script succeeded"]
