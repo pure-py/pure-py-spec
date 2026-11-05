@@ -9,6 +9,8 @@ import tomllib
 
 import purepy_conformance
 from purepy_conformance import (
+    BUG,
+    BUG_CITATION,
     CLASSIFICATION,
     ERROR_EXPECTED,
     MAIN,
@@ -79,6 +81,12 @@ def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
                 r.fail(f"{path.relative_to(suite_dir)} cites {cited.group(1)}")
             elif cited is not None and cited.group(1) not in spec:
                 r.fail(f"{path.relative_to(suite_dir)} cites {cited.group(1)}, not in the spec")
+            bug_dir = any(d.endswith(BUG) for d in dirs)
+            bug = BUG_CITATION.match(path.read_text(encoding="utf-8").split("\n", 2)[1])
+            if bug_dir and bug is None:
+                r.fail(f"{path.relative_to(suite_dir)} cites no bug on its second line")
+            elif bug is not None and not bug_dir:
+                r.fail(f"{path.relative_to(suite_dir)} cites a bug but is not filed under one")
 
 
 def check_classification(r: Results, suite_dir: pathlib.Path) -> None:
