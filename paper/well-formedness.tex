@@ -103,7 +103,13 @@ so they can be passed where \pyinline{Callable} types are expected.
 
 \input{spec/well-formedness/static-outcome}
 
+\begin{DeletedBlock}
 \input{spec/well-formedness/outcome-override-merge}
+\end{DeletedBlock}
+\begin{AddedBlock}
+Override and merge lift to static outcomes (Definition~\specnum{def:outcome-override-merge}), with $\Returns$ as zero for
+$\override$ and as unit for $\merge_{\Sigma}$.
+\end{AddedBlock}
 
 The statement judgement $\Sigma; \Gamma; \zeta \vdash s : R$ says that under $\Gamma$ and
 optional return type $\zeta$, statement $s$ has static outcome $R$ (\specfigref{typing-stmt}); every rule passes $\zeta$ down unchanged.
@@ -128,6 +134,7 @@ outcome of the path on which the scrutinee is not matched by any of the cases:
 The remaining type, the residual, reachability and exhaustiveness are the subject of
 \secref{well-formedness-patterns}.
 
+\begin{DeletedBlock}
 The \ruleName{defs} rule for a mutual def region of function definitions synthesises a type scheme for each definition
 (\specfigref{typing-def}), binds all the function names of the mutual def region at the synthesised type schemes, and checks each
 definition against its type scheme:
@@ -148,6 +155,15 @@ The body $s$ is checked with the
 return type denoted by $\psi$, and must have static outcome $\Returns$ unless that type is equivalent to \pyinline{None},
 so a function that declares a result definitely returns one. A return type such as $\tyUnion{\tyInt}{\tyNone}$
 does not exempt the body from returning, nor permit a bare \pyinline{return}, for compatibility with mypy (\secref{python-compatibility}).
+\end{DeletedBlock}
+\begin{AddedBlock}
+The \ruleName{defs} rule (\specfigrefTwo{typing-stmt-ctd}{typing-def}) checks each definition of a mutual def region against
+the type scheme synthesised from its annotations, in a context in which every name of the region is definitely assigned
+(\secref{mutual-recursion}). The body is checked with the declared return type, and must have static outcome $\Returns$
+unless that type is equivalent to \pyinline{None}, so a function that declares a result definitely returns one. A return
+type such as $\tyUnion{\tyInt}{\tyNone}$ does not exempt the body from returning, nor permit a bare \pyinline{return}, for
+compatibility with mypy (\secref{python-compatibility}).
+\end{AddedBlock}
 
 \subsection{Pattern matching}
 \label{sec:exhaustiveness}
