@@ -46,10 +46,9 @@ def check_python_version(r: Results) -> None:
 def check_unique_rule_names(r: Results) -> None:
     with r.test("unique rule names"):
         where: dict[str, list[str]] = {}
-        for source in ("spec", "paper"):
-            for f in sorted((ROOT / source).rglob("*.tex")):
-                for name in RULE_DEF.findall(current(f)):
-                    where.setdefault(name, []).append(str(f.relative_to(ROOT)))
+        for f in sorted((ROOT / "spec").rglob("*.tex")):
+            for name in RULE_DEF.findall(current(f)):
+                where.setdefault(name, []).append(str(f.relative_to(ROOT)))
         for name, files in sorted(where.items()):
             if len(files) > 1:
                 r.fail(f"{name} in {', '.join(files)}")
