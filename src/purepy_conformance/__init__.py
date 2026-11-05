@@ -114,17 +114,10 @@ def run(cmd: list[str], cwd: pathlib.Path | None = None) -> subprocess.Completed
 
 
 def runtime(interpreter: list[str]) -> str:
-    """Name of the Python implementation run by interpreter, in lower case, as in cpython, graalpy and pyodide"""
-    proc = run(
-        [
-            *interpreter,
-            "-c",
-            "import platform, sys; print(platform.python_implementation(), sys.platform)",
-        ]
-    )
-    implementation, platform = proc.stdout.split()
-    if platform == "emscripten":
-        return "pyodide"
+    """Name of the Python implementation run by interpreter, in lower case, as in cpython and graalpy; Pyodide
+    is cpython"""
+    proc = run([*interpreter, "-c", "import platform; print(platform.python_implementation())"])
+    implementation = proc.stdout.strip()
     return {"GraalVM": "graalpy"}.get(implementation, implementation.lower())
 
 
@@ -294,23 +287,25 @@ class Runner(Results):
         ]
 
     def outcome(self, suite: pathlib.Path, test: pathlib.Path) -> tuple[list[str], str | None]:
-        """Failures of a test, and the bug cited if the test fails as reported under the tool in use, mypy in
-        Python mode and otherwise the interpreter's runtime; such a test passing is a failure, since the bug has
-        then been fixed."""
+        """Failures of a test, and the bugs cited if the test fails as reported under a tool in use: mypy in
+        Python mode, and the interpreter's runtime. Such a test passing is a failure, since the bug has then been
+        fixed."""
         failures = self.run_test(suite, test)
-        tool = MYPY if self.python_mode else self.runtime
-        bug = reported_bug(test, tool) if tool else None
-        if bug is None:
-            return failures, None
-        if tool == MYPY:
-            return failures, None if failures else bug
-        runs = [f for f in failures if f.startswith("run:")]
-        if not runs:
-            return [
-                *failures,
-                f"run: passes, but filed as a reported {self.runtime} bug ({bug})",
-            ], None
-        return [f for f in failures if f not in runs], bug
+        reported = []
+        run_bug = reported_bug(test, self.runtime) if self.runtime else None
+        if run_bug:
+            runs = [f for f in failures if f.startswith("run:")]
+            if runs:
+                failures = [f for f in failures if f not in runs]
+                reported.append(run_bug)
+            else:
+                failures.append(
+                    f"run: passes, but filed as a reported {self.runtime} bug ({run_bug})"
+                )
+        check_bug = reported_bug(test, MYPY) if self.python_mode else None
+        if check_bug and not any(f.startswith("check:") for f in failures):
+            reported.append(check_bug)
+        return failures, ", ".join(reported) or None
 
     def run_suite(self, suite: pathlib.Path, jobs: int | None) -> None:
         """Tests run in parallel on jobs threads (default: one per core), reported in order."""
