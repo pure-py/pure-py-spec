@@ -94,10 +94,6 @@ Python typing specification does not specify how type arguments are inferred in 
 instantiating their type parameters from $\tau$ in the same way, provided the instantiated type is a subtype of $\tau$,
 so they can be passed where \pyinline{Callable} types are expected.
 
-
-
-
-
 \subsection{Statements}
 \label{sec:well-formedness-statements}
 
@@ -118,12 +114,9 @@ unless that type is equivalent to \pyinline{None}, so a function that declares a
 type such as $\tyUnion{\tyInt}{\tyNone}$ does not exempt the body from returning, nor permit a bare \pyinline{return}, for
 compatibility with mypy (\secref{python-compatibility}).
 
-A \pyinline{match} scrutinee synthesises a type $\sigma$\replaced{. \emph{Case checking} (\secref{well-formedness-patterns}) types the cases $\seq{b}$ against
+A \pyinline{match} scrutinee synthesises a type $\sigma$. \emph{Case checking} (\secref{well-formedness-patterns}) types the cases $\seq{b}$ against
 $\sigma$, merges their outcomes into $S$ and gives a final \emph{remaining type}, an over-approximation of the
-values of $\sigma$ left unmatched by the cases.}{, and its cases $\seq{b}$ are checked in turn by the
-auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\specfigref{typing-cases}), which threads
-a \emph{remaining type}, starting from $\sigma$, and a \emph{residual} $L$ of shapes, starting from the shapes of $\sigma$ (\figref{shapes}),
-through the cases, merging their outcomes into $S$. } The \ruleName{match} rule applies when the final remaining type is $\tyNever$, meaning the match is
+values of $\sigma$ left unmatched by the cases. The \ruleName{match} rule applies when the final remaining type is $\tyNever$, meaning the match is
 exhaustive; the \ruleName{match-partial} rule applies otherwise and also merges in $\Assigns{\varnothing}$, the
 outcome of the path on which the scrutinee is not matched by any of the cases:
 \begin{mathpar}
@@ -139,43 +132,30 @@ The remaining type, the residual, reachability and exhaustiveness are the subjec
 \label{sec:exhaustiveness}
 \label{sec:well-formedness-patterns}
 
-\replaced{For a \pyinline{match} with scrutinee type $\sigma$, case checking}{To check a \pyinline{match} with scrutinee type $\sigma$, the auxiliary judgement }
+For a \pyinline{match} with scrutinee type $\sigma$, case checking
 $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\specfigref{typing-cases}) threads a remaining type
-$\tau$ and a \replaced{\emph{residual}}{residual } $L$ through the cases\replaced{, both of which over-approximate the values of $\sigma$ left unmatched by earlier cases.}{, both over-approximations of the values of $\sigma$ which are not
-matched by any of the earlier cases. } The residual is an ordered set of \emph{shapes} \replaced{(\specfigref{shapes-syntax})}{(\figref{shapes}) }, each denoting a
-set of values of a single type, \replaced{starting}{and starts } from the shapes of $\sigma$; the remaining type is coarser, a type rather
-than a set of shapes, \replaced{starting}{and starts } from $\sigma$ itself. \deleted{Two auxiliary functions narrow a type $\tau$ by a pattern $p$: $\matchedAs{\Sigma}(\Gamma, \tau, p)$ is
-the type to which $\tau$ is narrowed if $p$ matches, and $\remaining{\Sigma}(\Gamma, \tau, p)$ is the type remaining if
-$p$ fails. }Each case's pattern is checked against the remaining type, binding \replaced{any}{its } pattern variables, and matched
+$\tau$ and a \emph{residual} $L$ through the cases, both of which over-approximate the values of $\sigma$ left unmatched by earlier cases. The residual is an ordered set of \emph{shapes} (\specfigref{shapes-syntax}), each denoting a
+set of values of a single type, starting from the shapes of $\sigma$; the remaining type is coarser, a type rather
+than a set of shapes, starting from $\sigma$ itself. Each case's pattern is checked against the remaining type, binding any pattern variables, and matched
 against the residual. Reachability is decided by the
 residual: a case is \emph{reachable} if its pattern matches at least one shape of the residual, and a match with an
-unreachable case is ill-formed. For a reachable case, the body is checked under the \added{pattern }bindings and its outcome merged
+unreachable case is ill-formed. For a reachable case, the body is checked under the pattern bindings and its outcome merged
 into $S$; the shapes left after matching and the type remaining if the pattern fails become the residual and remaining
-type for the case that follows\replaced{ (\ruleName{match-case}, \ruleName{match-cases}).}{: }
-\begin{DeletedBlock}
-\begin{mathpar}
-\small
-\input{spec/rules/match-cases}
-\end{mathpar}
-\end{DeletedBlock}
+type for the case that follows (\ruleName{match-case}, \ruleName{match-cases}).
 
-\replaced{The remaining type determines the types of pattern variables and, via the \ruleName{match} rule, whether a
-match is \emph{exhaustive}, meaning that its cases between them match every value of $\sigma$.}{A match is \emph{exhaustive} when its cases between them match every value of $\sigma$. Exhaustiveness is decided by
-the final remaining type, which the \ruleName{match} rule requires to be $\tyNever$, with \ruleName{match-partial}
-applying otherwise. The remaining type thus determines exhaustiveness as well as the types of pattern variables. } The Python typing
+The remaining type determines the types of pattern variables and, via the \ruleName{match} rule, whether a
+match is \emph{exhaustive}, meaning that its cases between them match every value of $\sigma$. The Python typing
 specification leaves narrowing largely unspecified,\footnote{\url{https://typing.python.org/en/latest/spec/narrowing.html}}
-so the remaining type emulates the narrowing of \replaced{match scrutinees}{a match scrutinee } observed in mypy
-(\secref{python-compatibility}), which subtracts a class \added{from the scrutinee type }only \replaced{when a
-constructor pattern matches}{for a
-constructor pattern that matches } every value of the class, \replaced{and narrows a tuple type only when exactly one sub-pattern of a tuple pattern can fail to match a value of the corresponding component type.}{and a tuple only through one refutable component, i.e.~one whose pattern can fail to match a value of the component's type. }
+so the remaining type emulates the narrowing of match scrutinees observed in mypy
+(\secref{python-compatibility}), which subtracts a class from the scrutinee type only when a
+constructor pattern matches every value of the class, and narrows a tuple type only when exactly one sub-pattern of a tuple pattern can fail to match a value of the corresponding component type.
 
 \input{paper/well-formedness/pattern-matching}
 
 The cases needed to exhaust a match therefore depend on the type of the scrutinee: a union is exhausted
 by covering each disjunct, a class type by a pattern for the class itself, \pyinline{bool} by
-\pyinline{True} and \pyinline{False}, and a dictionary type by the empty dictionary pattern, while \pyinline{int}, \pyinline{float}, \pyinline{str} and lists \replaced{need a variable or wildcard, since literal patterns match single values and list patterns match lists of a
-specific length}{have
-unboundedly many heads and need a variable or wildcard}. A literal-typed scrutinee is exhausted by covering
+\pyinline{True} and \pyinline{False}, and a dictionary type by the empty dictionary pattern, while \pyinline{int}, \pyinline{float}, \pyinline{str} and lists need a variable or wildcard, since literal patterns match single values and list patterns match lists of a
+specific length. A literal-typed scrutinee is exhausted by covering
 its literals, so $\exAssign{\pyinline{x}\exAnnot{\tyLiteral{\pyinline{42}}}}{\pyinline{42}}$ admits a match with a case for \pyinline{42} alone, while
 $\exAssign{\pyinline{x}\exAnnot{\tyInt}}{\pyinline{42}}$ keeps the type open. Over
 $\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
