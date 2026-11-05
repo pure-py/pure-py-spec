@@ -234,10 +234,25 @@ class Runner(Results):
         args_path = path.with_suffix(ARGS)
         args = args_path.read_text().splitlines() if args_path.exists() else []
         proc = run([*self.interpreter, path.name, *args], cwd=path.parent)
+        failures = self.mismatch(path, outcome, undefined, both, proc)
+        if self.runtime is None or f"{self.runtime}{BUG}" not in path.parts:
+            return failures
+        return [] if failures else [f"run: passes, but filed as a reported {self.runtime} bug"]
+
+    def mismatch(
+        self,
+        path: pathlib.Path,
+        outcome: PythonOutcome,
+        undefined: bool,
+        both: bool,
+        proc: subprocess.CompletedProcess[str],
+    ) -> list[str]:
+        """Differences of a run from the outcome expected of the test at path"""
+        expected = path.with_suffix(EXPECTED)
+        exception = path.with_suffix(EXCEPTION_EXPECTED)
         if undefined and proc.returncode == Exit.UNDEFINED:
             return []
-        if both:
-            succeeds = proc.returncode == 0
+        succeeds = proc.returncode == 0 if both else outcome == PythonOutcome.SUCCEEDS
         if succeeds:
             status_path = path.with_suffix(STATUS_EXPECTED)
             status = int(status_path.read_text()) if status_path.exists() else 0
@@ -278,20 +293,6 @@ class Runner(Results):
             *(self.interpret(path, python_outcome, undefined) if well_formed else []),
         ]
 
-    def outcome(self, suite: pathlib.Path, test: pathlib.Path) -> list[str]:
-        """Failures of a test, where a test filed under a reported bug of the interpreter's runtime must fail its
-        run, since the bug has otherwise been fixed"""
-        failures = self.run_test(suite, test)
-        if not (self.runtime and f"{self.runtime}{BUG}" in test.parts):
-            return failures
-        runs = [f for f in failures if f.startswith("run:")]
-        others = [f for f in failures if f not in runs]
-        return (
-            others
-            if runs
-            else [*others, f"run: passes, but filed as a reported {self.runtime} bug"]
-        )
-
     def run_suite(self, suite: pathlib.Path, jobs: int | None) -> None:
         """Tests run in parallel on jobs threads (default: one per core), reported in order."""
         found = list(tests(suite))
@@ -300,7 +301,7 @@ class Runner(Results):
         )
         self.run_only = len(found) - self.type_checked
         with concurrent.futures.ThreadPoolExecutor(jobs) as pool:
-            results = pool.map(lambda test: self.outcome(suite, test), found)
+            results = pool.map(lambda test: self.run_test(suite, test), found)
             last = None
             for test, failures in zip(found, results):
                 header = test.parent.relative_to(suite)
