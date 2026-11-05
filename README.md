@@ -45,10 +45,8 @@ make wheel
 The reference implementation is the latest release of the mechanisation in the `isabelle-purepy` repository;
 `make check-suite-purepy` runs the suite against it.
 
-`make check-suite-mechanisation` runs the suite against the mechanisation built from the `isabelle-purepy` clone
-beside this one on the branch of the same issue, or against the latest release when that clone has no such branch,
-and fails if any test fails other than those listed in `test/expected-failures.txt`. Enable the pre-push hook, which
-runs this check, once per clone:
+A push which changes the suite first runs `make check-suite-mechanisation`, allowing only the failures listed in
+`test/expected-failures.txt`. Enable the hook once per clone:
 
 ```bash
 git config core.hooksPath script/hooks
@@ -69,12 +67,9 @@ its exit status when non-zero, `.exception.expected` the exception raised by a t
 the output before the exception, `.error.expected` the diagnostic of the reference type checker for a test it
 rejects, and `.args` the command-line arguments of a run, one per line.
 
-A test which fails under a reported bug of a tool, listed in the specification, is filed in a subdirectory of its
-category named after the tool, such as `python-succeeds/agrees/graalpy-bug/` or `mypy-bug/`. Under that tool the
-runner requires the test to fail, since the bug has otherwise been fixed.
-
-A test under `undefined` may also have both `.expected` and `.exception.expected`, when Python implementations
-differ in its outcome; either outcome then passes, as does reporting undefined behaviour.
+A test which fails under a reported bug of a tool is filed under a directory named after the tool, such as
+`graalpy-bug/`, and must fail under that tool. A test under `undefined` may have both `.expected` and
+`.exception.expected`, when Python implementations differ; either then passes.
 
 An implementation conforms by its exit statuses, and may word diagnostics as it chooses. With `--check-messages`,
 the suite also checks each diagnostic against `.error.expected`. The reference type checker is tested with this
