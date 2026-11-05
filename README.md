@@ -69,11 +69,10 @@ its exit status when non-zero, `.exception.expected` the exception raised by a t
 the output before the exception, `.error.expected` the diagnostic of the reference type checker for a test it
 rejects, and `.args` the command-line arguments of a run, one per line.
 
-A test which fails under a reported bug of a tool is filed in a subdirectory of its category named after the tool,
-such as `python-succeeds/agrees/graalpy-bug/` or `mypy-bug/`, and cites the bug on its second line as `# bug: <url>`.
-The runner names the runtime it is given, as `cpython` or `graalpy`, with Pyodide a `cpython`, and under that runtime requires
-such a test to fail, reporting it as failing as a reported bug; under mypy, in Python mode, likewise. A test which
-passes under the tool whose bug it is filed under fails the run, since the bug has then been fixed.
+A test which fails under a reported bug of a tool, listed in the specification, is filed in a subdirectory of its
+category named after the tool, such as `python-succeeds/agrees/graalpy-bug/` or `mypy-bug/`. Under that tool the
+runner requires the test to fail, since the bug has otherwise been fixed. The runner identifies the runtime from the
+interpreter it is given, with Pyodide counting as CPython.
 
 A test under `undefined` may also have both `.expected` and `.exception.expected`, when Python implementations
 differ in its outcome; either outcome then passes, as does reporting undefined behaviour.

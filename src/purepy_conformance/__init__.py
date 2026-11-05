@@ -6,7 +6,6 @@ import contextlib
 import importlib.resources
 import os
 import pathlib
-import re
 import shlex
 import shutil
 import subprocess
@@ -17,7 +16,7 @@ from enum import IntEnum, StrEnum
 from typing import NamedTuple
 
 SUITE = "conformance-suite"
-GREEN, RED, YELLOW, RESET = "\033[32m", "\033[31m", "\033[33m", "\033[0m"
+GREEN, RED, RESET = "\033[32m", "\033[31m", "\033[0m"
 
 EXPECTED = ".expected"
 EXCEPTION_EXPECTED = f".exception{EXPECTED}"
@@ -30,7 +29,6 @@ HELPERS = "helpers"
 MAIN = "main.py"
 BUG = "-bug"  # suffix of a directory of tests failing under a reported bug of the tool named
 MYPY = "mypy"
-BUG_CITATION = re.compile(r"# bug: (\S+)")
 
 
 class PythonOutcome(StrEnum):
@@ -114,20 +112,11 @@ def run(cmd: list[str], cwd: pathlib.Path | None = None) -> subprocess.Completed
 
 
 def runtime(interpreter: list[str]) -> str:
-    """Name of the Python implementation run by interpreter, in lower case, as in cpython and graalpy; Pyodide
-    is cpython"""
+    """Implementation run by interpreter, named as in a directory of reported bugs, such as graalpy-bug; Pyodide
+    reports itself as CPython"""
     proc = run([*interpreter, "-c", "import platform; print(platform.python_implementation())"])
     implementation = proc.stdout.strip()
     return {"GraalVM": "graalpy"}.get(implementation, implementation.lower())
-
-
-def reported_bug(test: pathlib.Path, tool: str) -> str | None:
-    """Citation of the reported bug of tool under which test fails, if test is filed under one"""
-    if f"{tool}{BUG}" not in test.parts:
-        return None
-    path = test / MAIN if test.is_dir() else test
-    cited = BUG_CITATION.search(path.read_text().split("\n", 2)[1])
-    return cited[1] if cited else "bug not cited"
 
 
 class Results:
@@ -135,7 +124,6 @@ class Results:
         self.passed = 0
         self.failed: list[str] = []
         self.failures: list[str] = []
-        self.reported: list[str] = []  # tests failing as reported bugs
 
     @contextlib.contextmanager
     def test(self, label: object) -> Iterator[None]:
@@ -146,14 +134,10 @@ class Results:
     def fail(self, msg: str) -> None:
         self.failures.append(msg)
 
-    def record(self, label: object, failures: list[str], reported: str | None = None) -> None:
-        """Record a test as passed, failed, or failing as reported, where reported cites the bug."""
+    def record(self, label: object, failures: list[str]) -> None:
         if failures:
             self.failed.append(f"{label} ({'; '.join(failures)})")
             print(f"  {RED}✗{RESET} {self.failed[-1]}")
-        elif reported:
-            self.reported.append(f"{label} ({reported})")
-            print(f"  {YELLOW}!{RESET} {self.reported[-1]}")
         else:
             self.passed += 1
             print(f"  {GREEN}✓{RESET} {label}")
@@ -161,14 +145,12 @@ class Results:
             print(f"report: {label}\t{'failed' if failures else 'passed'}")
 
     def summary(self) -> None:
-        passed = self.passed + len(self.reported)
-        total = passed + len(self.failed)
-        reported = f", {len(self.reported)} failing as reported bug(s)" if self.reported else ""
+        total = self.passed + len(self.failed)
         print()
         if self.failed:
-            print(f"{RED}✗ {passed}/{total} passed, {len(self.failed)} failed{reported}{RESET}")
+            print(f"{RED}✗ {self.passed}/{total} passed, {len(self.failed)} failed{RESET}")
         else:
-            print(f"{GREEN}✓ {total}/{total} passed{reported}{RESET}")
+            print(f"{GREEN}✓ {total}/{total} passed{RESET}")
 
 
 class Runner(Results):
@@ -224,9 +206,9 @@ class Runner(Results):
             else:
                 shutil.copy(test, copy)
                 proc = run([*self.type_checker, test.name], cwd=copy.parent)
-        bug = reported_bug(test, MYPY)
+        bug = f"{MYPY}{BUG}" in test.parts
         if proc.returncode == 0 and bug:
-            return [f"check: accepted, but filed as a reported mypy bug ({bug})"]
+            return ["check: accepted, but filed as a reported mypy bug"]
         if proc.returncode != 0 and not bug:
             return [f"check: rejected: {(proc.stdout + proc.stderr).strip().split(chr(10), 1)[0]}"]
         return []
@@ -289,26 +271,19 @@ class Runner(Results):
             *(self.interpret(path, python_outcome, undefined) if well_formed else []),
         ]
 
-    def outcome(self, suite: pathlib.Path, test: pathlib.Path) -> tuple[list[str], str | None]:
-        """Failures of a test, and the bugs cited if the test fails as reported under a tool in use: mypy in
-        Python mode, and the interpreter's runtime. Such a test passing is a failure, since the bug has then been
-        fixed."""
+    def outcome(self, suite: pathlib.Path, test: pathlib.Path) -> list[str]:
+        """Failures of a test, where a test filed under a reported bug of the interpreter's runtime must fail its
+        run, since the bug has otherwise been fixed"""
         failures = self.run_test(suite, test)
-        reported = []
-        run_bug = reported_bug(test, self.runtime) if self.runtime else None
-        if run_bug:
-            runs = [f for f in failures if f.startswith("run:")]
-            if runs:
-                failures = [f for f in failures if f not in runs]
-                reported.append(run_bug)
-            else:
-                failures.append(
-                    f"run: passes, but filed as a reported {self.runtime} bug ({run_bug})"
-                )
-        check_bug = reported_bug(test, MYPY) if self.python_mode else None
-        if check_bug and not any(f.startswith("check:") for f in failures):
-            reported.append(check_bug)
-        return failures, ", ".join(reported) or None
+        if not (self.runtime and f"{self.runtime}{BUG}" in test.parts):
+            return failures
+        runs = [f for f in failures if f.startswith("run:")]
+        others = [f for f in failures if f not in runs]
+        return (
+            others
+            if runs
+            else [*others, f"run: passes, but filed as a reported {self.runtime} bug"]
+        )
 
     def run_suite(self, suite: pathlib.Path, jobs: int | None) -> None:
         """Tests run in parallel on jobs threads (default: one per core), reported in order."""
@@ -320,12 +295,12 @@ class Runner(Results):
         with concurrent.futures.ThreadPoolExecutor(jobs) as pool:
             results = pool.map(lambda test: self.outcome(suite, test), found)
             last = None
-            for test, (failures, bug) in zip(found, results):
+            for test, failures in zip(found, results):
                 header = test.parent.relative_to(suite)
                 if header != last:
                     print(header)
                     last = header
-                self.record(test.relative_to(suite), failures, bug)
+                self.record(test.relative_to(suite), failures)
 
 
 def is_well_formed(suite: pathlib.Path, test: pathlib.Path) -> bool:
