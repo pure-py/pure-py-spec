@@ -113,7 +113,7 @@ spec-anon.pdf: $(TEXFILES)
 
 ## Spec consistent with conformance suite
 check-consistency:
-	uv run --locked python test/consistency.py
+	uv run --locked python test/check-consistency.py
 
 ## Python passes conformance suite, with mypy as type checker
 check-suite-python:
@@ -128,6 +128,15 @@ PUREPY_LATEST_WHEEL = $(shell gh release view --repo https://github.com/pure-py/
 check-suite-purepy:
 	@test -n "$(PUREPY_LATEST_WHEEL)" || { echo "no release of the mechanisation found"; exit 1; }
 	uv run --locked python test/expected-failures.py --type-checker "uvx --from $(PUREPY_LATEST_WHEEL) purepy --check"
+
+## Suite against the isabelle-purepy branch of the same issue, or else the latest release
+check-suite-mechanisation:
+	@tree=$$(uv run --locked python test/mechanisation-worktree.py) || exit 1; \
+	if [ -z "$$tree" ]; then $(MAKE) check-suite-purepy; else \
+		test -z "$$(git -C "$$tree" status --porcelain)" || { echo "uncommitted changes in $$tree"; exit 1; }; \
+		$(MAKE) -C "$$tree" build && \
+		uv run --locked python test/expected-failures.py --type-checker "uv run --project $$tree purepy --check"; \
+	fi
 
 ## Wheel of the conformance suite and runner
 wheel: check-targets check-consistency check-suite-python check-suite-purepy
@@ -195,4 +204,4 @@ help:
 
 .PHONY: default all help check-targets paper-submission check-page-limit check-paper-anonymised check-review-mode \
 	check-anonymised check-archived-theories check-archived-suite check-submission clean \
-	check-consistency check-suite-python check-suite-purepy wheel
+	check-consistency check-suite-python check-suite-purepy check-suite-mechanisation wheel

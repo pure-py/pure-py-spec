@@ -1,27 +1,24 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import inspect
 import pathlib
 import re
 import sys
 import tomllib
 
-import purepy_conformance
 from purepy_conformance import (
-    CLASSIFICATION,
+    CLASSIFICATION_PLACEHOLDER,
     ERROR_EXPECTED,
-    MAIN,
     PurePyOutcome,
     PythonOutcome,
     Results,
+    main_module,
     run,
     suite,
     tests,
 )
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-TEST = ROOT / "test"
 PYTHON_VERSION = (ROOT / ".python-version").read_text().strip()
 
 RULE_NAME = re.compile(r"\\ruleName\{([a-z0-9-]+)\}")
@@ -66,7 +63,7 @@ def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
             m for f in sorted((ROOT / "spec").rglob("*.tex")) for m in RULE_NAME.findall(current(f))
         }
         for test in tests(suite_dir):
-            path = test / MAIN if test.is_dir() else test
+            path = main_module(test)
             dirs = test.relative_to(suite_dir).parts
             cites = dirs[1] not in (
                 PurePyOutcome.PARSER_REJECTS,
@@ -85,37 +82,30 @@ def check_classification(r: Results, suite_dir: pathlib.Path) -> None:
     """Check classification placeholder on expected errors for excluded features"""
     with r.test("classification of excluded features"):
         for test in tests(suite_dir):
-            path = test / MAIN if test.is_dir() else test
+            path = main_module(test)
             error = path.with_suffix(ERROR_EXPECTED)
             if not error.exists():
                 continue
             python, purepy = test.relative_to(suite_dir).parts[:2]
             text = error.read_text(encoding="utf-8").strip()
-            ends = text.endswith(f" {CLASSIFICATION}")
+            ends = text.endswith(f" {CLASSIFICATION_PLACEHOLDER}")
             required = python != PythonOutcome.REJECTS and purepy in (
                 PurePyOutcome.PARSER_REJECTS,
                 PurePyOutcome.EXCLUDED_FOR_NOW,
             )
             allowed = python != PythonOutcome.REJECTS and purepy != PurePyOutcome.AGREES
             if required and not ends:
-                r.fail(f"{error.relative_to(suite_dir)} does not end with {CLASSIFICATION}")
-            elif CLASSIFICATION in text and not (allowed and ends):
-                r.fail(f"{error.relative_to(suite_dir)} uses {CLASSIFICATION}")
+                r.fail(
+                    f"{error.relative_to(suite_dir)} does not end with {CLASSIFICATION_PLACEHOLDER}"
+                )
+            elif CLASSIFICATION_PLACEHOLDER in text and not (allowed and ends):
+                r.fail(f"{error.relative_to(suite_dir)} uses {CLASSIFICATION_PLACEHOLDER}")
 
 
 def check_lint(r: Results) -> None:
-    with r.test("consistency script and runner pass mypy and ruff"):
-        sources = [
-            str(TEST / "consistency.py"),
-            str(TEST / "expected-failures.py"),
-            inspect.getfile(purepy_conformance),
-        ]
-        for tool in (
-            ["mypy", "--strict", "--python-version", PYTHON_VERSION],
-            ["ruff", "check"],
-            ["ruff", "format", "--check"],
-        ):
-            proc = run([*tool, *sources])
+    with r.test("Python sources pass mypy and ruff"):
+        for tool in (["mypy"], ["ruff", "check"], ["ruff", "format", "--check"]):
+            proc = run(tool, cwd=ROOT)
             if proc.returncode != 0:
                 r.fail((proc.stdout + proc.stderr).strip()[:400])
                 break
@@ -130,7 +120,7 @@ def main() -> None:
         check_classification(consistency, suite_dir)
         check_lint(consistency)
     consistency.summary()
-    sys.exit(1 if consistency.failed else 0)
+    sys.exit(1 if len(consistency.failed) > 0 else 0)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,13 @@
+\begin{figure}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.26\textwidth}>{\raggedright\arraybackslash}p{0.11\textwidth}>{\raggedright\arraybackslash}p{0.33\textwidth}>{\raggedright\arraybackslash}p{0.22\textwidth}}
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}Construct & Reported in & Behaviour & Issue \\
+Match on Boolean literal scrutinee, with cases covering its value & mypy & Reports missing return, ignoring Boolean value known from literals & \href{https://github.com/python/mypy/issues/22202}{python/mypy\#22202} \\
+Operator \pyinline{//} on floats & GraalPy & Quotient 1 greater than in Python for some operands, such as \pyinline{1.0 // 0.1} & \href{https://github.com/oracle/graalpython/issues/1274}{oracle/graalpython\#1274}
+\end{tabular}
+\caption{Behaviours reported as bugs, with disagreement accepted by conformance suite}
+\label{fig:reported-bugs}
+\end{figure}

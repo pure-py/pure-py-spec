@@ -33,9 +33,9 @@ to sequential composition of static outcomes:
 \emph{Termination kinds} $\kappa$ record how a run ends; all but $\errUndef$ and $\errExcluded$ are named after the exceptions raised by the same program
 under Python in the same circumstances, except that $\errExit{0}$ also records a run which completes normally. A variable read before its assignment aborts with $\errName$ where
 Python raises \pyinline{UnboundLocalError}, a subclass of \pyinline{NameError}; distinguishing the two would require
-the environment to record whether unbound variables belong to functions or modules. Two termination kinds record operations which Python executes without an error. A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, one which the type system cannot rule out
+the environment to record whether unbound variables belong to functions or modules. A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, one which the type system cannot rule out
 and \PurePy leaves undefined, such as a
-comparison of two functions (\secref{no-coercions}). A run aborts with $\errExcluded$ when it reaches an operation
+comparison of two functions, or an operation whose outcome is not specified by the Python language reference and which differs between implementations, of which an overflowing \pyinline{**} is the only example at present (\secref{no-coercions}). A run aborts with $\errExcluded$ when it reaches an operation
 ruled out by the type system, such as a condition which evaluates to a non-Boolean.
 Attribute references, dictionary keys and constructor patterns headed by a built-in class, when ruled out by the type
 system, also abort with $\errExcluded$, even though Python sometimes rejects them; to be more precise here would require the
@@ -60,12 +60,12 @@ results carrying a sequence of values in place of a value.
 \subsection{Expressions and statements}
 \label{sec:eval-expressions}
 
-\Replaced{The value typing judgement $\vdash v : \theta$ says that value $v$ is well-typed at context entry $\theta$,
+The value typing judgement $\vdash v : \theta$ says that value $v$ is well-typed at context entry $\theta$,
 and the environment typing judgement $\vdash \rho : \Gamma$ says that environment $\rho$ is well-typed at context
-$\Gamma$, meaning every value in $\rho$ is well-typed at the corresponding entry in $\Gamma$}{A value is
-well-formed at a context entry, and an environment at a context } (\specfigref{value-env-typing}).
-For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any statement $s$ with
-$\Gamma \vdash s : R$, the statement evaluation judgement $\rho, s \Rightarrow o$ says that $s$ evaluates
+$\Gamma$, meaning every value in $\rho$ is well-typed at the corresponding entry in $\Gamma$ (\specfigref{value-env-typing}).
+Values typed at a type scheme are also typed at the instances of the scheme at closed types
+(\ruleName{val-inst}), matching the instantiation of names bound at a scheme by the \ruleName{var-scheme} rule.
+The statement evaluation judgement $\rho, s \Rightarrow o$ says that $s$ evaluates
 to outcome $o$ in $\rho$ (\specfigrefTwo{eval-block-outcome}{eval-block-fails}). An \pyinline{if} or
 \pyinline{assert} statement aborts with $\errExcluded$ when a condition evaluates to a non-Boolean\speconly{ (\ruleName{eval-if-nonbool}, \ruleName{eval-if-else-nonbool}, \ruleName{eval-assert-nonbool},
 \ruleName{eval-assert-msg-nonbool})}, and a failing \pyinline{assert} statement also aborts with $\errExcluded$ when
@@ -78,8 +78,7 @@ the scope of sequential-composition effects, so as black boxes functions are alw
 the result of a call\speconly{; if the statement completes without returning, the result is $\val{\pyinline{None}}$.}\paperonly{:}
 \paperinput{paper/operational-semantics/result}
 
-For any context $\Gamma$, any $\bind{\rho}{\Gamma}$ and any expression $e$ with $\Gamma \vdash e \synth
-\tau$, the expression evaluation judgement $\rho, e \Rightarrow r$ (\specfigrefTwo{eval-result}{eval-fails}) says that $e$ evaluates to
+The expression evaluation judgement $\rho, e \Rightarrow r$ (\specfigrefTwo{eval-result}{eval-fails}) says that $e$ evaluates to
 result $r$ in $\rho$, where $r$ is either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). A variable
 not bound in $\rho$, or bound to $\Unbound$, aborts with $\errName$\speconly{ (\ruleName{eval-var-unknown},
 \ruleName{eval-var-unbound})}. Function calls and constructor calls share one syntactic form, as do subscripting a container and applying a class to
@@ -152,7 +151,7 @@ pattern's class\paperonly{:}\speconly{.}
 Since an object records its class by name, the class test of $\matchOp{\Sigma}$ is a comparison of
 fully-qualified names.
 
-\subsection{Modules and programs}
+\subsection{Modules and programs}\label{sec:eval-programs}
 
 \speconly{Module and program evaluation are defined in \figref{eval-modules}.}\paperonly{Module and program evaluation
 are defined in full in \specfigref{eval-modules}.} A program runs each module body once, after its imports have loaded,
@@ -181,11 +180,12 @@ after which nothing more is printed. $\errExit{n}$ is a run that exited with sta
 An implementation \emph{conforms} to the semantics if, for every well-formed program $\mathcal{M}$, arguments $\mathcal{A}$
 and program result $(\seq{v}, \kappa)$ with $\mathcal{M}, \mathcal{A} \Rightarrow \seq{v}, \kappa$ and
 $\kappa \neq \errUndef$, a run of the implementation on $\mathcal{M}$ with arguments $\mathcal{A}$ writes the values
-$\seq{v}$ in order, each as by Python's \pyinline{str} followed by a newline, and reportstermination kind $\kappa$.
+$\seq{v}$ in order, each as by Python's \pyinline{str} followed by a newline, and reports termination kind $\kappa$.
 \end{specdefinition}
 
-\noindent The form in which an implementation reports the termination kind is not prescribed.
+\noindent The form in which an implementation reports the termination kind is not prescribed. An implementation also conforms if it meets this definition with the result of \pyinline{**} on floats being the nearest float below or above the exact power, not necessarily the nearer of the two. Python implementations conform, since they compute \pyinline{**} on floats with functions such as \pyinline{pow} in C and \pyinline{Math.pow} in Java, which meet this requirement.
 
 \specinput{spec/fig/eval-modules}
 
+\specinput{spec/operational-semantics/type-soundness}
 \paperinput{paper/operational-semantics/metatheory}

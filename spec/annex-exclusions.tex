@@ -7,11 +7,20 @@ This annex is informative and imposes no requirements; the exclusions which it d
 the syntax, well-formedness rules or semantics of \PurePy, and their classification follows from
 \secref{excluded-features}. It summarises the Python behaviours excluded by \PurePy{} by design
 (\secref{excluded-by-design}) with the stage at which each
-exclusion takes effect, and lists the common Python features excluded from this version
-(\secref{excluded-from-version}).
+exclusion takes effect, lists the common Python features excluded from this version
+(\secref{excluded-from-version}), and lists the Python runtime errors which well-formedness prevents
+(\secref{runtime-errors}).
 
 \section{Behaviours excluded by design}
 \label{sec:excluded-by-design}
+
+\subsection{Soft keywords as identifiers}
+\label{sec:soft-keywords}
+
+Python's soft keywords \pyinline{match}, \pyinline{case}, \pyinline{type} and \pyinline{_} are keywords only in
+\pyinline{match}, \pyinline{case} and \pyinline{type} statements and wildcard patterns, and identifiers elsewhere. In
+\PurePy they are not identifiers at all (\secref{lexical}), so that whether a word is a keyword does not depend on
+where it occurs.
 
 \subsection{Mutable state}
 \label{sec:no-mutable-state}
@@ -33,14 +42,14 @@ exclusion takes effect, and lists the common Python features excluded from this 
 
 \input{spec/exclusions/mypy-restrictions}
 
-\subsection{Runtime errors}
-\label{sec:runtime-errors}
-
-\input{spec/exclusions/prevented-errors}
-
 \section{Features excluded from this version}
 \label{sec:excluded-from-version}
 
 \figref{excluded-from-version} lists common Python features excluded from this version (\secref{excluded-features}).
 
 \input{spec/fig/excluded-from-version}
+
+\section{Runtime errors prevented by well-formedness}
+\label{sec:runtime-errors}
+
+\input{spec/exclusions/prevented-errors}

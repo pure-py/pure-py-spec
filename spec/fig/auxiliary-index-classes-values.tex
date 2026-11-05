@@ -15,7 +15,13 @@
 \noalign{\vskip 2mm}
 \auxgroup{Functions on values}
 \auxrow{$\typeOf(v)$}{type}{run-time type of $v$}{aux:type-of}
-\auxrow{$\eqOp{\Sigma}(v, v')$}{result}{structural equality; $\aborts{\errUndef}$ between functions, between Boolean and number, and between two \pyinline{nan} values in container}{aux:eq}
+\auxrow{$\realOf(n)$}{extended real number}{extended real number denoted by number $n$ other than $\nan$}{aux:real}
+\auxrow{$\fl(x)$}{float}{real number $x$ rounded to float}{aux:fl}
+\auxrow{$\floatOp(x)$}{result}{real number $x$ rounded to float; $\aborts{\errOverflow}$ if infinite}{aux:float}
+\auxrow{$\trunc(x)$}{integer}{integer part of real number $x$}{aux:trunc}
+\auxrow{$\floorDiv(n, n')$}{float}{floor division of floats}{aux:floordiv}
+\auxrow{$\modOp(n, n')$}{float}{remainder of float division, with sign of $n'$}{aux:mod}
+\auxrow{$\eqOp{\Sigma}(v, v')$}{result}{structural equality; $\aborts{\errUndef}$ between functions, between Boolean and number, and between $\nan$ and $\nan$ in container}{aux:eq}
 \auxrow{$\eqElems{\Sigma}(\seq{v}, \seq{v}\,')$}{result}{elementwise equality of value sequences}{aux:eq-elems}
 \auxrow{$\inOp{\Sigma}(v, v')$}{result}{whether $v$ is element of $v'$; $\errExcluded$ for range or non-string key, $\errType$ otherwise}{aux:in}
 \auxrow{$\inElems{\Sigma}(v, \seq{v})$}{result}{whether $\seq{v}$ has element equal to $v$}{aux:in-elems}

@@ -81,6 +81,15 @@
   \vdash v : \tau
 }
 \and
+\inferrule*[lab={\ruleName{val-inst}}]
+{
+  \vdash v : \scheme{\seq{\alpha}}{\sigma} \\
+  \fv(\tau_i) = \varnothing \quad (\forall i)
+}
+{
+  \vdash v : \subst{\seq{\tau}}{\seq{\alpha}}{\sigma}
+}
+\and
 \inferrule*[lab={\ruleName{val-prim}}]
 {
   \mathcal{E}(\mathcal{A})(q)(x) = \primVal{\primFn}
@@ -139,13 +148,14 @@
 \and
 \inferrule*[lab={\ruleName{val-pu}}]
 {
-  v = \Unbound \text{ or } \vdash v : \tau
+  v = \Unbound \text{ or } \vdash v : \theta \\
+  \theta \in \set{\tau, \scheme{\seq{\alpha}}{\tau}}
 }
 {
-  \vdash v : \PU{\tau}
+  \vdash v : \PU{\theta}
 }
 \end{mathpar}
-\subcaption{\replaced{Value $v$ is well-typed at context entry $\theta$}{Value $v$ is well-formed at context entry $\theta$ }}
+\subcaption{Value $v$ is well-typed at context entry $\theta$}
 \label{fig:value-typing}
 \end{subfigure}
 
@@ -172,9 +182,9 @@
   \vdash \set{\bind{x}{v}} \override \rho : \set{\bind{x}{\theta}} \override \Gamma
 }
 \end{mathpar}
-\subcaption{\replaced{Environment $\rho$ is well-typed at context $\Gamma$}{Environment $\rho$ is well-formed at context $\Gamma$ }}
+\subcaption{Environment $\rho$ is well-typed at context $\Gamma$}
 \label{fig:env-typing}
 \end{subfigure}
-\caption{Value and environment \replaced{typing}{well-formedness }}
+\caption{Value and environment typing}
 \label{fig:value-env-typing}
 \end{figure}

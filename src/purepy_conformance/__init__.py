@@ -12,8 +12,8 @@ import subprocess
 import sys
 import tempfile
 from collections.abc import Iterator, Sequence
+from dataclasses import dataclass, field
 from enum import IntEnum, StrEnum
-from typing import NamedTuple
 
 SUITE = "conformance-suite"
 GREEN, RED, RESET = "\033[32m", "\033[31m", "\033[0m"
@@ -23,11 +23,12 @@ EXCEPTION_EXPECTED = f".exception{EXPECTED}"
 ERROR_EXPECTED = f".error{EXPECTED}"
 STATUS_EXPECTED = f".status{EXPECTED}"
 OUTPUT_EXPECTED = f".output{EXPECTED}"
-ARGS = ".args"  # command-line arguments, one per line
+ARGS = ".args"
 
 HELPERS = "helpers"
 MAIN = "main.py"
-MYPY_BUG = "mypy-bug"
+BUG = "-bug"
+MYPY = "mypy"
 
 
 class PythonOutcome(StrEnum):
@@ -48,21 +49,16 @@ SYNTAX_ERROR = "SyntaxError"
 
 
 class Classification(StrEnum):
-    """Wording of the classification in a diagnostic for an excluded Python feature."""
-
     BY_DESIGN = "not allowed in PurePy (excluded by design)"
     FOR_NOW = "not allowed in PurePy (excluded from this version)"
 
 
 def excluded(feature: str, classification: Classification) -> str:
-    """Diagnostic for a rejection of feature, with its classification."""
     return f"{feature} {classification}"
 
 
-# Placeholder for classification at end of expected error for excluded feature
-CLASSIFICATION = "{classification}"
+CLASSIFICATION_PLACEHOLDER = "{classification}"
 
-# Classification of an excluded feature, for each PurePy outcome which rejects a program
 CLASSIFICATION_OF: dict[PurePyOutcome, Classification] = {
     PurePyOutcome.PARSER_REJECTS: Classification.BY_DESIGN,
     PurePyOutcome.TYPING_REJECTS: Classification.BY_DESIGN,
@@ -71,9 +67,11 @@ CLASSIFICATION_OF: dict[PurePyOutcome, Classification] = {
 
 
 def expected_error(text: str, purepy: PurePyOutcome) -> str:
-    """Expected error, with a trailing classification placeholder replaced by the full diagnostic."""
-    if text.endswith(f" {CLASSIFICATION}"):
-        return excluded(text.removesuffix(f" {CLASSIFICATION}"), CLASSIFICATION_OF[purepy])
+    """Replace trailing classification placeholder by classification"""
+    if text.endswith(f" {CLASSIFICATION_PLACEHOLDER}"):
+        return excluded(
+            text.removesuffix(f" {CLASSIFICATION_PLACEHOLDER}"), CLASSIFICATION_OF[purepy]
+        )
     return text
 
 
@@ -81,17 +79,11 @@ class Exit(IntEnum):
     OK = 0
     NOT_ALLOWED = 1
     ILL_FORMED = 3
-    UNDEFINED = 4  # Interpreter: run aborted with undefined behaviour
-    EXCLUDED_FOR_NOW = 5  # Feature excluded from this version, found by parser or type checker
+    UNDEFINED = 4
+    EXCLUDED_FOR_NOW = 5
 
 
-class Expectation(NamedTuple):
-    exit: Exit
-    error_expected: bool  # type checker output contains .error.expected
-    python: PythonOutcome
-
-
-# Type checker verdict for each PurePy outcome
+# Exit status of type checker, and whether output contains expected error
 TYPE_CHECKER_VERDICT: dict[PurePyOutcome, tuple[Exit, bool]] = {
     PurePyOutcome.PARSER_REJECTS: (Exit.NOT_ALLOWED, True),
     PurePyOutcome.TYPING_REJECTS: (Exit.ILL_FORMED, True),
@@ -101,13 +93,71 @@ TYPE_CHECKER_VERDICT: dict[PurePyOutcome, tuple[Exit, bool]] = {
 }
 
 
-def expectation(python: PythonOutcome, purepy: PurePyOutcome) -> Expectation:
-    exit, error_expected = TYPE_CHECKER_VERDICT[purepy]
-    return Expectation(exit, error_expected, python)
-
-
 def run(cmd: list[str], cwd: pathlib.Path | None = None) -> subprocess.CompletedProcess[str]:
     return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, check=False)
+
+
+class Runtime(StrEnum):
+    CPYTHON = "cpython"
+    GRAALPY = "graalpy"
+    PYODIDE = "pyodide"
+
+
+RUNTIME_QUERY = "import platform, sys; print(platform.python_implementation(), sys.platform)"
+
+
+def runtime(interpreter: list[str]) -> Runtime:
+    implementation, system = run([*interpreter, "-c", RUNTIME_QUERY]).stdout.split()
+    if system == "emscripten":
+        return Runtime.PYODIDE
+    return {"CPython": Runtime.CPYTHON, "GraalVM": Runtime.GRAALPY}[implementation]
+
+
+def main_module(test: pathlib.Path) -> pathlib.Path:
+    return test / MAIN if test.is_dir() else test
+
+
+def filing_errors(path: pathlib.Path, outcome: PythonOutcome, undefined: bool) -> list[str]:
+    expected = path.with_suffix(EXPECTED)
+    exception = path.with_suffix(EXCEPTION_EXPECTED)
+    both = expected.exists() and exception.exists()
+    if both and not undefined or not (expected.exists() or exception.exists()):
+        return [f"run: needs exactly one of {expected.name} and {exception.name}"]
+    if not both and (outcome == PythonOutcome.SUCCEEDS) != expected.exists():
+        return [f"run: misfiled, has {expected.name if expected.exists() else exception.name}"]
+    name = exception.read_text().strip() if exception.exists() else None
+    if name is not None and (outcome == PythonOutcome.REJECTS) != name.startswith(SYNTAX_ERROR):
+        return [f"run: misfiled, expects {name}"]
+    return []
+
+
+def under_bug(stage: str, failures: list[str], test: pathlib.Path, tool: str) -> list[str]:
+    """Invert failures if test is filed under reported bug of tool"""
+    if f"{tool}{BUG}" not in test.parts:
+        return failures
+    return [] if len(failures) > 0 else [f"{stage}: passes, but filed as a reported {tool} bug"]
+
+
+def check_output(path: pathlib.Path, proc: subprocess.CompletedProcess[str]) -> list[str]:
+    status_path = path.with_suffix(STATUS_EXPECTED)
+    status = int(status_path.read_text()) if status_path.exists() else 0
+    if proc.returncode != status:
+        return [f"run: exit {proc.returncode}, expected {status}: {proc.stderr.strip()}"]
+    if proc.stdout != path.with_suffix(EXPECTED).read_text():
+        return ["run: output mismatch"]
+    return []
+
+
+def check_exception(path: pathlib.Path, proc: subprocess.CompletedProcess[str]) -> list[str]:
+    name = path.with_suffix(EXCEPTION_EXPECTED).read_text().strip()
+    if proc.returncode == 0:
+        return [f"run: expected {name} but script succeeded"]
+    if name not in proc.stderr:
+        return [f"run: expected {name}, got: {proc.stderr.strip()}"]
+    output = path.with_suffix(OUTPUT_EXPECTED)
+    if proc.stdout != (output.read_text() if output.exists() else ""):
+        return ["run: output before the exception mismatch"]
+    return []
 
 
 class Results:
@@ -126,145 +176,113 @@ class Results:
         self.failures.append(msg)
 
     def record(self, label: object, failures: list[str]) -> None:
-        if failures:
-            self.failed.append(f"{label} ({'; '.join(failures)})")
-            print(f"  {RED}✗{RESET} {self.failed[-1]}")
+        if len(failures) > 0:
+            self.failed.append(str(label))
+            print(f"  {RED}✗{RESET} {label} ({'; '.join(failures)})")
         else:
             self.passed += 1
             print(f"  {GREEN}✓{RESET} {label}")
         if os.environ.get("REPORT"):
-            print(f"report: {label}\t{'failed' if failures else 'passed'}")
+            print(f"report: {label}\t{'failed' if len(failures) > 0 else 'passed'}")
 
     def summary(self) -> None:
         total = self.passed + len(self.failed)
         print()
-        if self.failed:
+        if len(self.failed) > 0:
             print(f"{RED}✗ {self.passed}/{total} passed, {len(self.failed)} failed{RESET}")
         else:
             print(f"{GREEN}✓ {total}/{total} passed{RESET}")
 
 
+@dataclass
 class Runner(Results):
-    def __init__(
-        self,
-        type_checker: list[str],
-        interpreter: list[str] | None,
-        python_mode: bool,
-        check_messages: bool,
-    ) -> None:
+    type_checker: list[str]
+    interpreter: list[str] | None  # None: tests not run
+    python_mode: bool
+    check_messages: bool
+    runtime: Runtime | None = field(init=False)
+
+    def __post_init__(self) -> None:
         super().__init__()
-        self.type_checker = type_checker
-        self.interpreter = interpreter  # None: tests not run
-        self.python_mode = python_mode  # Suite checked against Python and mypy
-        self.check_messages = (
-            check_messages  # Diagnostics checked against those of reference type checker
-        )
-        self.type_checked = 0
-        self.run_only = 0
+        self.runtime = None if self.interpreter is None else runtime(self.interpreter)
 
-    def type_check(
-        self, path: pathlib.Path, exit: Exit, error_expected: bool, purepy: PurePyOutcome
-    ) -> list[str]:
-        """Each test is checked in a separate directory, so other tests can't interfere. Single-module tests
-        are copied to a new directory before running."""
-        with tempfile.TemporaryDirectory() as tmp:
-            checked = path if path.name == MAIN else pathlib.Path(shutil.copy(path, tmp))
-            proc = run([*self.type_checker, str(checked)])
-        output = proc.stdout + proc.stderr
-        error = path.with_suffix(ERROR_EXPECTED)
-        if proc.returncode != exit:
-            first = output.strip().split("\n", 1)[0].replace(f"{checked.parent}/", "")
-            return [f"check: exit {proc.returncode}, expected {int(exit)}: {first}"]
-        if not error_expected:
-            return []
-        if not error.exists():
-            return [f"check: missing {error.name}"]
-        expected = expected_error(error.read_text().strip(), purepy)
-        if expected not in output:
-            got = output.strip().replace(f"{checked.parent}/", "")
-            return [f"check: expected {expected!r}, got: {got}"]
-        return []
-
-    def type_check_accepts(self, test: pathlib.Path) -> list[str]:
-        """Type-check a copy of a test in a temporary directory, so that the type checker writes nothing into
-        the suite. The test must be accepted unless it is filed as a reported mypy bug."""
+    def run_type_checker(self, test: pathlib.Path) -> subprocess.CompletedProcess[str]:
+        """Type-check copy of test, so that tests can't interfere and suite stays unchanged"""
         with tempfile.TemporaryDirectory() as tmp:
             copy = pathlib.Path(tmp) / test.name
             if test.is_dir():
                 shutil.copytree(test, copy)
-                proc = run([*self.type_checker, MAIN], cwd=copy)
-            else:
-                shutil.copy(test, copy)
-                proc = run([*self.type_checker, test.name], cwd=copy.parent)
-        reported_bug = MYPY_BUG in test.parts
-        if proc.returncode == 0 and reported_bug:
-            return ["check: accepted, but filed as a reported mypy bug"]
-        if proc.returncode != 0 and not reported_bug:
-            return [f"check: rejected: {(proc.stdout + proc.stderr).strip().split(chr(10), 1)[0]}"]
+                return run([*self.type_checker, MAIN], cwd=copy)
+            shutil.copy(test, copy)
+            return run([*self.type_checker, test.name], cwd=copy.parent)
+
+    def check_verdict(
+        self, test: pathlib.Path, exit: Exit, error_expected: bool, purepy: PurePyOutcome
+    ) -> list[str]:
+        proc = self.run_type_checker(test)
+        output = (proc.stdout + proc.stderr).strip()
+        if proc.returncode != exit:
+            return [
+                f"check: exit {proc.returncode}, expected {int(exit)}: {output.split(chr(10), 1)[0]}"
+            ]
+        if not error_expected:
+            return []
+        error = main_module(test).with_suffix(ERROR_EXPECTED)
+        if not error.exists():
+            return [f"check: missing {error.name}"]
+        expected = expected_error(error.read_text().strip(), purepy)
+        if expected not in output:
+            return [f"check: expected {expected!r}, got: {output}"]
         return []
+
+    def check_mypy_accepts(self, test: pathlib.Path) -> list[str]:
+        proc = self.run_type_checker(test)
+        output = (proc.stdout + proc.stderr).strip()
+        failures = (
+            [] if proc.returncode == 0 else [f"check: rejected: {output.split(chr(10), 1)[0]}"]
+        )
+        return under_bug("check", failures, test, MYPY)
 
     def interpret(self, path: pathlib.Path, outcome: PythonOutcome, undefined: bool) -> list[str]:
         if self.interpreter is None:
             return []
-        succeeds = outcome == PythonOutcome.SUCCEEDS
-        expected = path.with_suffix(EXPECTED)
-        exception = path.with_suffix(EXCEPTION_EXPECTED)
-        if expected.exists() == exception.exists():
-            return [f"run: needs exactly one of {expected.name} and {exception.name}"]
-        if succeeds != expected.exists():
-            return [f"run: misfiled, has {expected.name if expected.exists() else exception.name}"]
+        misfiled = filing_errors(path, outcome, undefined)
+        if len(misfiled) > 0:
+            return misfiled
         args_path = path.with_suffix(ARGS)
         args = args_path.read_text().splitlines() if args_path.exists() else []
         proc = run([*self.interpreter, path.name, *args], cwd=path.parent)
-        if undefined and proc.returncode == Exit.UNDEFINED:
-            return []
-        if succeeds:
-            status_path = path.with_suffix(STATUS_EXPECTED)
-            status = int(status_path.read_text()) if status_path.exists() else 0
-            if proc.returncode != status:
-                return [f"run: exit {proc.returncode}, expected {status}: {proc.stderr.strip()}"]
-            if proc.stdout != expected.read_text():
-                return ["run: output mismatch"]
-            return []
-        name = exception.read_text().strip()
-        if (outcome == PythonOutcome.REJECTS) != name.startswith(SYNTAX_ERROR):
-            return [f"run: misfiled, expects {name}"]
-        if proc.returncode == 0:
-            return [f"run: expected {name} but script succeeded"]
-        if name not in proc.stderr:
-            return [f"run: expected {name}, got: {proc.stderr.strip()}"]
-        output = path.with_suffix(OUTPUT_EXPECTED)
-        if proc.stdout != (output.read_text() if output.exists() else ""):
-            return ["run: output before the exception mismatch"]
-        return []
+        both = path.with_suffix(EXPECTED).exists() and path.with_suffix(EXCEPTION_EXPECTED).exists()
+        succeeds = proc.returncode == 0 if both else outcome == PythonOutcome.SUCCEEDS
+        failures = (
+            []
+            if undefined and proc.returncode == Exit.UNDEFINED
+            else check_output(path, proc)
+            if succeeds
+            else check_exception(path, proc)
+        )
+        return failures if self.runtime is None else under_bug("run", failures, path, self.runtime)
 
     def run_test(self, suite: pathlib.Path, test: pathlib.Path) -> list[str]:
-        """Run a test and return its failures. Within the suite, a test's path starts with its Python outcome
-        and its PurePy outcome, as in python-succeeds/agrees/.../name.py, or .../name/main.py for a program of
-        several modules."""
+        """Run test, taking Python and PurePy outcomes from first two directories of path within suite"""
         dirs = test.relative_to(suite).parts[:-1]
-        purepy = PurePyOutcome(dirs[1])
-        exit, error_expected, python_outcome = expectation(PythonOutcome(dirs[0]), purepy)
-        path = test / MAIN if test.is_dir() else test
+        python_outcome, purepy = PythonOutcome(dirs[0]), PurePyOutcome(dirs[1])
+        exit, error_expected = TYPE_CHECKER_VERDICT[purepy]
+        path = main_module(test)
         well_formed = exit == Exit.OK
+        undefined = purepy == PurePyOutcome.UNDEFINED
         if self.python_mode:
             return [
-                *(self.type_check_accepts(test) if well_formed else []),
-                *self.interpret(path, python_outcome, False),
+                *(self.check_mypy_accepts(test) if well_formed else []),
+                *self.interpret(path, python_outcome, undefined),
             ]
-        undefined = purepy == PurePyOutcome.UNDEFINED
         return [
-            *self.type_check(path, exit, error_expected and self.check_messages, purepy),
+            *self.check_verdict(test, exit, error_expected and self.check_messages, purepy),
             *(self.interpret(path, python_outcome, undefined) if well_formed else []),
         ]
 
     def run_suite(self, suite: pathlib.Path, jobs: int | None) -> None:
-        """Tests run in parallel on jobs threads (default: one per core), reported in order."""
         found = list(tests(suite))
-        self.type_checked = sum(
-            1 for test in found if not self.python_mode or is_well_formed(suite, test)
-        )
-        self.run_only = len(found) - self.type_checked
         with concurrent.futures.ThreadPoolExecutor(jobs) as pool:
             results = pool.map(lambda test: self.run_test(suite, test), found)
             last = None
@@ -281,8 +299,7 @@ def is_well_formed(suite: pathlib.Path, test: pathlib.Path) -> bool:
 
 
 def tests(suite: pathlib.Path) -> Iterator[pathlib.Path]:
-    """Tests sorted by path: a module as a .py file, or a program as the directory holding its main
-    module."""
+    """Tests sorted by path, each a module or directory of program"""
     found = [
         path
         for path in suite.rglob("*.py")
@@ -299,7 +316,7 @@ def suite() -> Iterator[pathlib.Path]:
         yield path
 
 
-def main(argv: Sequence[str] | None = None) -> None:
+def check_conformance(argv: Sequence[str] | None = None) -> Runner:
     parser = argparse.ArgumentParser(prog="purepy-conformance")
     parser.add_argument("interpreter", nargs="?", default="python3")
     parser.add_argument(
@@ -333,12 +350,16 @@ def main(argv: Sequence[str] | None = None) -> None:
     )
     with suite() as path:
         runner.run_suite(path, args.jobs)
+        found = list(tests(path))
+        checked = sum(1 for test in found if is_well_formed(path, test))
     runner.summary()
     if args.python_mode:
-        print(
-            f"Python mode: {runner.type_checked} tests type-checked and run, {runner.run_only} run only"
-        )
-    sys.exit(0 if not runner.failed else 1)
+        print(f"Python mode: {checked} tests type-checked and run, {len(found) - checked} run only")
+    return runner
+
+
+def main(argv: Sequence[str] | None = None) -> None:
+    sys.exit(1 if len(check_conformance(argv).failed) > 0 else 0)
 
 
 if __name__ == "__main__":

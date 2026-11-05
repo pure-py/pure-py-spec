@@ -19,10 +19,11 @@ dev = [
 
 [tool.mypy]
 strict = true
+files = ["src/purepy_conformance/__init__.py", "test", "script"]
 
 [tool.ruff]
 line-length = 100
-extend-exclude = ["src/purepy_conformance/conformance-suite"]
+extend-exclude = ["src/purepy_conformance/conformance-suite", "evaluation"]
 
 # Annotations unevaluated in every module, so no type needs quoting
 [tool.ruff.lint]

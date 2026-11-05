@@ -1,29 +1,61 @@
 \begin{figure}
 \small
 \centering
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.14\textwidth}>{\raggedright\arraybackslash}p{0.31\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}}
+\newcommand*{\opsep}{\arrayrulecolor{gray!30}\hline}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.08\textwidth}>{\raggedright\arraybackslash}p{0.31\textwidth}>{\raggedright\arraybackslash}p{0.48\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}$\odot$ & $(\tau_1, \tau_2)$ & $\hat{\odot}(v, v')$ \\
-\pyinline{==} & $(\tyObject, \tyObject)$ & $\val{\pyinline{False}}$ if $v$ and $v'$ are both \pyinline{nan}; $\eqOp{\Sigma}(v, v')$ otherwise \\
-\pyinline{!=} & $(\tyObject, \tyObject)$ & $\val{\pyinline{True}}$ if $v$ and $v'$ are both \pyinline{nan} or $\eqOp{\Sigma}(v, v') = \val{\pyinline{False}}$; $\val{\pyinline{False}}$ if $\eqOp{\Sigma}(v, v') = \val{\pyinline{True}}$; $\eqOp{\Sigma}(v, v')$ otherwise \\
+\pyinline{==} & $(\tyObject, \tyObject)$ & $\val{\pyinline{False}}$ if $v = v' = \nan$; $\eqOp{\Sigma}(v, v')$ otherwise \\
+\opsep
+\pyinline{!=} & $(\tyObject, \tyObject)$ & $\val{\pyinline{True}}$ if $v = v' = \nan$ or $\eqOp{\Sigma}(v, v') = \val{\pyinline{False}}$; $\val{\pyinline{False}}$ if $\eqOp{\Sigma}(v, v') = \val{\pyinline{True}}$; $\eqOp{\Sigma}(v, v')$ otherwise \\
+\opsep
 \pyinline{in} & $(\tyObject, \tyObject)$ & $\inOp{\Sigma}(v, v')$ \\
+\opsep
 \pyinline{not in} & $(\tyObject, \tyObject)$ & $\val{\pyinline{True}}$ if $\inOp{\Sigma}(v, v') = \val{\pyinline{False}}$; $\val{\pyinline{False}}$ if $\inOp{\Sigma}(v, v') = \val{\pyinline{True}}$; $\inOp{\Sigma}(v, v')$ otherwise \\
-\pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & $(\tyFloat, \tyFloat)$ & \todo{Numeric order, as in Python} \\
-\pyinline{<}\quad\pyinline{<=}\quad\pyinline{>}\quad\pyinline{>=} & $(\tyStr, \tyStr)$ & $\val{\pyinline{True}}$ if $v < v'$, $v \leq v'$, $v > v'$ or $v \geq v'$ respectively in the lexicographic order on code points; $\val{\pyinline{False}}$ otherwise \\
-\pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{//}\quad\pyinline{\%} & $(\tyInt, \tyInt)$ & \todo{Integer arithmetic, as in Python; $\aborts{\errZeroDiv}$ if the divisor is zero} \\
-\pyinline{**} & $(\tyInt, \tyInt)$ & \todo{Integer power, as in Python, giving a float if $v'$ is negative} \\
-\pyinline{+}\quad\pyinline{-}\quad\pyinline{*}\quad\pyinline{/}\quad\pyinline{//}\quad\pyinline{\%}\quad\pyinline{**} & $(\tyFloat, \tyFloat)$ & \todo{Float arithmetic, as in Python, with precision left to the implementation; $\aborts{\errZeroDiv}$ if the divisor is zero, and $\aborts{\errOverflow}$ if Python raises the exception of that name, such as for an integer too large to convert to a float} \\
-\pyinline{+} & $(\tyStr, \tyStr)$ & $\val{v \concat v'}$ \\
-\pyinline{+} & $(\tyList{\tyObject}, \tyList{\tyObject})$ & $\val{\exList{\seq{v} \concat \seq{v}'}}$ if $v = \exList{\seq{v}}$ and $v' = \exList{\seq{v}'}$ \\
-\pyinline{+} & $(\tyTuple{\tyObject^m}, \tyTuple{\tyObject^n})$ & $\val{\exTuple{\seq{v} \concat \seq{v}'}}$ if $v = \exTuple{v_1, \ldots, v_m}$ and $v' = \exTuple{v'_1, \ldots, v'_n}$ \\
-\pyinline{*} & $(\tyStr, \tyInt)$ & $\val{\bigconcat{v^n}}$ where $n = \max(v', 0)$ \\
-\pyinline{*} & $(\tyInt, \tyStr)$ & $\val{\bigconcat{v'^n}}$ where $n = \max(v, 0)$ \\
-\pyinline{*} & $(\tyList{\tyObject}, \tyInt)$ & $\val{\exList{\bigconcat{\seq{v}^n}}}$ if $v = \exList{\seq{v}}$, where $n = \max(v', 0)$ \\
-\pyinline{*} & $(\tyInt, \tyList{\tyObject})$ & $\val{\exList{\bigconcat{\seq{v}^n}}}$ if $v' = \exList{\seq{v}}$, where $n = \max(v, 0)$
+\opsep
+\pyinline{<} & $(\tyFloat, \tyFloat)$ & $\val{\pyinline{True}}$ if $\realOf(v) < \realOf(v')$; $\val{\pyinline{False}}$ otherwise \\
+ & $(\tyStr, \tyStr)$ & $\val{\pyinline{True}}$ if $v < v'$; $\val{\pyinline{False}}$ otherwise \\
+\opsep
+\pyinline{<=} & $(\tyFloat, \tyFloat)$ & $\val{\pyinline{True}}$ if $\realOf(v) \leq \realOf(v')$; $\val{\pyinline{False}}$ otherwise \\
+ & $(\tyStr, \tyStr)$ & $\val{\pyinline{True}}$ if $v \leq v'$; $\val{\pyinline{False}}$ otherwise \\
+\opsep
+\pyinline{>} & $(\tyFloat, \tyFloat)$ & $\val{\pyinline{True}}$ if $\realOf(v) > \realOf(v')$; $\val{\pyinline{False}}$ otherwise \\
+ & $(\tyStr, \tyStr)$ & $\val{\pyinline{True}}$ if $v > v'$; $\val{\pyinline{False}}$ otherwise \\
+\opsep
+\pyinline{>=} & $(\tyFloat, \tyFloat)$ & $\val{\pyinline{True}}$ if $\realOf(v) \geq \realOf(v')$; $\val{\pyinline{False}}$ otherwise \\
+ & $(\tyStr, \tyStr)$ & $\val{\pyinline{True}}$ if $v \geq v'$; $\val{\pyinline{False}}$ otherwise \\
+\opsep
+\pyinline{+} & $(\tyInt, \tyInt)$ & $\val{v + v'}$ \\
+ & $(\tyFloat, \tyFloat)$ & $\val{v + v'}$ \\
+ & $(\tyStr, \tyStr)$ & $\val{v \concat v'}$ \\
+ & $(\tyList{\tyObject}, \tyList{\tyObject})$ & $\val{\exList{\seq{v} \concat \seq{v}'}}$ where $v = \exList{\seq{v}}$ and $v' = \exList{\seq{v}'}$ \\
+ & $(\tyTuple{\tyObject^m}, \tyTuple{\tyObject^n})$ & $\val{\exTuple{\seq{v} \concat \seq{v}'}}$ where $v = \exTuple{v_1, \ldots, v_m}$ and $v' = \exTuple{v'_1, \ldots, v'_n}$ \\
+\opsep
+\pyinline{-} & $(\tyInt, \tyInt)$ & $\val{v - v'}$ \\
+ & $(\tyFloat, \tyFloat)$ & $\val{v - v'}$ \\
+\opsep
+\pyinline{*} & $(\tyInt, \tyInt)$ & $\val{v \times v'}$ \\
+ & $(\tyFloat, \tyFloat)$ & $\val{v \times v'}$ \\
+ & $(\tyStr, \tyInt)$ & $\val{\bigconcat{v^n}}$ where $n = \max(v', 0)$ \\
+ & $(\tyInt, \tyStr)$ & $\val{\bigconcat{v'^n}}$ where $n = \max(v, 0)$ \\
+ & $(\tyList{\tyObject}, \tyInt)$ & $\val{\exList{\bigconcat{\seq{v}^n}}}$ where $v = \exList{\seq{v}}$ and $n = \max(v', 0)$ \\
+ & $(\tyInt, \tyList{\tyObject})$ & $\val{\exList{\bigconcat{\seq{v}^n}}}$ where $v' = \exList{\seq{v}}$ and $n = \max(v, 0)$ \\
+\opsep
+\pyinline{/} & $(\tyInt, \tyInt)$ & $\floatOp(v / v')$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
+ & $(\tyFloat, \tyFloat)$ & $\val{v / v'}$ if $\realOf(v') \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
+\opsep
+\pyinline{//} & $(\tyInt, \tyInt)$ & $\val{\lfloor v / v' \rfloor}$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
+ & $(\tyFloat, \tyFloat)$ & $\val{\floorDiv(v, v')}$ if $\realOf(v') \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
+\opsep
+\pyinline{\%} & $(\tyInt, \tyInt)$ & $\val{v - (v' \times \lfloor v / v' \rfloor)}$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
+ & $(\tyFloat, \tyFloat)$ & $\val{\modOp(v, v')}$ if $\realOf(v') \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
+\opsep
+\pyinline{**} & $(\tyInt, \tyInt)$ & $\val{v^{v'}}$ if $v' \geq 0$; $\aborts{\errZeroDiv}$ if $v = 0$ and $v' < 0$; as at $(\tyFloat, \tyInt)$ otherwise \\
+ & $(\tyFloat, \tyInt)$ & $\aborts{\errZeroDiv}$ if $\realOf(v) = 0$ and $v' < 0$; $\aborts{\errUndef}$ if $v$ finite and $\fl(\realOf(v)^{v'})$ infinite; $\val{\fl(\realOf(v)^{v'})}$ otherwise
 \end{tabular}
 
 \vspace{3mm}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.14\textwidth}>{\raggedright\arraybackslash}p{0.31\textwidth}>{\raggedright\arraybackslash}p{0.43\textwidth}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.08\textwidth}>{\raggedright\arraybackslash}p{0.31\textwidth}>{\raggedright\arraybackslash}p{0.48\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}$\ominus$ & $\tau$ & $\hat{\ominus}(v)$ \\
 \pyinline{not} & $\tyBool$ & $\val{\pyinline{False}}$ if $v = \pyinline{True}$; $\val{\pyinline{True}}$ otherwise \\
