@@ -5,7 +5,7 @@
 ## [v0.25.0](https://pure-py.github.io/pure-py-spec/v0.25.0/PurePy-spec.pdf)
 
 PurePy is a pure (side-effect free) subset of Python, intended initially for researchers in programming
-languages and programming pedagogy, and in the longer term as a common language for scientific computing,
+languages, and in the longer term as a common language for scientific computing,
 supporting efficient, portable applications in modelling, data processing, data analysis and visualisation.
 
 The specification defines a versioned formal grammar and a formal semantics for the language, and the
