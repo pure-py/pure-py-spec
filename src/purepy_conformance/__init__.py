@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 from collections.abc import Iterator, Sequence
+from dataclasses import dataclass, field
 from enum import IntEnum, StrEnum
 
 SUITE = "conformance-suite"
@@ -137,7 +138,7 @@ def under_bug(stage: str, failures: list[str], test: pathlib.Path, tool: str) ->
     """Failures of a stage of a test, inverted if the test is filed under a reported bug of tool"""
     if f"{tool}{BUG}" not in test.parts:
         return failures
-    return [] if failures else [f"{stage}: passes, but filed as a reported {tool} bug"]
+    return [] if len(failures) > 0 else [f"{stage}: passes, but filed as a reported {tool} bug"]
 
 
 def output_mismatch(path: pathlib.Path, proc: subprocess.CompletedProcess[str]) -> list[str]:
@@ -180,42 +181,37 @@ class Results:
         self.failures.append(msg)
 
     def record(self, label: object, failures: list[str]) -> None:
-        if failures:
+        if len(failures) > 0:
             self.failed.append(f"{label} ({'; '.join(failures)})")
             print(f"  {RED}✗{RESET} {self.failed[-1]}")
         else:
             self.passed += 1
             print(f"  {GREEN}✓{RESET} {label}")
         if os.environ.get("REPORT"):
-            print(f"report: {label}\t{'failed' if failures else 'passed'}")
+            print(f"report: {label}\t{'failed' if len(failures) > 0 else 'passed'}")
 
     def summary(self) -> None:
         total = self.passed + len(self.failed)
         print()
-        if self.failed:
+        if len(self.failed) > 0:
             print(f"{RED}✗ {self.passed}/{total} passed, {len(self.failed)} failed{RESET}")
         else:
             print(f"{GREEN}✓ {total}/{total} passed{RESET}")
 
 
+@dataclass
 class Runner(Results):
-    def __init__(
-        self,
-        type_checker: list[str],
-        interpreter: list[str] | None,
-        python_mode: bool,
-        check_messages: bool,
-    ) -> None:
-        super().__init__()
-        self.type_checker = type_checker
-        self.interpreter = interpreter  # None: tests not run
-        self.python_mode = python_mode  # Suite checked against Python and mypy
-        self.check_messages = check_messages  # Diagnostics checked against reference type checker
-        self.type_checked = 0
-        self.run_only = 0
-        self.runtime = runtime(interpreter) if interpreter else None
+    type_checker: list[str]
+    interpreter: list[str] | None  # None: tests not run
+    python_mode: bool  # Suite checked against Python and mypy
+    check_messages: bool  # Diagnostics checked against reference type checker
+    runtime: Runtime | None = field(init=False)
 
-    def type_check_copy(self, test: pathlib.Path) -> subprocess.CompletedProcess[str]:
+    def __post_init__(self) -> None:
+        super().__init__()
+        self.runtime = None if self.interpreter is None else runtime(self.interpreter)
+
+    def run_type_checker(self, test: pathlib.Path) -> subprocess.CompletedProcess[str]:
         """Type-check a copy of test in a temporary directory, so that tests cannot interfere and the type
         checker writes nothing into the suite"""
         with tempfile.TemporaryDirectory() as tmp:
@@ -226,10 +222,10 @@ class Runner(Results):
             shutil.copy(test, copy)
             return run([*self.type_checker, test.name], cwd=copy.parent)
 
-    def type_check(
+    def check_verdict(
         self, test: pathlib.Path, exit: Exit, error_expected: bool, purepy: PurePyOutcome
     ) -> list[str]:
-        proc = self.type_check_copy(test)
+        proc = self.run_type_checker(test)
         output = (proc.stdout + proc.stderr).strip()
         if proc.returncode != exit:
             return [
@@ -245,8 +241,8 @@ class Runner(Results):
             return [f"check: expected {expected!r}, got: {output}"]
         return []
 
-    def type_check_accepts(self, test: pathlib.Path) -> list[str]:
-        proc = self.type_check_copy(test)
+    def check_mypy_accepts(self, test: pathlib.Path) -> list[str]:
+        proc = self.run_type_checker(test)
         output = (proc.stdout + proc.stderr).strip()
         failures = (
             [] if proc.returncode == 0 else [f"check: rejected: {output.split(chr(10), 1)[0]}"]
@@ -257,7 +253,7 @@ class Runner(Results):
         if self.interpreter is None:
             return []
         misfiled = filing_errors(path, outcome, undefined)
-        if misfiled:
+        if len(misfiled) > 0:
             return misfiled
         args_path = path.with_suffix(ARGS)
         args = args_path.read_text().splitlines() if args_path.exists() else []
@@ -285,21 +281,17 @@ class Runner(Results):
         undefined = purepy == PurePyOutcome.UNDEFINED
         if self.python_mode:
             return [
-                *(self.type_check_accepts(test) if well_formed else []),
+                *(self.check_mypy_accepts(test) if well_formed else []),
                 *self.interpret(path, python_outcome, undefined),
             ]
         return [
-            *self.type_check(test, exit, error_expected and self.check_messages, purepy),
+            *self.check_verdict(test, exit, error_expected and self.check_messages, purepy),
             *(self.interpret(path, python_outcome, undefined) if well_formed else []),
         ]
 
     def run_suite(self, suite: pathlib.Path, jobs: int | None) -> None:
         """Tests run in parallel on jobs threads (default: one per core), reported in order."""
         found = list(tests(suite))
-        self.type_checked = sum(
-            1 for test in found if not self.python_mode or is_well_formed(suite, test)
-        )
-        self.run_only = len(found) - self.type_checked
         with concurrent.futures.ThreadPoolExecutor(jobs) as pool:
             results = pool.map(lambda test: self.run_test(suite, test), found)
             last = None
@@ -368,12 +360,12 @@ def main(argv: Sequence[str] | None = None) -> None:
     )
     with suite() as path:
         runner.run_suite(path, args.jobs)
+        found = list(tests(path))
+        checked = sum(1 for test in found if is_well_formed(path, test))
     runner.summary()
     if args.python_mode:
-        print(
-            f"Python mode: {runner.type_checked} tests type-checked and run, {runner.run_only} run only"
-        )
-    sys.exit(0 if not runner.failed else 1)
+        print(f"Python mode: {checked} tests type-checked and run, {len(found) - checked} run only")
+    sys.exit(1 if len(runner.failed) > 0 else 0)
 
 
 if __name__ == "__main__":
