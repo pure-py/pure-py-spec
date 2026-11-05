@@ -12,8 +12,8 @@
 & \Sigma \vdash \odot(\sigma_1, \sigma_2) : ((\tyFloat, \tyFloat), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{<}, \pyinline{<=}, \pyinline{>}, \pyinline{>=}} \text{ and } \Sigma \vdash \sigma_1, \sigma_2 \subty \tyFloat \\
 & \Sigma \vdash \odot(\sigma_1, \sigma_2) : ((\tyStr, \tyStr), \tyBool) && \quad \text{if } \odot \in \set{\pyinline{<}, \pyinline{<=}, \pyinline{>}, \pyinline{>=}} \text{ and } \Sigma \vdash \sigma_1, \sigma_2 \subty \tyStr \\
 & \Sigma \vdash \odot(\sigma_1, \sigma_2) : ((\tyInt, \tyInt), \tyInt) && \quad \text{if } \odot \in \set{\pyinline{+}, \pyinline{-}, \pyinline{*}, \pyinline{//}, \pyinline{\%}} \text{ and } \Sigma \vdash \sigma_1, \sigma_2 \subty \tyInt \\
-& \Sigma \vdash \odot(\sigma_1, \sigma_2) : ((\tyFloat, \tyFloat), \tyFloat) && \quad \text{if } \odot \in \set{\pyinline{+}, \pyinline{-}, \pyinline{*}, \pyinline{//}, \pyinline{\%}, \pyinline{/}\deleted{, \pyinline{**}}} \text{ and } \Sigma \vdash \sigma_1, \sigma_2 \subty \tyFloat \\
-& \added{\Sigma \vdash \pyinline{**}(\sigma_1, \sigma_2) : ((\tyFloat, \tyInt), \tyFloat)} && \quad \added{\text{if } \Sigma \vdash \sigma_1 \subty \tyFloat \text{ and } \Sigma \vdash \sigma_2 \subty \tyInt} \\
+& \Sigma \vdash \odot(\sigma_1, \sigma_2) : ((\tyFloat, \tyFloat), \tyFloat) && \quad \text{if } \odot \in \set{\pyinline{+}, \pyinline{-}, \pyinline{*}, \pyinline{//}, \pyinline{\%}, \pyinline{/}} \text{ and } \Sigma \vdash \sigma_1, \sigma_2 \subty \tyFloat \\
+& \Sigma \vdash \pyinline{**}(\sigma_1, \sigma_2) : ((\tyFloat, \tyInt), \tyFloat) && \quad \text{if } \Sigma \vdash \sigma_1 \subty \tyFloat \text{ and } \Sigma \vdash \sigma_2 \subty \tyInt \\
 & \Sigma \vdash \pyinline{+}(\sigma_1, \sigma_2) : ((\tyStr, \tyStr), \tyStr) && \quad \text{if } \Sigma \vdash \sigma_1, \sigma_2 \subty \tyStr \\
 & \rlap{$\Sigma \vdash \pyinline{+}(\tyList{\sigma}, \tyList{\tau}) : ((\tyList{\sigma}, \tyList{\tau}), \tyList{\joinTy{\Sigma}{\sigma}{\tau}})$} \\
 & \rlap{$\Sigma \vdash \pyinline{+}(\tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}) : ((\tyTuple{\seq{\sigma}}, \tyTuple{\seq{\tau}}), \tyTuple{\seq{\sigma} \mathbin{\concat} \seq{\tau}})$} \\

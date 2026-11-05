@@ -33,9 +33,9 @@ to sequential composition of static outcomes:
 \emph{Termination kinds} $\kappa$ record how a run ends; all but $\errUndef$ and $\errExcluded$ are named after the exceptions raised by the same program
 under Python in the same circumstances, except that $\errExit{0}$ also records a run which completes normally. A variable read before its assignment aborts with $\errName$ where
 Python raises \pyinline{UnboundLocalError}, a subclass of \pyinline{NameError}; distinguishing the two would require
-the environment to record whether unbound variables belong to functions or modules. \deleted{Two termination kinds record operations which Python executes without an error. }A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, one which the type system cannot rule out
+the environment to record whether unbound variables belong to functions or modules. A run aborts with $\errUndef$ when it reaches a dynamically excluded operation, one which the type system cannot rule out
 and \PurePy leaves undefined, such as a
-comparison of two functions\added{, or an operation whose outcome is not specified by the Python language reference and which differs between implementations, of which an overflowing \pyinline{**} is the only example at present} (\secref{no-coercions}). A run aborts with $\errExcluded$ when it reaches an operation
+comparison of two functions, or an operation whose outcome is not specified by the Python language reference and which differs between implementations, of which an overflowing \pyinline{**} is the only example at present (\secref{no-coercions}). A run aborts with $\errExcluded$ when it reaches an operation
 ruled out by the type system, such as a condition which evaluates to a non-Boolean.
 Attribute references, dictionary keys and constructor patterns headed by a built-in class, when ruled out by the type
 system, also abort with $\errExcluded$, even though Python sometimes rejects them; to be more precise here would require the
@@ -183,7 +183,7 @@ $\kappa \neq \errUndef$, a run of the implementation on $\mathcal{M}$ with argum
 $\seq{v}$ in order, each as by Python's \pyinline{str} followed by a newline, and reports termination kind $\kappa$.
 \end{specdefinition}
 
-\noindent The form in which an implementation reports the termination kind is not prescribed. \added{An implementation also conforms if it meets this definition with the result of \pyinline{**} on floats being the nearest float below or above the exact power, not necessarily the nearer of the two. Python implementations conform, since they compute \pyinline{**} on floats with functions such as \pyinline{pow} in C and \pyinline{Math.pow} in Java, which meet this requirement.}
+\noindent The form in which an implementation reports the termination kind is not prescribed. An implementation also conforms if it meets this definition with the result of \pyinline{**} on floats being the nearest float below or above the exact power, not necessarily the nearer of the two. Python implementations conform, since they compute \pyinline{**} on floats with functions such as \pyinline{pow} in C and \pyinline{Math.pow} in Java, which meet this requirement.
 
 \specinput{spec/fig/eval-modules}
 
