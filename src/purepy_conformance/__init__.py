@@ -13,7 +13,6 @@ import sys
 import tempfile
 from collections.abc import Iterator, Sequence
 from enum import IntEnum, StrEnum
-from typing import NamedTuple
 
 SUITE = "conformance-suite"
 GREEN, RED, RESET = "\033[32m", "\033[31m", "\033[0m"
@@ -85,13 +84,7 @@ class Exit(IntEnum):
     EXCLUDED_FOR_NOW = 5  # Feature excluded from this version, found by parser or type checker
 
 
-class Expectation(NamedTuple):
-    exit: Exit
-    error_expected: bool  # type checker output contains .error.expected
-    python: PythonOutcome
-
-
-# Type checker verdict for each PurePy outcome
+# Type checker exit status for each PurePy outcome, and whether its output contains .error.expected
 TYPE_CHECKER_VERDICT: dict[PurePyOutcome, tuple[Exit, bool]] = {
     PurePyOutcome.PARSER_REJECTS: (Exit.NOT_ALLOWED, True),
     PurePyOutcome.TYPING_REJECTS: (Exit.ILL_FORMED, True),
@@ -99,11 +92,6 @@ TYPE_CHECKER_VERDICT: dict[PurePyOutcome, tuple[Exit, bool]] = {
     PurePyOutcome.UNDEFINED: (Exit.OK, False),
     PurePyOutcome.AGREES: (Exit.OK, False),
 }
-
-
-def expectation(python: PythonOutcome, purepy: PurePyOutcome) -> Expectation:
-    exit, error_expected = TYPE_CHECKER_VERDICT[purepy]
-    return Expectation(exit, error_expected, python)
 
 
 def run(cmd: list[str], cwd: pathlib.Path | None = None) -> subprocess.CompletedProcess[str]:
@@ -124,6 +112,32 @@ def runtime(interpreter: list[str]) -> Runtime:
     if system == "emscripten":
         return Runtime.PYODIDE
     return {"CPython": Runtime.CPYTHON, "GraalVM": Runtime.GRAALPY}[implementation]
+
+
+def main_module(test: pathlib.Path) -> pathlib.Path:
+    return test / MAIN if test.is_dir() else test
+
+
+def filing_errors(path: pathlib.Path, outcome: PythonOutcome, undefined: bool) -> list[str]:
+    """Expectation files of the test at path which do not match its directory"""
+    expected = path.with_suffix(EXPECTED)
+    exception = path.with_suffix(EXCEPTION_EXPECTED)
+    both = expected.exists() and exception.exists()
+    if both and not undefined or not (expected.exists() or exception.exists()):
+        return [f"run: needs exactly one of {expected.name} and {exception.name}"]
+    if not both and (outcome == PythonOutcome.SUCCEEDS) != expected.exists():
+        return [f"run: misfiled, has {expected.name if expected.exists() else exception.name}"]
+    name = exception.read_text().strip() if exception.exists() else None
+    if name is not None and (outcome == PythonOutcome.REJECTS) != name.startswith(SYNTAX_ERROR):
+        return [f"run: misfiled, expects {name}"]
+    return []
+
+
+def under_bug(stage: str, failures: list[str], test: pathlib.Path, tool: str) -> list[str]:
+    """Failures of a stage of a test, inverted if the test is filed under a reported bug of tool"""
+    if f"{tool}{BUG}" not in test.parts:
+        return failures
+    return [] if failures else [f"{stage}: passes, but filed as a reported {tool} bug"]
 
 
 def output_mismatch(path: pathlib.Path, proc: subprocess.CompletedProcess[str]) -> list[str]:
@@ -201,63 +215,54 @@ class Runner(Results):
         self.run_only = 0
         self.runtime = runtime(interpreter) if interpreter else None
 
-    def type_check(
-        self, path: pathlib.Path, exit: Exit, error_expected: bool, purepy: PurePyOutcome
-    ) -> list[str]:
-        """Each test is checked in a separate directory, so other tests can't interfere. Single-module tests
-        are copied to a new directory before running."""
-        with tempfile.TemporaryDirectory() as tmp:
-            checked = path if path.name == MAIN else pathlib.Path(shutil.copy(path, tmp))
-            proc = run([*self.type_checker, str(checked)])
-        output = proc.stdout + proc.stderr
-        error = path.with_suffix(ERROR_EXPECTED)
-        if proc.returncode != exit:
-            first = output.strip().split("\n", 1)[0].replace(f"{checked.parent}/", "")
-            return [f"check: exit {proc.returncode}, expected {int(exit)}: {first}"]
-        if not error_expected:
-            return []
-        if not error.exists():
-            return [f"check: missing {error.name}"]
-        expected = expected_error(error.read_text().strip(), purepy)
-        if expected not in output:
-            got = output.strip().replace(f"{checked.parent}/", "")
-            return [f"check: expected {expected!r}, got: {got}"]
-        return []
-
-    def type_check_accepts(self, test: pathlib.Path) -> list[str]:
-        """Type-check a copy of a test in a temporary directory, so that the type checker writes nothing into
-        the suite. The test must be accepted unless it is filed as a reported mypy bug."""
+    def type_check_copy(self, test: pathlib.Path) -> subprocess.CompletedProcess[str]:
+        """Type-check a copy of test in a temporary directory, so that tests cannot interfere and the type
+        checker writes nothing into the suite"""
         with tempfile.TemporaryDirectory() as tmp:
             copy = pathlib.Path(tmp) / test.name
             if test.is_dir():
                 shutil.copytree(test, copy)
-                proc = run([*self.type_checker, MAIN], cwd=copy)
-            else:
-                shutil.copy(test, copy)
-                proc = run([*self.type_checker, test.name], cwd=copy.parent)
-        bug = f"{MYPY}{BUG}" in test.parts
-        if proc.returncode == 0 and bug:
-            return ["check: accepted, but filed as a reported mypy bug"]
-        if proc.returncode != 0 and not bug:
-            return [f"check: rejected: {(proc.stdout + proc.stderr).strip().split(chr(10), 1)[0]}"]
+                return run([*self.type_checker, MAIN], cwd=copy)
+            shutil.copy(test, copy)
+            return run([*self.type_checker, test.name], cwd=copy.parent)
+
+    def type_check(
+        self, test: pathlib.Path, exit: Exit, error_expected: bool, purepy: PurePyOutcome
+    ) -> list[str]:
+        proc = self.type_check_copy(test)
+        output = (proc.stdout + proc.stderr).strip()
+        if proc.returncode != exit:
+            return [
+                f"check: exit {proc.returncode}, expected {int(exit)}: {output.split(chr(10), 1)[0]}"
+            ]
+        if not error_expected:
+            return []
+        error = main_module(test).with_suffix(ERROR_EXPECTED)
+        if not error.exists():
+            return [f"check: missing {error.name}"]
+        expected = expected_error(error.read_text().strip(), purepy)
+        if expected not in output:
+            return [f"check: expected {expected!r}, got: {output}"]
         return []
+
+    def type_check_accepts(self, test: pathlib.Path) -> list[str]:
+        proc = self.type_check_copy(test)
+        output = (proc.stdout + proc.stderr).strip()
+        failures = (
+            [] if proc.returncode == 0 else [f"check: rejected: {output.split(chr(10), 1)[0]}"]
+        )
+        return under_bug("check", failures, test, MYPY)
 
     def interpret(self, path: pathlib.Path, outcome: PythonOutcome, undefined: bool) -> list[str]:
         if self.interpreter is None:
             return []
-        expected = path.with_suffix(EXPECTED)
-        exception = path.with_suffix(EXCEPTION_EXPECTED)
-        both = expected.exists() and exception.exists()
-        if both and not undefined or not (expected.exists() or exception.exists()):
-            return [f"run: needs exactly one of {expected.name} and {exception.name}"]
-        if not both and (outcome == PythonOutcome.SUCCEEDS) != expected.exists():
-            return [f"run: misfiled, has {expected.name if expected.exists() else exception.name}"]
-        name = exception.read_text().strip() if exception.exists() else None
-        if name is not None and (outcome == PythonOutcome.REJECTS) != name.startswith(SYNTAX_ERROR):
-            return [f"run: misfiled, expects {name}"]
+        misfiled = filing_errors(path, outcome, undefined)
+        if misfiled:
+            return misfiled
         args_path = path.with_suffix(ARGS)
         args = args_path.read_text().splitlines() if args_path.exists() else []
         proc = run([*self.interpreter, path.name, *args], cwd=path.parent)
+        both = path.with_suffix(EXPECTED).exists() and path.with_suffix(EXCEPTION_EXPECTED).exists()
         succeeds = proc.returncode == 0 if both else outcome == PythonOutcome.SUCCEEDS
         failures = (
             []
@@ -266,18 +271,16 @@ class Runner(Results):
             if succeeds
             else exception_mismatch(path, proc)
         )
-        if self.runtime is None or f"{self.runtime}{BUG}" not in path.parts:
-            return failures
-        return [] if failures else [f"run: passes, but filed as a reported {self.runtime} bug"]
+        return failures if self.runtime is None else under_bug("run", failures, path, self.runtime)
 
     def run_test(self, suite: pathlib.Path, test: pathlib.Path) -> list[str]:
         """Run a test and return its failures. Within the suite, a test's path starts with its Python outcome
         and its PurePy outcome, as in python-succeeds/agrees/.../name.py, or .../name/main.py for a program of
         several modules."""
         dirs = test.relative_to(suite).parts[:-1]
-        purepy = PurePyOutcome(dirs[1])
-        exit, error_expected, python_outcome = expectation(PythonOutcome(dirs[0]), purepy)
-        path = test / MAIN if test.is_dir() else test
+        python_outcome, purepy = PythonOutcome(dirs[0]), PurePyOutcome(dirs[1])
+        exit, error_expected = TYPE_CHECKER_VERDICT[purepy]
+        path = main_module(test)
         well_formed = exit == Exit.OK
         undefined = purepy == PurePyOutcome.UNDEFINED
         if self.python_mode:
@@ -286,7 +289,7 @@ class Runner(Results):
                 *self.interpret(path, python_outcome, undefined),
             ]
         return [
-            *self.type_check(path, exit, error_expected and self.check_messages, purepy),
+            *self.type_check(test, exit, error_expected and self.check_messages, purepy),
             *(self.interpret(path, python_outcome, undefined) if well_formed else []),
         ]
 
