@@ -103,10 +103,6 @@ so they can be passed where \pyinline{Callable} types are expected.
 
 \input{spec/well-formedness/static-outcome}
 
-\begin{DeletedBlock}
-\input{spec/well-formedness/outcome-override-merge}
-\end{DeletedBlock}
-
 The statement judgement $\Sigma; \Gamma; \zeta \vdash s : R$ says that under $\Gamma$ and
 optional return type $\zeta$, statement $s$ has static outcome $R$ (\specfigref{typing-stmt}); every rule passes $\zeta$ down unchanged.
 A sequence $\exSeq{s}{s'}$ types $s$, then types $s'$ under $\Gamma$ overridden by the context assigned
@@ -117,7 +113,7 @@ once per disjunct (\ruleName{call-stmt-union}), following \ruleName{call-union} 
 
 A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
 auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\specfigref{typing-cases}), which threads
-a \replaced{\emph{remaining type}}{remaining type }, starting from $\sigma$, and a \replaced{\emph{residual}}{residual } $L$ of shapes, starting from the shapes of $\sigma$ (\figref{shapes}),
+a \emph{remaining type}, starting from $\sigma$, and a \emph{residual} $L$ of shapes, starting from the shapes of $\sigma$ (\figref{shapes}),
 through the cases, merging their outcomes into $S$. The \ruleName{match} rule applies when the final remaining type is $\tyNever$, meaning the match is
 exhaustive; the \ruleName{match-partial} rule applies otherwise and also merges in $\Assigns{\varnothing}$, the
 outcome of the path on which the scrutinee is not matched by any of the cases:
@@ -130,44 +126,20 @@ outcome of the path on which the scrutinee is not matched by any of the cases:
 The remaining type, the residual, reachability and exhaustiveness are the subject of
 \secref{well-formedness-patterns}.
 
-\begin{DeletedBlock}
-The \ruleName{defs} rule for a mutual def region of function definitions synthesises a type scheme for each definition
-(\specfigref{typing-def}), binds all the function names of the mutual def region at the synthesised type schemes, and checks each
-definition against its type scheme:
-\begin{mathpar}
-\small
-\input{spec/rules/defs}
-\end{mathpar}
-For a definition $\exDef{f[\seq{\alpha}]}{\bind{\seq{x}}{\seq{\psi}}}{\exRetAnnot{\psi}}{s}$,
-the auxiliary judgements $\Sigma; \Gamma \vdash d \synth \pi$ and $\Sigma; \Gamma \vdash d \checks \pi$ synthesise the type
-scheme from the annotations and check the body $s$. Both rules extend the
-context with $\TypeVar$ entries for the type parameters $\seq{\alpha}$. A type scheme without type parameters is identical to its \pyinline{Callable} type, so the \ruleName{defs} rule binds the name of a
-function without type parameters as a variable of that type. The type schemes of functions with type parameters are instantiated
-at a call, by the argument types (\ruleName{callee-scheme}), and when checked against a \pyinline{Callable} type, by that
-type. Since annotations denote types, not type schemes, declarations and
-assignments never bind variables at type schemes, only at types.
-
-The body $s$ is checked with the
-return type denoted by $\psi$, and must have static outcome $\Returns$ unless that type is equivalent to \pyinline{None},
-so a function that declares a result definitely returns one. A return type such as $\tyUnion{\tyInt}{\tyNone}$
-does not exempt the body from returning, nor permit a bare \pyinline{return}, for compatibility with mypy (\secref{python-compatibility}).
-\end{DeletedBlock}
-\begin{AddedBlock}
 The \ruleName{defs} rule (\specfigrefTwo{typing-stmt-ctd}{typing-def}) checks each definition of a mutual def region against
 the type scheme synthesised from its annotations, in a context in which each function name is definitely assigned
 (\secref{mutual-recursion}). The body is checked with the declared return type, and must have static outcome $\Returns$
 unless that type is equivalent to \pyinline{None}, so a function that declares a result definitely returns one. A return
 type such as $\tyUnion{\tyInt}{\tyNone}$ does not exempt the body from returning, nor permit a bare \pyinline{return}, for
 compatibility with mypy (\secref{python-compatibility}).
-\end{AddedBlock}
 
 \subsection{Pattern matching}
 \label{sec:exhaustiveness}
 \label{sec:well-formedness-patterns}
 
 To check a \pyinline{match} with scrutinee type $\sigma$, the auxiliary judgement
-$\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\specfigref{typing-cases}) threads a \replaced{remaining type}{\emph{remaining type} }
-$\tau$ and a \replaced{residual}{\emph{residual} } $L$ through the cases, both over-approximations of the values of $\sigma$ which are not
+$\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\specfigref{typing-cases}) threads a remaining type
+$\tau$ and a residual $L$ through the cases, both over-approximations of the values of $\sigma$ which are not
 matched by any of the earlier cases. The residual is an ordered set of \emph{shapes} (\figref{shapes}), each denoting a
 set of values of a single type, and starts from the shapes of $\sigma$; the remaining type is coarser, a type rather
 than a set of shapes, and starts from $\sigma$ itself. Two auxiliary functions narrow a type $\tau$ by a pattern $p$: $\matchedAs{\Sigma}(\Gamma, \tau, p)$ is
