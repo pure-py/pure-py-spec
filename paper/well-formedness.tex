@@ -118,10 +118,12 @@ unless that type is equivalent to \pyinline{None}, so a function that declares a
 type such as $\tyUnion{\tyInt}{\tyNone}$ does not exempt the body from returning, nor permit a bare \pyinline{return}, for
 compatibility with mypy (\secref{python-compatibility}).
 
-A \pyinline{match} scrutinee synthesises a type $\sigma$, and its cases $\seq{b}$ are checked in turn by the
+A \pyinline{match} scrutinee synthesises a type $\sigma$, \replaced{against which the cases $\seq{b}$ are checked by an
+auxiliary judgement, which merges their outcomes into $S$ and gives a final remaining type and residual
+(\secref{well-formedness-patterns}).}{and its cases $\seq{b}$ are checked in turn by the
 auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\specfigref{typing-cases}), which threads
 a \emph{remaining type}, starting from $\sigma$, and a \emph{residual} $L$ of shapes, starting from the shapes of $\sigma$ (\figref{shapes}),
-through the cases, merging their outcomes into $S$. The \ruleName{match} rule applies when the final remaining type is $\tyNever$, meaning the match is
+through the cases, merging their outcomes into $S$. } The \ruleName{match} rule applies when the final remaining type is $\tyNever$, meaning the match is
 exhaustive; the \ruleName{match-partial} rule applies otherwise and also merges in $\Assigns{\varnothing}$, the
 outcome of the path on which the scrutinee is not matched by any of the cases:
 \begin{mathpar}
@@ -138,26 +140,28 @@ The remaining type, the residual, reachability and exhaustiveness are the subjec
 \label{sec:well-formedness-patterns}
 
 To check a \pyinline{match} with scrutinee type $\sigma$, the auxiliary judgement
-$\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\specfigref{typing-cases}) threads a remaining type
-$\tau$ and a residual $L$ through the cases, both over-approximations of the values of $\sigma$ which are not
-matched by any of the earlier cases. The residual is an ordered set of \emph{shapes} (\figref{shapes}), each denoting a
+$\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\specfigref{typing-cases}) threads a \replaced{\emph{remaining type}}{remaining type }
+$\tau$ and a \replaced{\emph{residual}}{residual } $L$ through the cases, both over-approximations of the values of $\sigma$ which are not
+matched by any of the earlier cases. The residual is an ordered set of \emph{shapes} \replaced{(\specfigref{shapes-syntax})}{(\figref{shapes}) }, each denoting a
 set of values of a single type, and starts from the shapes of $\sigma$; the remaining type is coarser, a type rather
-than a set of shapes, and starts from $\sigma$ itself. Two auxiliary functions narrow a type $\tau$ by a pattern $p$: $\matchedAs{\Sigma}(\Gamma, \tau, p)$ is
+than a set of shapes, and starts from $\sigma$ itself. \deleted{Two auxiliary functions narrow a type $\tau$ by a pattern $p$: $\matchedAs{\Sigma}(\Gamma, \tau, p)$ is
 the type to which $\tau$ is narrowed if $p$ matches, and $\remaining{\Sigma}(\Gamma, \tau, p)$ is the type remaining if
-$p$ fails. Each case's pattern is checked against the remaining type, binding its pattern variables, and matched
+$p$ fails. }Each case's pattern is checked against the remaining type, binding its pattern variables, and matched
 against the residual. Reachability is decided by the
 residual: a case is \emph{reachable} if its pattern matches at least one shape of the residual, and a match with an
 unreachable case is ill-formed. For a reachable case, the body is checked under the bindings and its outcome merged
 into $S$; the shapes left after matching and the type remaining if the pattern fails become the residual and remaining
-type for the case that follows:
+type for the case that follows\replaced{ (\ruleName{match-case}, \ruleName{match-cases}).}{: }
+\begin{DeletedBlock}
 \begin{mathpar}
 \small
 \input{spec/rules/match-cases}
 \end{mathpar}
+\end{DeletedBlock}
 
-A match is \emph{exhaustive} when its cases between them match every value of $\sigma$. Exhaustiveness is decided by
+A match is \emph{exhaustive} when its cases between them match every value of $\sigma$. \deleted{Exhaustiveness is decided by
 the final remaining type, which the \ruleName{match} rule requires to be $\tyNever$, with \ruleName{match-partial}
-applying otherwise. The remaining type thus determines exhaustiveness as well as the types of pattern variables. The Python typing
+applying otherwise. }The remaining type \deleted{thus }determines exhaustiveness as well as the types of pattern variables. The Python typing
 specification leaves narrowing largely unspecified,\footnote{\url{https://typing.python.org/en/latest/spec/narrowing.html}}
 so the remaining type emulates the narrowing of a match scrutinee observed in mypy
 (\secref{python-compatibility}), which subtracts a class only for a
@@ -167,8 +171,9 @@ constructor pattern that matches every value of the class, and a tuple only thro
 
 The cases needed to exhaust a match therefore depend on the type of the scrutinee: a union is exhausted
 by covering each disjunct, a class type by a pattern for the class itself, \pyinline{bool} by
-\pyinline{True} and \pyinline{False}, and a dictionary type by the empty dictionary pattern, while \pyinline{int}, \pyinline{float}, \pyinline{str} and lists have
-unboundedly many heads and need a variable or wildcard. A literal-typed scrutinee is exhausted by covering
+\pyinline{True} and \pyinline{False}, and a dictionary type by the empty dictionary pattern, while \pyinline{int}, \pyinline{float}, \pyinline{str} and lists \replaced{need a variable or wildcard, since a literal or list pattern matches values with only one literal or
+length}{have
+unboundedly many heads and need a variable or wildcard}. A literal-typed scrutinee is exhausted by covering
 its literals, so $\exAssign{\pyinline{x}\exAnnot{\tyLiteral{\pyinline{42}}}}{\pyinline{42}}$ admits a match with a case for \pyinline{42} alone, while
 $\exAssign{\pyinline{x}\exAnnot{\tyInt}}{\pyinline{42}}$ keeps the type open. Over
 $\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,

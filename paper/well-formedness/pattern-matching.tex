@@ -1,3 +1,4 @@
+\begin{DeletedBlock}
 \paragraph{Pattern checking.}
 Checking a pattern against the remaining type (\ruleName{match-case}) rejects a tuple pattern at a type
 with list values and a list pattern at a type with tuple values, and either at a type with range values, because matching either form of pattern
@@ -39,6 +40,7 @@ only when a pattern requires it, because a class may refer to itself through its
 shape in advance would not terminate. The \ruleName{pat-constr} rule matches a pattern for a class $D$
 against a constructor shape for a subclass $C$ of $D$, matching the sub-patterns, with wildcards for omitted
 fields, against the field shapes position by position.
+\end{DeletedBlock}
 
 The residual and the remaining type can differ. In the following program, the two cases between them match
 every value of \pyinline{C}:
@@ -64,7 +66,7 @@ def f(c: C) -> int:
 \end{listingcol}
 \end{listingrow*}
 
-\noindent The residual starts as the rest shape of \pyinline{C}. The first case splits it into a shape of
+\noindent The residual starts as \replaced{a shape denoting every value of \pyinline{C}}{the rest shape of \pyinline{C} }. The first case splits it into a shape of
 \pyinline{C} with a tuple field and a shape of \pyinline{C} with a \pyinline{None} field, and matches the
 shape with the \pyinline{None} field. The second case matches the shape with the tuple field, leaving the
 empty residual, so a third case would be unreachable.
