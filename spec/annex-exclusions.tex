@@ -42,10 +42,10 @@ exclusion takes effect, and lists the common Python features excluded from this 
 \label{sec:reserved-words}
 
 \begin{AddedBlock}
-Python's soft keywords \pyinline{match}, \pyinline{case}, \pyinline{type} and \pyinline{_} are keywords only in their
-statement or pattern positions and identifiers elsewhere, so that a Python program may bind a variable named
-\pyinline{type}. \PurePy reserves them in every position (\secref{lexical}), anticipating their use as keywords in later
-versions; \pyinline{_} is the wildcard pattern and never a variable.
+Python's soft keywords \pyinline{match}, \pyinline{case}, \pyinline{type} and \pyinline{_} are keywords in statement or
+pattern position and identifiers elsewhere, so a Python program may bind a variable named \pyinline{type}. \PurePy
+reserves them in every position (\secref{lexical}), so that whether a word is a keyword does not depend on where it
+occurs; \pyinline{_} is then only the wildcard pattern.
 \end{AddedBlock}
 
 \section{Features excluded from this version}
