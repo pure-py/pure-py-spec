@@ -108,7 +108,7 @@ def check_classification(r: Results, suite_dir: pathlib.Path) -> None:
 def check_lint(r: Results) -> None:
     with r.test("consistency script and runner pass mypy and ruff"):
         sources = [
-            str(TEST / "consistency.py"),
+            str(TEST / "check-consistency.py"),
             str(TEST / "expected-failures.py"),
             inspect.getfile(purepy_conformance),
         ]

@@ -113,7 +113,7 @@ spec-anon.pdf: $(TEXFILES)
 
 ## Spec consistent with conformance suite
 check-consistency:
-	uv run --locked python test/consistency.py
+	uv run --locked python test/check-consistency.py
 
 ## Python passes conformance suite, with mypy as type checker
 check-suite-python:
