@@ -118,9 +118,9 @@ unless that type is equivalent to \pyinline{None}, so a function that declares a
 type such as $\tyUnion{\tyInt}{\tyNone}$ does not exempt the body from returning, nor permit a bare \pyinline{return}, for
 compatibility with mypy (\secref{python-compatibility}).
 
-A \pyinline{match} scrutinee synthesises a type $\sigma$\replaced{. An auxiliary judgement checks the cases $\seq{b}$ against
+A \pyinline{match} scrutinee synthesises a type $\sigma$\replaced{. \emph{Case checking} (\secref{well-formedness-patterns}) types the cases $\seq{b}$ against
 $\sigma$, merges their outcomes into $S$ and gives a final \emph{remaining type}, an over-approximation of the
-values of $\sigma$ which are not matched by any of the cases (\secref{well-formedness-patterns}).}{, and its cases $\seq{b}$ are checked in turn by the
+values of $\sigma$ which are not matched by any of the cases.}{, and its cases $\seq{b}$ are checked in turn by the
 auxiliary judgement $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\specfigref{typing-cases}), which threads
 a \emph{remaining type}, starting from $\sigma$, and a \emph{residual} $L$ of shapes, starting from the shapes of $\sigma$ (\figref{shapes}),
 through the cases, merging their outcomes into $S$. } The \ruleName{match} rule applies when the final remaining type is $\tyNever$, meaning the match is
@@ -139,7 +139,7 @@ The remaining type, the residual, reachability and exhaustiveness are the subjec
 \label{sec:exhaustiveness}
 \label{sec:well-formedness-patterns}
 
-To check a \pyinline{match} with scrutinee type $\sigma$, the auxiliary judgement
+\replaced{For a \pyinline{match} with scrutinee type $\sigma$, case checking}{To check a \pyinline{match} with scrutinee type $\sigma$, the auxiliary judgement }
 $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\specfigref{typing-cases}) threads a remaining type
 $\tau$ and a \replaced{\emph{residual}}{residual } $L$ through the cases, both over-approximations of the values of $\sigma$ which are not
 matched by any of the earlier cases. The residual is an ordered set of \emph{shapes} \replaced{(\specfigref{shapes-syntax})}{(\figref{shapes}) }, each denoting a
