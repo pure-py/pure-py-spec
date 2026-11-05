@@ -74,6 +74,9 @@ The runner names the runtime it is given, as `cpython` or `graalpy`, with Pyodid
 such a test to fail, reporting it as failing as a reported bug; under mypy, in Python mode, likewise. A test which
 passes under the tool whose bug it is filed under fails the run, since the bug has then been fixed.
 
+A test under `undefined` may also have both `.expected` and `.exception.expected`, when Python implementations
+differ in its outcome; either outcome then passes, as does reporting undefined behaviour.
+
 An implementation conforms by its exit statuses, and may word diagnostics as it chooses. With `--check-messages`,
 the suite also checks each diagnostic against `.error.expected`. The reference type checker is tested with this
 option. A diagnostic for an excluded Python feature names the feature and says whether it is excluded by design or

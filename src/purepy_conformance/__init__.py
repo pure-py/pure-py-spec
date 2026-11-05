@@ -237,15 +237,18 @@ class Runner(Results):
         succeeds = outcome == PythonOutcome.SUCCEEDS
         expected = path.with_suffix(EXPECTED)
         exception = path.with_suffix(EXCEPTION_EXPECTED)
-        if expected.exists() == exception.exists():
+        both = expected.exists() and exception.exists()
+        if both and not undefined or not (expected.exists() or exception.exists()):
             return [f"run: needs exactly one of {expected.name} and {exception.name}"]
-        if succeeds != expected.exists():
+        if not both and succeeds != expected.exists():
             return [f"run: misfiled, has {expected.name if expected.exists() else exception.name}"]
         args_path = path.with_suffix(ARGS)
         args = args_path.read_text().splitlines() if args_path.exists() else []
         proc = run([*self.interpreter, path.name, *args], cwd=path.parent)
         if undefined and proc.returncode == Exit.UNDEFINED:
             return []
+        if both:
+            succeeds = proc.returncode == 0
         if succeeds:
             status_path = path.with_suffix(STATUS_EXPECTED)
             status = int(status_path.read_text()) if status_path.exists() else 0
@@ -275,12 +278,12 @@ class Runner(Results):
         exit, error_expected, python_outcome = expectation(PythonOutcome(dirs[0]), purepy)
         path = test / MAIN if test.is_dir() else test
         well_formed = exit == Exit.OK
+        undefined = purepy == PurePyOutcome.UNDEFINED
         if self.python_mode:
             return [
                 *(self.type_check_accepts(test) if well_formed else []),
-                *self.interpret(path, python_outcome, False),
+                *self.interpret(path, python_outcome, undefined),
             ]
-        undefined = purepy == PurePyOutcome.UNDEFINED
         return [
             *self.type_check(path, exit, error_expected and self.check_messages, purepy),
             *(self.interpret(path, python_outcome, undefined) if well_formed else []),
