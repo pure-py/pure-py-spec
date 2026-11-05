@@ -182,8 +182,8 @@ class Results:
 
     def record(self, label: object, failures: list[str]) -> None:
         if len(failures) > 0:
-            self.failed.append(f"{label} ({'; '.join(failures)})")
-            print(f"  {RED}✗{RESET} {self.failed[-1]}")
+            self.failed.append(str(label))
+            print(f"  {RED}✗{RESET} {label} ({'; '.join(failures)})")
         else:
             self.passed += 1
             print(f"  {GREEN}✓{RESET} {label}")
@@ -324,7 +324,7 @@ def suite() -> Iterator[pathlib.Path]:
         yield path
 
 
-def main(argv: Sequence[str] | None = None) -> None:
+def check_conformance(argv: Sequence[str] | None = None) -> Runner:
     parser = argparse.ArgumentParser(prog="purepy-conformance")
     parser.add_argument("interpreter", nargs="?", default="python3")
     parser.add_argument(
@@ -363,7 +363,11 @@ def main(argv: Sequence[str] | None = None) -> None:
     runner.summary()
     if args.python_mode:
         print(f"Python mode: {checked} tests type-checked and run, {len(found) - checked} run only")
-    sys.exit(1 if len(runner.failed) > 0 else 0)
+    return runner
+
+
+def main(argv: Sequence[str] | None = None) -> None:
+    sys.exit(1 if len(check_conformance(argv).failed) > 0 else 0)
 
 
 if __name__ == "__main__":

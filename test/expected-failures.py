@@ -10,11 +10,10 @@ from __future__ import annotations
 import argparse
 import pathlib
 import re
-import shlex
 import subprocess
 import sys
 
-from purepy_conformance import Runner, suite
+from purepy_conformance import check_conformance
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 EXPECTED = ROOT / "test" / "expected-failures.txt"
@@ -59,15 +58,9 @@ def issue_state(issue: str) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--type-checker", default="purepy --check")
-    parser.add_argument("--jobs", type=int)
     parser.add_argument("--no-expected-failures", action="store_true")
-    args = parser.parse_args()
-    runner = Runner(shlex.split(args.type_checker), None, False, True)
-    with suite() as path:
-        runner.run_suite(path, args.jobs)
-    runner.summary()
-    failed = [failure.split(" (", 1)[0] for failure in runner.failed]
+    args, conformance_args = parser.parse_known_args()
+    failed = check_conformance(["--no-run", "--check-messages", *conformance_args]).failed
     listed = [] if args.no_expected_failures else expected_failures()
     unexpected = [test for test in failed if not any(covers(entry, test) for entry, _ in listed)]
     stale = [entry for entry, _ in listed if not any(covers(entry, test) for test in failed)]
