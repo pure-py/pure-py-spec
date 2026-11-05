@@ -66,8 +66,8 @@
 \pyinline{+} & $(\tyInt, \tyInt)$ & $\val{v + v'}$ \\
  & $(\tyFloat, \tyFloat)$ & $\val{v + v'}$ \\
  & $(\tyStr, \tyStr)$ & $\val{v \concat v'}$ \\
- & $(\tyList{\tyObject}, \tyList{\tyObject})$ & $\val{\exList{\seq{v} \concat \seq{v}'}}$ if $v = \exList{\seq{v}}$ and $v' = \exList{\seq{v}'}$ \\
- & $(\tyTuple{\tyObject^m}, \tyTuple{\tyObject^n})$ & $\val{\exTuple{\seq{v} \concat \seq{v}'}}$ if $v = \exTuple{v_1, \ldots, v_m}$ and $v' = \exTuple{v'_1, \ldots, v'_n}$ \\
+ & $(\tyList{\tyObject}, \tyList{\tyObject})$ & $\val{\exList{\seq{v} \concat \seq{v}'}}$ where $v = \exList{\seq{v}}$ and $v' = \exList{\seq{v}'}$ \\
+ & $(\tyTuple{\tyObject^m}, \tyTuple{\tyObject^n})$ & $\val{\exTuple{\seq{v} \concat \seq{v}'}}$ where $v = \exTuple{v_1, \ldots, v_m}$ and $v' = \exTuple{v'_1, \ldots, v'_n}$ \\
 \opsep
 \pyinline{-} & $(\tyInt, \tyInt)$ & $\val{v - v'}$ \\
  & $(\tyFloat, \tyFloat)$ & $\val{v - v'}$ \\
@@ -76,8 +76,8 @@
  & $(\tyFloat, \tyFloat)$ & $\val{v \times v'}$ \\
  & $(\tyStr, \tyInt)$ & $\val{\bigconcat{v^n}}$ where $n = \max(v', 0)$ \\
  & $(\tyInt, \tyStr)$ & $\val{\bigconcat{v'^n}}$ where $n = \max(v, 0)$ \\
- & $(\tyList{\tyObject}, \tyInt)$ & $\val{\exList{\bigconcat{\seq{v}^n}}}$ if $v = \exList{\seq{v}}$, where $n = \max(v', 0)$ \\
- & $(\tyInt, \tyList{\tyObject})$ & $\val{\exList{\bigconcat{\seq{v}^n}}}$ if $v' = \exList{\seq{v}}$, where $n = \max(v, 0)$ \\
+ & $(\tyList{\tyObject}, \tyInt)$ & $\val{\exList{\bigconcat{\seq{v}^n}}}$ where $v = \exList{\seq{v}}$ and $n = \max(v', 0)$ \\
+ & $(\tyInt, \tyList{\tyObject})$ & $\val{\exList{\bigconcat{\seq{v}^n}}}$ where $v' = \exList{\seq{v}}$ and $n = \max(v, 0)$ \\
 \opsep
 \pyinline{/} & $(\tyFloat, \tyFloat)$ & $\val{v / v'}$ if $v' \neq 0$; $\aborts{\errZeroDiv}$ otherwise \\
 \opsep
