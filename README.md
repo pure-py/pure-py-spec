@@ -71,8 +71,8 @@ rejects, and `.args` the command-line arguments of a run, one per line.
 
 A test which fails under a reported bug of a tool, listed in the specification, is filed in a subdirectory of its
 category named after the tool, such as `python-succeeds/agrees/graalpy-bug/` or `mypy-bug/`. Under that tool the
-runner requires the test to fail, since the bug has otherwise been fixed. The runner identifies the runtime from the
-interpreter it is given.
+runner requires the test to fail, since the bug has otherwise been fixed. The runner names the runtime of the interpreter it
+is given as `cpython`, `graalpy` or `pyodide`.
 
 A test under `undefined` may also have both `.expected` and `.exception.expected`, when Python implementations
 differ in its outcome; either outcome then passes, as does reporting undefined behaviour.
