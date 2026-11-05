@@ -15,6 +15,8 @@
 \noalign{\vskip 2mm}
 \auxgroup{Functions on values}
 \auxrow{$\typeOf(v)$}{type}{run-time type of $v$}{aux:type-of}
+\auxrow{\added{$\floorDiv(v, v')$}}{\added{float}}{\added{floor division of floats}}{aux:floordiv}
+\auxrow{\added{$\modOp(v, v')$}}{\added{float}}{\added{remainder of float division, with the sign of $v'$}}{aux:mod}
 \auxrow{$\eqOp{\Sigma}(v, v')$}{result}{structural equality; $\aborts{\errUndef}$ between functions, between Boolean and number, and between two \replaced{NaNs}{\pyinline{nan} values } in container}{aux:eq}
 \auxrow{$\eqElems{\Sigma}(\seq{v}, \seq{v}\,')$}{result}{elementwise equality of value sequences}{aux:eq-elems}
 \auxrow{$\inOp{\Sigma}(v, v')$}{result}{whether $v$ is element of $v'$; $\errExcluded$ for range or non-string key, $\errType$ otherwise}{aux:in}

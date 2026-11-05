@@ -1,0 +1,4 @@
+\modOp(v, v') &{}= \text{a NaN} && \quad \text{if } \NaN(v), \NaN(v') \text{ or } v \text{ infinite} \\*
+\modOp(v, v') &{}= v && \quad \text{if } v' \text{ infinite and } v \text{ zero or of the sign of } v' \\*
+\modOp(v, v') &{}= v' && \quad \text{if } v' \text{ infinite and } v \text{ nonzero, of the opposite sign} \\*
+\modOp(v, v') &{}= \fl(v - (v' \times \lfloor v / v' \rfloor)) && \quad \text{otherwise}

@@ -3,3 +3,4 @@ python-succeeds/parser-rejects/soft_keyword_case.py	pure-py/pure-py-spec#328
 python-succeeds/parser-rejects/soft_keyword_type.py	pure-py/pure-py-spec#328
 python-succeeds/parser-rejects/underscore_variable.py	pure-py/pure-py-spec#328
 python-succeeds/parser-rejects/underscore_generator.py	pure-py/pure-py-spec#328
+python-succeeds/typing-rejects/power_float_exponent.py	pure-py/pure-py-spec#328

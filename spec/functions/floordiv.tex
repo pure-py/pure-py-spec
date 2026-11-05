@@ -1,0 +1,6 @@
+\floorDiv(v, v') &{}= \text{a NaN} && \quad \text{if } \NaN(v), \NaN(v') \text{ or } v \text{ infinite} \\*
+\floorDiv(v, v') &{}= -1.0 && \quad \text{if } v' \text{ infinite and } v \text{ nonzero, of the opposite sign} \\*
+\floorDiv(v, v') &{}= 0.0 && \quad \text{if } v' \text{ infinite and } v \text{ zero or of the sign of } v' \\*
+\floorDiv(v, v') &{}= \lceil d' - \tfrac{1}{2} \rceil && \quad \text{otherwise, where } m = v - (v' \times \trunc(v / v')), \\*
+&&& \quad \phantom{\text{otherwise, }} d = \fl(\fl(v - m) / v'), \text{ and } d' = \fl(d - 1) \\*
+&&& \quad \phantom{\text{otherwise, }} \text{if } m \neq 0 \text{ has the opposite sign to } v', \text{ and } d \text{ otherwise}
