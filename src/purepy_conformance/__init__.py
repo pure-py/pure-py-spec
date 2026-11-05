@@ -112,8 +112,6 @@ def run(cmd: list[str], cwd: pathlib.Path | None = None) -> subprocess.Completed
 
 
 class Runtime(StrEnum):
-    """Python runtime, named as in a directory of reported bugs"""
-
     CPYTHON = "cpython"
     GRAALPY = "graalpy"
     PYODIDE = "pyodide"
