@@ -9,6 +9,6 @@ class, whereas Python ignores the remaining fields.
 
 Three exclusions are dynamic, because the types of the operands do not determine them. At type
 \pyinline{object}, equality between a Boolean and a number or between two functions has undefined behaviour.
-Equality of containers also has undefined behaviour when both of the elements compared are \replaced{NaNs}{\pyinline{nan} },
+Equality of containers also has undefined behaviour when both of the elements compared are \replaced{$\nan$}{\pyinline{nan} },
 because Python compares container elements by identity before equality, so identical NaNs match but distinct
 ones do not.

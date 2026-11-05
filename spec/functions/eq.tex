@@ -1,7 +1,7 @@
 \setPadWidth{\eqElems{\Sigma}(\seq{v}, \delta'(\seq{w}))}%
 \eqOp{\Sigma}(n, n') &{}= \padded{\val{\pyinline{True}}} \quad \text{if } \replaced{n \text{ and } n' \text{ equal in value}}{n = n' \text{ and } n \text{ not } \pyinline{nan} } \\*
 \deleted{\eqOp{\Sigma}(n, n')} &\deleted{{}= \padded{\val{\pyinline{False}}} \quad \text{if } n \neq n'} \\*
-\eqOp{\Sigma}(n, \replaced{n'}{n }) &{}= \padded{\aborts{\errUndef}} \quad \text{if } \replaced{\NaN(n) \text{ and } \NaN(n')}{n \text{ } \pyinline{nan} } \\*
+\eqOp{\Sigma}(n, \replaced{n'}{n }) &{}= \padded{\aborts{\errUndef}} \quad \text{if } \replaced{n = n' = \nan}{n \text{ } \pyinline{nan} } \\*
 \eqOp{\Sigma}(w, w') &{}= \padded{\val{\pyinline{True}}} \quad \text{if } w = w' \\*
 \eqOp{\Sigma}(w, w') &{}= \padded{\val{\pyinline{False}}} \quad \text{if } w \neq w' \\*
 \eqOp{\Sigma}(\pyinline{True}, \pyinline{True}) &{}= \eqOp{\Sigma}(\pyinline{False}, \pyinline{False}) = \val{\pyinline{True}} \\*

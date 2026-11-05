@@ -43,9 +43,9 @@
 \added{\begin{tabular}{>{\raggedright\arraybackslash}p{0.08\textwidth}>{\raggedright\arraybackslash}p{0.31\textwidth}>{\raggedright\arraybackslash}p{0.46\textwidth}>{\raggedright\arraybackslash}p{0.02\textwidth}}
 \arrayrulecolor{gray!60}\hline
 \rowcolor{grammarheadcolor}$\odot$ & $(\tau_1, \tau_2)$ & $\hat{\odot}(v, v')$ & \\
-\pyinline{==} & $(\tyObject, \tyObject)$ & $\val{\pyinline{False}}$ if $\NaN(v)$ and $\NaN(v')$; $\eqOp{\Sigma}(v, v')$ otherwise \\
+\pyinline{==} & $(\tyObject, \tyObject)$ & $\val{\pyinline{False}}$ if $v = v' = \nan$; $\eqOp{\Sigma}(v, v')$ otherwise \\
 \opsep
-\pyinline{!=} & $(\tyObject, \tyObject)$ & $\val{\pyinline{True}}$ if $\NaN(v)$ and $\NaN(v')$ or $\eqOp{\Sigma}(v, v') = \val{\pyinline{False}}$; $\val{\pyinline{False}}$ if $\eqOp{\Sigma}(v, v') = \val{\pyinline{True}}$; $\eqOp{\Sigma}(v, v')$ otherwise \\
+\pyinline{!=} & $(\tyObject, \tyObject)$ & $\val{\pyinline{True}}$ if $v = v' = \nan$ or $\eqOp{\Sigma}(v, v') = \val{\pyinline{False}}$; $\val{\pyinline{False}}$ if $\eqOp{\Sigma}(v, v') = \val{\pyinline{True}}$; $\eqOp{\Sigma}(v, v')$ otherwise \\
 \opsep
 \pyinline{in} & $(\tyObject, \tyObject)$ & $\inOp{\Sigma}(v, v')$ \\
 \opsep

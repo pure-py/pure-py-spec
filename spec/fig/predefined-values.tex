@@ -11,7 +11,7 @@
  & \pyinline{round} & \multicolumn{2}{l}{$\primVal{\primFn}$ where} \\
  & & $\quad \primFn(n) = \val{n'}$ & if $n'$ nearest integer to $n$, ties to even \\
  & & $\quad \primFn(n) = \aborts{\errOverflow}$ & if $n$ infinite \\
- & & $\quad \primFn(n) = \aborts{\errValue}$ & if \replaced{$\NaN(n)$}{$n$ \pyinline{nan} } \\
+ & & $\quad \primFn(n) = \aborts{\errValue}$ & if \replaced{$n = \nan$}{$n$ \pyinline{nan} } \\
  & & $\quad \primFn(v) = \aborts{\errExcluded}$ & if $v$ Boolean \\
  & & $\quad \primFn(v, v') = \aborts{\errExcluded}$ & if $v$ number or Boolean, \\
  & & & and $v'$ integer, Boolean or \pyinline{None} \\
