@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Before pushing commits that change the conformance suite, run the suite against the mechanisation of the same
-issue, allowing only the failures listed in test/expected-failures.txt. The mechanisation is the worktree of the isabelle-purepy clone beside the main clone of
-this repository whose branch has the issue number of the pushed branch, or the worktree on main if no branch has it.
-Refuse the push if the suite fails or an assumption of the check is violated."""
+issue, or against the latest release of the mechanisation when there is none, allowing only the failures listed in
+test/expected-failures.txt. The mechanisation of the issue is the worktree of the isabelle-purepy clone beside the
+main clone of this repository whose branch has the issue number of the pushed branch. Refuse the push if the suite
+fails or an assumption of the check is violated."""
 
 from __future__ import annotations
 
@@ -37,16 +38,15 @@ def worktrees(clone: pathlib.Path) -> list[tuple[pathlib.Path, str]]:
     return [(pathlib.Path(entry["worktree"]), entry.get("branch", "").removeprefix("refs/heads/")) for entry in entries]
 
 
-def mechanisation(clone: pathlib.Path, branch: str) -> pathlib.Path:
+def mechanisation(clone: pathlib.Path, branch: str) -> pathlib.Path | None:
+    """Worktree of clone on a branch of the issue of branch, if any"""
     issue = re.match(r"\d+-", branch)
-    trees = worktrees(clone)
-    matching = [path for path, name in trees if issue and name.startswith(issue[0])]
-    main = [path for path, name in trees if name == "main"]
+    if not issue or not (clone / ".git").is_dir():
+        return None
+    matching = [path for path, name in worktrees(clone) if name.startswith(issue[0])]
     if len(matching) > 1:
         fail(f"several worktrees of {clone} on branches of issue {issue[0][:-1]}: {', '.join(map(str, matching))}")
-    if not matching and not main:
-        fail(f"no worktree of {clone} on main or on a branch of the issue of {branch}")
-    return (matching or main)[0]
+    return matching[0] if matching else None
 
 
 def check(clone: pathlib.Path, branch: str, sha: str) -> None:
@@ -55,6 +55,11 @@ def check(clone: pathlib.Path, branch: str, sha: str) -> None:
     if git("status", "--porcelain"):
         fail("uncommitted changes here")
     tree = mechanisation(clone, branch)
+    if tree is None:
+        print(f"pre-push: suite of {branch} against the latest release of the mechanisation", file=sys.stderr)
+        if subprocess.run(["make", "check-suite-purepy"]).returncode != 0:
+            fail(f"suite of {branch} fails against the latest release of the mechanisation")
+        return
     if git("status", "--porcelain", cwd=tree):
         fail(f"uncommitted changes in {tree}")
     print(f"pre-push: suite of {branch} against the mechanisation in {tree}", file=sys.stderr)
@@ -74,8 +79,6 @@ def main() -> None:
         return
     spec = pathlib.Path(git("rev-parse", "--path-format=absolute", "--git-common-dir")).parent
     clone = spec.parent / "isabelle-purepy"
-    if not (clone / ".git").is_dir():
-        fail(f"no isabelle-purepy clone beside {spec}")
     for branch, sha in branches:
         check(clone, branch, sha)
 
