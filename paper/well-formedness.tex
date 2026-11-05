@@ -167,7 +167,7 @@ specification leaves narrowing largely unspecified,\footnote{\url{https://typing
 so the remaining type emulates the narrowing of \replaced{match scrutinees}{a match scrutinee } observed in mypy
 (\secref{python-compatibility}), which subtracts a class \added{from the scrutinee type }only \replaced{when a
 constructor pattern matches}{for a
-constructor pattern that matches } every value of the class, and a tuple only through one refutable component, i.e.~one whose pattern can fail to match a value of the component's type.
+constructor pattern that matches } every value of the class, \replaced{and narrows a tuple type only when exactly one sub-pattern of a tuple pattern can fail to match a value of the corresponding component type.}{and a tuple only through one refutable component, i.e.~one whose pattern can fail to match a value of the component's type. }
 
 \input{paper/well-formedness/pattern-matching}
 
