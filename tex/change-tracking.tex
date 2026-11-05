@@ -32,7 +32,11 @@
   \newcommand{\Added}[1]{#1}
   \newcommand{\Deleted}[1]{}
   \newcommand{\Replaced}[2]{#1}
-  \newenvironment{DeletedBlock}{\setbox0\vbox\bgroup}{\egroup}
+  % A float cannot be typeset inside a box, so a deleted figure is boxed too, without its caption. Labels in
+  % the discarded box are never written, so references inside it are dropped.
+  \newenvironment{DeletedBlock}{\setbox0\vbox\bgroup\renewcommand*{\ref}[1]{}%
+    \renewenvironment{figure}[1][]{\setbox1\vbox\bgroup\renewcommand{\caption}[2][]{}}{\egroup}%
+    \renewenvironment{figure*}[1][]{\setbox1\vbox\bgroup\renewcommand{\caption}[2][]{}}{\egroup}}{\egroup}
   \newenvironment{AddedBlock}{\par}{\par}
 \else
   \newcommand{\Added}[1]{\leavevmode\protect\cbstart\added{#1}\protect\cbend\xspace}
