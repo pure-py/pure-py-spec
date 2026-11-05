@@ -17,7 +17,7 @@ Non-string \pyinline{assert} message & Any object accepted, shown in traceback &
 Boolean against number under \pyinline{==} or \pyinline{!=} & Compared as numbers, so \pyinline{True} equals \pyinline{1} & Static; dynamic at \pyinline{object} & \pyinline{bool} and \pyinline{int} incomparable (\ruleName{binop}); at \pyinline{object}, equality undefined \\\rowgap
 Function under \pyinline{==} or \pyinline{!=} & Compared by identity, so two textually identical lambdas are unequal & Static; dynamic at \pyinline{object} & Callable types not equality types (\ruleName{binop}); at \pyinline{object}, undefined between functions \\\rowgap
 \replaced{$\nan$}{\pyinline{nan} } under container equality or membership & Elements compared by identity before equality, so identical NaNs match but distinct ones do not & Dynamic & Undefined when both elements are \replaced{$\nan$}{\pyinline{nan} } \\\rowgap
-\added{Overflow of \pyinline{**} on floats} & \added{\pyinline{OverflowError} in CPython, an infinity in GraalPy} & \added{Dynamic} & \added{Undefined when the result lies beyond the largest float}
+\added{Overflow of \pyinline{**} on floats} & \added{\pyinline{OverflowError} in CPython, an infinity in GraalPy} & \added{Dynamic} & \added{Undefined when result rounds to infinity}
 \end{tabular}
 \caption{Python coercions\added{, lax matches and non-portable operations} \replaced{excluded}{and lax matches excluded } by \PurePy}
 \label{fig:coercions}
