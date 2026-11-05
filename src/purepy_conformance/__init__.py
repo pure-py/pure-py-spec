@@ -23,11 +23,11 @@ EXCEPTION_EXPECTED = f".exception{EXPECTED}"
 ERROR_EXPECTED = f".error{EXPECTED}"
 STATUS_EXPECTED = f".status{EXPECTED}"
 OUTPUT_EXPECTED = f".output{EXPECTED}"
-ARGS = ".args"  # command-line arguments, one per line
+ARGS = ".args"
 
 HELPERS = "helpers"
 MAIN = "main.py"
-BUG = "-bug"  # Directory suffix for tests of reported bugs
+BUG = "-bug"
 MYPY = "mypy"
 
 
@@ -49,19 +49,15 @@ SYNTAX_ERROR = "SyntaxError"
 
 
 class Classification(StrEnum):
-    """Wording of the classification in a diagnostic for an excluded Python feature."""
-
     BY_DESIGN = "not allowed in PurePy (excluded by design)"
     FOR_NOW = "not allowed in PurePy (excluded from this version)"
 
 
 def excluded(feature: str, classification: Classification) -> str:
-    """Diagnostic for a rejection of feature, with its classification."""
     return f"{feature} {classification}"
 
 
-# Placeholder for classification at end of expected error for excluded feature
-CLASSIFICATION = "{classification}"
+CLASSIFICATION_PLACEHOLDER = "{classification}"
 
 CLASSIFICATION_OF: dict[PurePyOutcome, Classification] = {
     PurePyOutcome.PARSER_REJECTS: Classification.BY_DESIGN,
@@ -71,9 +67,11 @@ CLASSIFICATION_OF: dict[PurePyOutcome, Classification] = {
 
 
 def expected_error(text: str, purepy: PurePyOutcome) -> str:
-    """Expected error, with a trailing classification placeholder replaced by the full diagnostic."""
-    if text.endswith(f" {CLASSIFICATION}"):
-        return excluded(text.removesuffix(f" {CLASSIFICATION}"), CLASSIFICATION_OF[purepy])
+    """Replace trailing classification placeholder by classification"""
+    if text.endswith(f" {CLASSIFICATION_PLACEHOLDER}"):
+        return excluded(
+            text.removesuffix(f" {CLASSIFICATION_PLACEHOLDER}"), CLASSIFICATION_OF[purepy]
+        )
     return text
 
 
@@ -81,11 +79,11 @@ class Exit(IntEnum):
     OK = 0
     NOT_ALLOWED = 1
     ILL_FORMED = 3
-    UNDEFINED = 4  # Interpreter: run aborted with undefined behaviour
-    EXCLUDED_FOR_NOW = 5  # Feature excluded from this version, found by parser or type checker
+    UNDEFINED = 4
+    EXCLUDED_FOR_NOW = 5
 
 
-# Type checker exit status for each PurePy outcome, and whether its output contains .error.expected
+# Exit status of type checker, and whether output contains expected error
 TYPE_CHECKER_VERDICT: dict[PurePyOutcome, tuple[Exit, bool]] = {
     PurePyOutcome.PARSER_REJECTS: (Exit.NOT_ALLOWED, True),
     PurePyOutcome.TYPING_REJECTS: (Exit.ILL_FORMED, True),
@@ -120,7 +118,6 @@ def main_module(test: pathlib.Path) -> pathlib.Path:
 
 
 def filing_errors(path: pathlib.Path, outcome: PythonOutcome, undefined: bool) -> list[str]:
-    """Expectation files of the test at path which do not match its directory"""
     expected = path.with_suffix(EXPECTED)
     exception = path.with_suffix(EXCEPTION_EXPECTED)
     both = expected.exists() and exception.exists()
@@ -135,14 +132,13 @@ def filing_errors(path: pathlib.Path, outcome: PythonOutcome, undefined: bool) -
 
 
 def under_bug(stage: str, failures: list[str], test: pathlib.Path, tool: str) -> list[str]:
-    """Failures of a stage of a test, inverted if the test is filed under a reported bug of tool"""
+    """Invert failures if test is filed under reported bug of tool"""
     if f"{tool}{BUG}" not in test.parts:
         return failures
     return [] if len(failures) > 0 else [f"{stage}: passes, but filed as a reported {tool} bug"]
 
 
-def output_mismatch(path: pathlib.Path, proc: subprocess.CompletedProcess[str]) -> list[str]:
-    """Check that running test at path gave expected exit status and output"""
+def check_output(path: pathlib.Path, proc: subprocess.CompletedProcess[str]) -> list[str]:
     status_path = path.with_suffix(STATUS_EXPECTED)
     status = int(status_path.read_text()) if status_path.exists() else 0
     if proc.returncode != status:
@@ -152,8 +148,7 @@ def output_mismatch(path: pathlib.Path, proc: subprocess.CompletedProcess[str]) 
     return []
 
 
-def exception_mismatch(path: pathlib.Path, proc: subprocess.CompletedProcess[str]) -> list[str]:
-    """Check that running test at path printed expected output, then raised expected exception"""
+def check_exception(path: pathlib.Path, proc: subprocess.CompletedProcess[str]) -> list[str]:
     name = path.with_suffix(EXCEPTION_EXPECTED).read_text().strip()
     if proc.returncode == 0:
         return [f"run: expected {name} but script succeeded"]
@@ -203,8 +198,8 @@ class Results:
 class Runner(Results):
     type_checker: list[str]
     interpreter: list[str] | None  # None: tests not run
-    python_mode: bool  # Suite checked against Python and mypy
-    check_messages: bool  # Diagnostics checked against reference type checker
+    python_mode: bool
+    check_messages: bool
     runtime: Runtime | None = field(init=False)
 
     def __post_init__(self) -> None:
@@ -212,8 +207,7 @@ class Runner(Results):
         self.runtime = None if self.interpreter is None else runtime(self.interpreter)
 
     def run_type_checker(self, test: pathlib.Path) -> subprocess.CompletedProcess[str]:
-        """Type-check a copy of test in a temporary directory, so that tests cannot interfere and the type
-        checker writes nothing into the suite"""
+        """Type-check copy of test, so that tests can't interfere and suite stays unchanged"""
         with tempfile.TemporaryDirectory() as tmp:
             copy = pathlib.Path(tmp) / test.name
             if test.is_dir():
@@ -263,9 +257,9 @@ class Runner(Results):
         failures = (
             []
             if undefined and proc.returncode == Exit.UNDEFINED
-            else output_mismatch(path, proc)
+            else check_output(path, proc)
             if succeeds
-            else exception_mismatch(path, proc)
+            else check_exception(path, proc)
         )
         return failures if self.runtime is None else under_bug("run", failures, path, self.runtime)
 
@@ -288,7 +282,6 @@ class Runner(Results):
         ]
 
     def run_suite(self, suite: pathlib.Path, jobs: int | None) -> None:
-        """Run tests in parallel on jobs threads, one per core by default, and report results in order"""
         found = list(tests(suite))
         with concurrent.futures.ThreadPoolExecutor(jobs) as pool:
             results = pool.map(lambda test: self.run_test(suite, test), found)
@@ -306,8 +299,7 @@ def is_well_formed(suite: pathlib.Path, test: pathlib.Path) -> bool:
 
 
 def tests(suite: pathlib.Path) -> Iterator[pathlib.Path]:
-    """Tests sorted by path: a module as a .py file, or a program as the directory holding its main
-    module."""
+    """Tests sorted by path, each a module or directory of program"""
     found = [
         path
         for path in suite.rglob("*.py")

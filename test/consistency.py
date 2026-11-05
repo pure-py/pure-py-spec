@@ -9,7 +9,7 @@ import tomllib
 
 import purepy_conformance
 from purepy_conformance import (
-    CLASSIFICATION,
+    CLASSIFICATION_PLACEHOLDER,
     ERROR_EXPECTED,
     MAIN,
     PurePyOutcome,
@@ -91,16 +91,18 @@ def check_classification(r: Results, suite_dir: pathlib.Path) -> None:
                 continue
             python, purepy = test.relative_to(suite_dir).parts[:2]
             text = error.read_text(encoding="utf-8").strip()
-            ends = text.endswith(f" {CLASSIFICATION}")
+            ends = text.endswith(f" {CLASSIFICATION_PLACEHOLDER}")
             required = python != PythonOutcome.REJECTS and purepy in (
                 PurePyOutcome.PARSER_REJECTS,
                 PurePyOutcome.EXCLUDED_FOR_NOW,
             )
             allowed = python != PythonOutcome.REJECTS and purepy != PurePyOutcome.AGREES
             if required and not ends:
-                r.fail(f"{error.relative_to(suite_dir)} does not end with {CLASSIFICATION}")
-            elif CLASSIFICATION in text and not (allowed and ends):
-                r.fail(f"{error.relative_to(suite_dir)} uses {CLASSIFICATION}")
+                r.fail(
+                    f"{error.relative_to(suite_dir)} does not end with {CLASSIFICATION_PLACEHOLDER}"
+                )
+            elif CLASSIFICATION_PLACEHOLDER in text and not (allowed and ends):
+                r.fail(f"{error.relative_to(suite_dir)} uses {CLASSIFICATION_PLACEHOLDER}")
 
 
 def check_lint(r: Results) -> None:
