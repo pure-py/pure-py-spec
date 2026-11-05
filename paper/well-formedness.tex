@@ -143,8 +143,8 @@ The remaining type, the residual, reachability and exhaustiveness are the subjec
 $\Sigma; \Gamma; \zeta \vdash \tau, L, \seq{b} : S, \tau', L'$ (\specfigref{typing-cases}) threads a remaining type
 $\tau$ and a \replaced{\emph{residual}}{residual } $L$ through the cases\replaced{, both of which over-approximate the values of $\sigma$ left unmatched by earlier cases.}{, both over-approximations of the values of $\sigma$ which are not
 matched by any of the earlier cases. } The residual is an ordered set of \emph{shapes} \replaced{(\specfigref{shapes-syntax})}{(\figref{shapes}) }, each denoting a
-set of values of a single type, and starts from the shapes of $\sigma$; the remaining type is coarser, a type rather
-than a set of shapes, and starts from $\sigma$ itself. \deleted{Two auxiliary functions narrow a type $\tau$ by a pattern $p$: $\matchedAs{\Sigma}(\Gamma, \tau, p)$ is
+set of values of a single type, \replaced{starting}{and starts } from the shapes of $\sigma$; the remaining type is coarser, a type rather
+than a set of shapes, \replaced{starting}{and starts } from $\sigma$ itself. \deleted{Two auxiliary functions narrow a type $\tau$ by a pattern $p$: $\matchedAs{\Sigma}(\Gamma, \tau, p)$ is
 the type to which $\tau$ is narrowed if $p$ matches, and $\remaining{\Sigma}(\Gamma, \tau, p)$ is the type remaining if
 $p$ fails. }Each case's pattern is checked against the remaining type, binding its pattern variables, and matched
 against the residual. Reachability is decided by the
