@@ -10,7 +10,7 @@
 \pyinline{AttributeError} & \replaced{Module attribute required to be definitely assigned; object attribute required to be a field of the class}{Always: a module attribute must resolve to a definitely assigned member, and an object attribute must be a field of the class. } & \figref{typing-synth} \\\rowgap
 \pyinline{TypeError} & \replaced{Operator overload required at operand types}{The operation is a constructor call or constructor pattern, which must match the arity of the class exactly. (Only excess sub-patterns are a Python error; a pattern with fewer sub-patterns is excluded even though Python permits it.) } & \figref{typing-synth}\deleted{, \figref{typing-pat-shape}} \\\rowgap
 & \added{Callee required to be a function or class, with arguments matching parameters or fields} & \added{\figref{typing-synth}} \\\rowgap
-& \added{Constructor pattern required to match class arity, although Python permits fewer sub-patterns} & \added{\figref{typing-pat-shape}}
+& \added{Constructor pattern required to match class arity; Python permits fewer sub-patterns} & \added{\figref{typing-pat-shape}}
 \end{tabular}
 \caption{Python errors prevented by well-formedness}
 \label{fig:prevented-errors}
