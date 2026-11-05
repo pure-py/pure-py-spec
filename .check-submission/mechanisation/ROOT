@@ -1,0 +1,31 @@
+session "mechanisation" = HOL +
+  options [timeout = 1200]
+  sessions
+    "HOL-Library"
+  theories
+    Util
+    Floats
+    Strings
+    Positions
+    Syntax
+    Semantics
+    Correctness
+    Contexts
+    Reasons
+    Types
+    Subtyping
+    Shapes
+    Patterns
+    Matching
+    Operators
+    Typing
+    Programs
+    Examples
+
+session "mechanisation-python" in "python" = "mechanisation" +
+  options [timeout = 1200]
+  sessions
+    Python
+  theories
+    Codegen
+  export_files (in "python_out") "*:**"

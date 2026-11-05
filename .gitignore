@@ -14,14 +14,11 @@
 *.toc
 *.zip
 .DS_Store
-.check-submission/
 .claude/settings.local.json
 .mypy_cache/
 .venv/
 __pycache__/
 dist/
-paper-anon.references
-submission.tsv
 tex/anon-name.tex
 tex/mypy-version.tex
 tex/python-version.tex

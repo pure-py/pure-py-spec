@@ -17,7 +17,7 @@ description: PurePy-specific additions to the technical-authoring, coding-conven
 
 ## LaTeX
 
-- Rebuild the paper after every change to verify that it builds without errors.
+- Rebuild the specification after every change to verify that it builds without errors.
 - Put primes outside `\vec`, not inside: `\vec{e}'`, not `\vec{e'}`.
 
 ## Conformance suite
