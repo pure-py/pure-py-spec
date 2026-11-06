@@ -8,7 +8,6 @@ to detect dynamically excluded operations (\issue{64}).}
 \input{spec/fig/reported-bugs}
 \FloatBarrier
 
-\begin{AddedBlock}
 \subsubsection{Attribution of ill-formedness}\label{sec:ill-formedness-attribution}
 
 So that rejections can be traced to the specification, tests of ill-formed programs attribute the ill-formedness to
@@ -42,4 +41,3 @@ also a literal type. Thus an expression of type $\tyList{\tyStr}$ assigned to a 
 $\tyList{\tyInt}$ cites \ruleName{subty-list}. If the subtyping judgement does not select a rule, the type mismatch
 cites instead the judgement and rule with the subtyping judgement as a premise, so the declaration
 $\exAssign{x\exAnnot{\tyInt}}{\pymath{"a"}}$ cites \ruleName{declare-assign} rather than \ruleName{check-syn}.
-\end{AddedBlock}
