@@ -1,4 +1,4 @@
-# judgement: stmt, rule: defs
+# judgement: module, rule: module
 def f() -> int:
     return 0
 def g() -> int:

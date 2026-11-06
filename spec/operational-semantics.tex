@@ -165,7 +165,7 @@ environments by the same equations, but with values in place of context entries 
 contexts.}
 
 Evaluation of a sequence of module bodies extends $\mathcal{L}$ with the environment of each module in
-turn\speconly{ (\ruleName{eval-modules-cons})}. Following the \ruleName{module} rule (\replaced{\specfigref{typing-mod}}{\specfigref{typing-module} }), the
+turn\speconly{ (\ruleName{eval-modules-cons})}. Following the \ruleName{module} rule (\specfigref{typing-mod}), the
 environment of a module $q$ consists of a stub for each submodule of $q$, overridden by the environment assigned by the
 body of $q$. The program rules start from the environments $\mathcal{E}(\mathcal{A})$ of the predefined modules, given
 the command-line arguments $\mathcal{A}$\speconly{ (\ruleName{eval-program} and \ruleName{eval-program-abort})}.

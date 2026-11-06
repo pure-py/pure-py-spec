@@ -1,4 +1,4 @@
-# judgement: stmt, rule: declare
+# judgement: module, rule: module
 x: int
 x: int
 x = 1

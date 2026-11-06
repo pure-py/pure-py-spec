@@ -1,4 +1,4 @@
-# judgement: type-def, rule: class-extend
+# judgement: resolve-name
 from dataclasses import dataclass
 
 @dataclass

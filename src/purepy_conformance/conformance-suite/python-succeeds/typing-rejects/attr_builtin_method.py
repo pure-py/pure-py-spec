@@ -1,4 +1,4 @@
-# judgement: synth, rule: attr-object
+# judgement: synth
 xs: list[int] = [1]
 xs.append(2)
 print(xs)
