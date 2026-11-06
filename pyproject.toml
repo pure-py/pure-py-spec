@@ -34,5 +34,4 @@ required-imports = ["from __future__ import annotations"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/purepy_conformance"]
-# Generated from the specification, so ignored by git
 artifacts = ["src/purepy_conformance/figure-numbers.json"]
