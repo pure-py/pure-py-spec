@@ -37,7 +37,8 @@ judgement for type expressions alone, and a subscripted integer cites the synthe
 premises of every matching rule fail.
 
 Type mismatches cite the subtyping judgement between the synthesised and expected types, and the rule selected by the
-subtyping judgement, with literal types taken as their base types except against literal types. An expression of type
+subtyping judgement. In the subtyping judgement, a literal type is taken as its base type unless the other type is
+also a literal type. An expression of type
 $\tyList{\tyStr}$ assigned to a variable declared at $\tyList{\tyInt}$ cites \ruleName{subty-list}. If the subtyping
 judgement does not select a rule, the type mismatch cites instead the judgement and rule with the subtyping judgement
 as a premise. The declaration $\exAssign{x\exAnnot{\tyInt}}{\pymath{"a"}}$ cites \ruleName{declare-assign} rather
