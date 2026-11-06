@@ -30,7 +30,7 @@ jobs:
         with:
           root_file: PurePy-spec.tex
 
-      - name: Keep labels of specification
+      - name: Keep LaTeX auxiliary file of specification
         run: mkdir -p xref && cp PurePy-spec.aux xref/
 
       - name: Run checks and build wheel

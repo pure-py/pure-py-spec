@@ -79,7 +79,7 @@ jobs:
         with:
           root_file: PurePy-spec.tex
 
-      - name: Keep labels of specification
+      - name: Keep LaTeX auxiliary file of specification
         run: mkdir -p xref && cp PurePy-spec.aux xref/
 
       # The PDF is served from GitHub Pages rather than attached to the release, since GitHub serves release files
