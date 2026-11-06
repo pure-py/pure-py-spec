@@ -6,3 +6,4 @@ python-succeeds/parser-rejects/underscore_generator.py	pure-py/isabelle-purepy#4
 python-succeeds/typing-rejects/power_float_exponent.py	pure-py/isabelle-purepy#41
 python-succeeds/excluded-for-now/pat_head_int.py	pure-py/isabelle-purepy#36
 python-raises/excluded-for-now/pat_head_int_two_positional.py	pure-py/isabelle-purepy#36
+python-succeeds/agrees/str_shadow.py	pure-py/isabelle-purepy#36
