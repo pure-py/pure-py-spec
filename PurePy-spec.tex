@@ -123,9 +123,9 @@ This chapter collects the notation of the specification: the metavariables
 \end{figure}
 
 \FloatBarrier
-% Figures numbered within chapter, or within section inside one, with a hyphen before the figure's index (3-1, 3.1-1).
+% Figures numbered within chapter, or within section inside one, with an en dash before the figure's index (3--1, 3.1--1).
 \counterwithin*{figure}{section}
-\renewcommand*{\thefigure}{\ifnum\value{section}=0 \thechapter\else\thesection\fi-\arabic{figure}}
+\renewcommand*{\thefigure}{\ifnum\value{section}=0 \thechapter\else\thesection\fi--\arabic{figure}}
 \renewcommand*{\theHfigure}{\thefigure}
 
 % The shared sources use \section for what is a chapter here; shift the heading levels, innermost first,

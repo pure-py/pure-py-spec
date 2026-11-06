@@ -82,7 +82,11 @@ def figures(text: str) -> Figures:
 
 
 def main() -> None:
-    numbers = dict(NEWLABEL.findall(LABELS.read_text(encoding="utf-8")))
+    # En dash in a figure number written as its TeX ligature
+    numbers = {
+        label: number.replace("--", "\u2013")
+        for label, number in NEWLABEL.findall(LABELS.read_text(encoding="utf-8"))
+    }
     figs = figures(source(SPEC))
     for rule, label in figs.rules.items():
         assert label in figs.judgements, (
