@@ -71,8 +71,8 @@ jobs:
         with:
           ref: ${{ steps.version.outputs.tag }}
 
-      - name: Generate Python and mypy version macros
-        run: make tex/python-version.tex tex/mypy-version.tex
+      - name: Generate Python and mypy version and anonymised name macros
+        run: make tex/python-version.tex tex/mypy-version.tex tex/anon-name.tex
 
       - name: Build LaTeX document
         uses: xu-cheng/latex-action@v4

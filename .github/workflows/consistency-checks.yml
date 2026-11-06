@@ -22,8 +22,8 @@ jobs:
           enable-cache: true
 
       # The wheel exports figure numbers taken from the labels of a build of the specification.
-      - name: Generate Python and mypy version macros
-        run: make tex/python-version.tex tex/mypy-version.tex
+      - name: Generate Python and mypy version and anonymised name macros
+        run: make tex/python-version.tex tex/mypy-version.tex tex/anon-name.tex
 
       - name: Build LaTeX document
         uses: xu-cheng/latex-action@v4
