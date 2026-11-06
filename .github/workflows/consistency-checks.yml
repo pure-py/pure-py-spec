@@ -21,6 +21,18 @@ jobs:
         with:
           enable-cache: true
 
+      # The wheel exports figure numbers taken from the labels of a build of the specification.
+      - name: Generate Python and mypy version macros
+        run: make tex/python-version.tex tex/mypy-version.tex
+
+      - name: Build LaTeX document
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: PurePy-spec.tex
+
+      - name: Keep labels of specification
+        run: mkdir -p xref && cp PurePy-spec.aux xref/
+
       - name: Run checks and build wheel
         env:
           GH_TOKEN: ${{ github.token }}
