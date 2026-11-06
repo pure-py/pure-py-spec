@@ -19,9 +19,9 @@ The cited judgement is the innermost judgement to fail in an attempted derivatio
 arguments to a callee of union type cites \ruleName{call} rather than \ruleName{call-union}, because the call fails for
 one disjunct of the callee type.
 
-The conclusion of a rule \emph{matches} a judgement if a substitution for the metavariables of the conclusion yields
-the judgement, with any type, context or value derived by the judgement disregarded, since a failing judgement does
-not derive one. A judgement \emph{selects} a rule if the rule is the only rule with a conclusion matching the
+Since a failing judgement does not derive a type, context or value, the conclusion of a rule \emph{matches} a
+judgement if a substitution for the metavariables of the conclusion yields the judgement apart from the positions of
+derived types, contexts and values. A judgement \emph{selects} a rule if the rule is the only rule with a conclusion matching the
 judgement, or, of several rules with matching conclusions, the only rule with its \emph{selecting premises} holding.
 The selecting premises of a rule are the premises which decide between rules with matching conclusions, such as
 premises on the type synthesised by a subexpression or on the context entry of a name. The citation names the rule
