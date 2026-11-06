@@ -31,7 +31,7 @@ NEWLABEL = re.compile(r"\\newlabel\{fig:([a-z0-9-]+)\}\{\{([^{}]*)\}")
 
 
 def source(f: pathlib.Path) -> str:
-    """Source of f with inputs expanded, and comments and text in deleted change markup removed"""
+    """Read f, expanding inputs and removing comments and text deleted in change markup"""
     text = COMMENT.sub("", f.read_text(encoding="utf-8"))
     text = REPLACED.sub(lambda m: m[1], DELETED.sub("", text))
     return INPUT.sub(lambda m: source((ROOT / m[1]).with_suffix(".tex")), text)
