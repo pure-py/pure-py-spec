@@ -34,8 +34,8 @@ The type checker rejects a program by exit status 5 if it uses a feature exclude
 by 1 if outside the syntax of PurePy and 3 if ill-formed. The interpreter must give the recorded Python outcome, or
 report undefined behaviour by exit status 4 when the run has undefined behaviour in PurePy.
 
-The package also exports `figure_numbers`, giving the number of the figure of the specification defining each rule,
-by the rule's name, and each judgement form, by the label of its figure, for citation in an implementation's diagnostics.
+The package also exports `figure_numbers`, which gives the figure number in the specification of each rule, by name,
+and of each judgement figure, by label, for citation in the diagnostics of an implementation.
 
 ## Release workflow
 
