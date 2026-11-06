@@ -3,9 +3,9 @@
   \mathcal{M}(q) = \seq{\iota}\;t \\
   \mathcal{P}(\pyinline{builtins}) = \Gamma \\
   \Sigma; q \vdash \seq{\iota} : \Gamma' \binding \Sigma^\dagger \\
-  \Sigma^\dagger; q; \Gamma \override \Gamma' \mathbin{\override} \added{\set{\bind{\pymath{\_\_name\_\_}}{\tyStr}} \override {}}\scopeS(\added{\pymath{\_\_name\_\_} \cons {}}\declaresS(\seq{\iota}), t) \vdash t : \Assigns{\Delta} \binding \Sigma' \\
-  (\added{\set{\pymath{\_\_name\_\_}} \cup {}}\dom(\Gamma') \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
+  \Sigma^\dagger; q; \Gamma \override \Gamma' \mathbin{\override} \scopeS(\declaresS(\seq{\iota}), t) \vdash t : \Assigns{\Delta} \binding \Sigma' \\
+  (\dom(\Gamma') \cup \dom(\Delta)) \cap \dom(\submods(q)) = \varnothing
 }
 {
-  \Sigma \vdash_{\mathsf{mod}} q : \submods(q) \override \added{\set{\bind{\pymath{\_\_name\_\_}}{\tyStr}} \override {}}\Delta \binding \Sigma'
+  \Sigma \vdash_{\mathsf{mod}} q : \submods(q) \override \Delta \binding \Sigma'
 }

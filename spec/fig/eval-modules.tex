@@ -5,10 +5,10 @@
 \inferrule*[lab={\ruleName{eval-module}}]
 {
   \mathcal{M}(q) = \seq{\iota}\;t \\
-  q, \mathcal{L}(\pyinline{builtins}) \mathbin{\override} \importEnv{\mathcal{L}}(\seq{\iota}) \mathbin{\override} \added{\set{\bind{\pymath{\_\_name\_\_}}{\nameOf(q)}} \override {}}\scopeS(\added{\pymath{\_\_name\_\_} \cons {}}\declaresS(\seq{\iota}), t), t \Rightarrow o
+  q, \mathcal{L}(\pyinline{builtins}) \mathbin{\override} \importEnv{\mathcal{L}}(\seq{\iota}) \mathbin{\override} \scopeS(\declaresS(\seq{\iota}), t), t \Rightarrow o
 }
 {
-  q, \mathcal{L} \Rightarrow_{\mathsf{mod}} \added{\outcome{\varepsilon}{\assigns{\set{\bind{\pymath{\_\_name\_\_}}{\nameOf(q)}}}} \override {}}o
+  q, \mathcal{L} \Rightarrow_{\mathsf{mod}} o
 }
 \end{mathpar}
 
