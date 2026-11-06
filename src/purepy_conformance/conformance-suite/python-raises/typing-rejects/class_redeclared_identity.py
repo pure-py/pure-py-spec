@@ -1,4 +1,4 @@
-# judgement: stmt, rule: declare-assign
+# judgement: module, rule: module
 from dataclasses import dataclass
 
 

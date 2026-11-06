@@ -1,4 +1,4 @@
-# judgement: check-pattern, rule: check-var
+# judgement: module, rule: module
 from dataclasses import dataclass
 
 
