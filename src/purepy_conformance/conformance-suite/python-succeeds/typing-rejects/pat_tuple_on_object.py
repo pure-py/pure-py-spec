@@ -1,4 +1,4 @@
-# rule: check-tuple-none
+# judgement: check-pattern, rule: check-tuple-none
 def f(o: object) -> int:
     match o:
         case (a, b):

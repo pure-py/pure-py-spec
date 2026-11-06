@@ -1,4 +1,4 @@
-# rule: qual-generator
+# judgement: quals, rule: qual-generator
 def f(v: list[int] | int) -> int:
     return len([x for x in v])
 

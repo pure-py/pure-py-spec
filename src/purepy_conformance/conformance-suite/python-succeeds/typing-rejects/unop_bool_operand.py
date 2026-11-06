@@ -1,3 +1,3 @@
-# rule: unop
+# judgement: synth, rule: unop
 b: bool = True
 print(-b)

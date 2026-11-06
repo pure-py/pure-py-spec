@@ -1,4 +1,4 @@
-# rule: assert-false-msg
+# judgement: stmt, rule: assert-false-msg
 def f(b: bool) -> int:
     if b:
         return 1

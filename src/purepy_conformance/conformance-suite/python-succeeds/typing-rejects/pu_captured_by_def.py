@@ -1,4 +1,4 @@
-# rule: var
+# judgement: synth, rule: var
 def f(b: bool) -> int:
     x: int
     if b:

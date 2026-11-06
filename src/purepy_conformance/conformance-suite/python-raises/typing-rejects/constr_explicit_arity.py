@@ -1,4 +1,4 @@
-# rule: constr-explicit
+# judgement: synth, rule: constr-explicit
 from dataclasses import dataclass
 
 

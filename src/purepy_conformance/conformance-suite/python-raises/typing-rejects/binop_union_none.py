@@ -1,4 +1,4 @@
-# rule: binop-union-left
+# judgement: synth, rule: binop
 def f(x: int | None) -> int:
     return x + 1
 

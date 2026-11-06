@@ -1,4 +1,4 @@
-# rule: module
+# judgement: module, rule: module
 def g() -> int:
     return 0
 

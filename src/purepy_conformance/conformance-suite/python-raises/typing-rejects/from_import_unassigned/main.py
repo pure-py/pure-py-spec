@@ -1,3 +1,3 @@
-# rule: imp-member
+# judgement: import-name, rule: imp-member
 from lib import x
 print(0)

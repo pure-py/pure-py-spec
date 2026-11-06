@@ -1,4 +1,4 @@
-# rule: pat-shapes
+# judgement: match-set, rule: pat-shapes
 d: dict[str, int] = {"a": 1}
 match d:
     case {"a": x}:

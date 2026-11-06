@@ -1,4 +1,4 @@
-# rule: check-constr
+# judgement: instance, rule: instance-below
 from dataclasses import dataclass
 
 @dataclass

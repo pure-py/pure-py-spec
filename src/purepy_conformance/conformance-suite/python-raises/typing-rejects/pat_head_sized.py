@@ -1,4 +1,4 @@
-# rule: check-constr
+# judgement: check-pattern
 from typing import Sized
 
 match [1]:

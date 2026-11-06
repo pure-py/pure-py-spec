@@ -1,4 +1,4 @@
-# rule: check-syn
+# judgement: check, rule: tuple
 type Pair[A, B] = tuple[B, A]
 
 p: Pair[int, str] = (1, "a")

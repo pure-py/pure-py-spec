@@ -1,4 +1,4 @@
-# rule: subty-sized
+# judgement: subtyping, rule: subty-sized
 from typing import Sized
 
 x: Sized = 5

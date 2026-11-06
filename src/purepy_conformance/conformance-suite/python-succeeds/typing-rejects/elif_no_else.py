@@ -1,4 +1,4 @@
-# rule: var
+# judgement: synth, rule: var
 x: int = 1
 y: int
 if x == 0:

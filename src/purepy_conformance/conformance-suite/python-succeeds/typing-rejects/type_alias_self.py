@@ -1,4 +1,4 @@
-# rule: type-alias
+# judgement: type-def, rule: type-alias
 type Nested = int | list[Nested]
 
 v: Nested = 3

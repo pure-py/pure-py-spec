@@ -1,4 +1,4 @@
-# rule: def-body
+# judgement: def-check, rule: def-body
 def f(b: bool) -> int:
     if b:
         return 1

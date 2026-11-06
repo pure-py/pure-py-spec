@@ -1,4 +1,4 @@
-# rule: import
+# judgement: module
 import zzq_missing
 
 x: int = 1

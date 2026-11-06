@@ -1,4 +1,4 @@
-# rule: var
+# judgement: synth, rule: var
 def f() -> int:
     x: int
     def g() -> int:

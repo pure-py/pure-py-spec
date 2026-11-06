@@ -1,4 +1,4 @@
-# rule: constr-explicit
+# judgement: resolve-type
 from dataclasses import dataclass
 
 

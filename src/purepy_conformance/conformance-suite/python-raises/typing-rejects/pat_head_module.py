@@ -1,4 +1,4 @@
-# rule: check-constr
+# judgement: check-pattern
 import sys
 
 match 1:

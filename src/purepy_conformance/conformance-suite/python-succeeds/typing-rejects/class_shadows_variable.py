@@ -1,4 +1,4 @@
-# rule: module
+# judgement: module, rule: module
 from dataclasses import dataclass
 
 value: int = 1

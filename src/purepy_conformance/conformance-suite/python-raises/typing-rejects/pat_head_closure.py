@@ -1,4 +1,4 @@
-# rule: check-constr
+# judgement: check-pattern
 def f(x: int) -> int:
     return x
 

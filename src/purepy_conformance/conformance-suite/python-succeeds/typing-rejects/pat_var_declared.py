@@ -1,4 +1,4 @@
-# rule: module
+# judgement: module, rule: module
 x: int = 1
 match 5:
     case x:

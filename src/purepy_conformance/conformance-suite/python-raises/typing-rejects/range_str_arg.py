@@ -1,2 +1,2 @@
-# rule: constr
+# judgement: synth, rule: constr
 print(len(range(0, "a")))

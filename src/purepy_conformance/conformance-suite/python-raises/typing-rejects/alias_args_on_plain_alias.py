@@ -1,4 +1,4 @@
-# rule: ty-alias
+# judgement: resolve-type, rule: ty-alias
 type Num = int
 
 x: Num[int] = 1

@@ -1,4 +1,4 @@
-# rule: call
+# judgement: synth, rule: call
 def f(x: int) -> int:
     return x
 

@@ -1,4 +1,4 @@
-# rule: assign
+# judgement: stmt, rule: assign
 def f(x: int) -> int:
     a: int = x
     x = 5

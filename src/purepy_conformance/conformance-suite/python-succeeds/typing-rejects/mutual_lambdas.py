@@ -1,4 +1,4 @@
-# rule: var
+# judgement: synth, rule: var
 from typing import Callable
 
 f: Callable[[int], int] = lambda x: 0 if x == 0 else g(x - 1)

@@ -1,4 +1,4 @@
-# rule: def-body
+# judgement: def-check, rule: def-body
 def f(x: int) -> int:
     x: int
     return x

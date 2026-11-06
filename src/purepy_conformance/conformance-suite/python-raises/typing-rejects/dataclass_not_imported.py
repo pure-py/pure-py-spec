@@ -1,4 +1,4 @@
-# rule: class
+# judgement: type-def, rule: class
 @dataclass
 class P:
     x: int

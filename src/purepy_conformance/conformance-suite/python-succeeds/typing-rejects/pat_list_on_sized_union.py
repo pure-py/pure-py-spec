@@ -1,4 +1,4 @@
-# rule: check-list-none
+# judgement: check-pattern, rule: check-list-none
 from typing import Sized
 
 

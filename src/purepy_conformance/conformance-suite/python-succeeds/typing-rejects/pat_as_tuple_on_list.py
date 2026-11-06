@@ -1,4 +1,4 @@
-# rule: check-as
+# judgement: check-pattern, rule: check-tuple-none
 v: list[int] = [1, 2]
 match v:
     case (a, b) as t:

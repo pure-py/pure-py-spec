@@ -1,3 +1,3 @@
-# rule: list
+# judgement: check, rule: list
 xs: list[int] = [1, "a"]
 print(xs)

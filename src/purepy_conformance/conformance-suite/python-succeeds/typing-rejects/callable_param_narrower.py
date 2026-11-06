@@ -1,4 +1,4 @@
-# rule: subty-callable
+# judgement: subtyping, rule: subty-callable
 from typing import Callable
 
 def f(n: int) -> int:

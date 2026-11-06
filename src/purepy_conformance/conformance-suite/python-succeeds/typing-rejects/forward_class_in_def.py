@@ -1,4 +1,4 @@
-# rule: var
+# judgement: synth, rule: var
 from dataclasses import dataclass
 
 def make() -> int:

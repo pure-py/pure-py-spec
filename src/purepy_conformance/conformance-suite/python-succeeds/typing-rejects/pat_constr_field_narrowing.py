@@ -1,4 +1,4 @@
-# rule: binop
+# judgement: synth, rule: binop
 from dataclasses import dataclass
 
 @dataclass

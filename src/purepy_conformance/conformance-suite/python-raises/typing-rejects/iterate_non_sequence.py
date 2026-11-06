@@ -1,2 +1,2 @@
-# rule: qual-generator
+# judgement: quals, rule: qual-generator
 print([x for x in 5])

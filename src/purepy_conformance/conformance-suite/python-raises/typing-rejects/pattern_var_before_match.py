@@ -1,4 +1,4 @@
-# rule: var
+# judgement: synth, rule: var
 print(x)
 match 1:
     case x:

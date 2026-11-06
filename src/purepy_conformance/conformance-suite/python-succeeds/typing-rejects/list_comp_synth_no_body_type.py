@@ -1,2 +1,2 @@
-# rule: syn-list-comp
+# judgement: synth
 print([[] for x in [1]])

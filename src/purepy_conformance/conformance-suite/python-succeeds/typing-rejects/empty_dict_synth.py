@@ -1,2 +1,2 @@
-# rule: check-syn
+# judgement: synth
 print({})

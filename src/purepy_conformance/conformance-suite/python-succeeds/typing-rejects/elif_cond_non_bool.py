@@ -1,4 +1,4 @@
-# rule: if
+# judgement: stmt, rule: if
 x: int = 1
 if x == 0:
     print("a")

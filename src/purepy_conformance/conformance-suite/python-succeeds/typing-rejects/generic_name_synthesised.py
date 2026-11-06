@@ -1,4 +1,4 @@
-# rule: var
+# judgement: synth, rule: var
 def identity[T](x: T) -> T:
     return x
 

@@ -1,4 +1,4 @@
-# rule: pat-shapes
+# judgement: match-set, rule: pat-shapes
 def f(v: list[int] | tuple[int, int]) -> int:
     match v:
         case {"k": x}:

@@ -1,4 +1,4 @@
-# rule: match-partial
+# judgement: stmt, rule: match-partial
 def f(p: tuple[bool, bool], c: bool) -> int:
     if c:
         match p:

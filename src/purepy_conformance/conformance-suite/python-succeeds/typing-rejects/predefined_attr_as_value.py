@@ -1,4 +1,4 @@
-# rule: attr-module
+# judgement: synth, rule: attr-module
 import typing
 
 x: int = typing.Callable

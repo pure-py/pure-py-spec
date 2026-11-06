@@ -1,4 +1,4 @@
-# rule: var
+# judgement: synth, rule: var
 type Num = int
 
 x: int = Num

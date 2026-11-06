@@ -1,4 +1,4 @@
-# rule: check-tuple-none
+# judgement: check-pattern, rule: check-tuple-none
 def f(d: dict[str, list[int] | tuple[int, int]]) -> int:
     match d:
         case {"k": (a, b)}:

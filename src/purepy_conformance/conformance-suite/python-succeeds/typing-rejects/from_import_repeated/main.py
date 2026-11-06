@@ -1,3 +1,3 @@
-# rule: from-import
+# judgement: imports, rule: from-import
 from m import x, x
 print(x)

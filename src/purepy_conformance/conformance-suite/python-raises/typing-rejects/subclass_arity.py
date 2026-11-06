@@ -1,4 +1,4 @@
-# rule: constr
+# judgement: synth, rule: constr
 from dataclasses import dataclass
 
 @dataclass

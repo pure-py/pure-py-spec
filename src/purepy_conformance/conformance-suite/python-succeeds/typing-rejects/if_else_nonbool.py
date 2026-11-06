@@ -1,4 +1,4 @@
-# rule: if-else
+# judgement: stmt, rule: if-else
 if 5:
     print("yes")
 else:

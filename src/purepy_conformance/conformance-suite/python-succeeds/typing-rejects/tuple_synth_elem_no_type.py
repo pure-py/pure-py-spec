@@ -1,2 +1,2 @@
-# rule: syn-tuple
+# judgement: synth
 print(([],))

@@ -1,4 +1,4 @@
-# rule: var
+# judgement: synth, rule: var
 def foo(b: bool) -> int:
     x: int
     y: int

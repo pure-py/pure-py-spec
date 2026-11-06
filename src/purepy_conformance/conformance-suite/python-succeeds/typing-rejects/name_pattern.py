@@ -1,4 +1,4 @@
-# rule: module
+# judgement: module, rule: module
 match 1:
     case __name__:
         pass

@@ -1,4 +1,4 @@
-# rule: subscript-dict
+# judgement: synth, rule: subscript-dict
 def f(d: dict[str, int]) -> int:
     return d["a", "b"]
 

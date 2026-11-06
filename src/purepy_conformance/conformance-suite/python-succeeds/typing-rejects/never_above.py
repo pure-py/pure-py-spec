@@ -1,4 +1,4 @@
-# rule: check-syn
+# judgement: stmt, rule: return
 from typing import Never
 
 def f() -> Never:

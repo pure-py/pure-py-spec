@@ -1,4 +1,4 @@
-# rule: var-scheme
+# judgement: check, rule: var-scheme
 def identity[T](x: T) -> T:
     return x
 

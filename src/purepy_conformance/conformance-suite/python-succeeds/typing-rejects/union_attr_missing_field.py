@@ -1,4 +1,4 @@
-# rule: attr-union
+# judgement: synth, rule: attr-object
 from dataclasses import dataclass
 
 

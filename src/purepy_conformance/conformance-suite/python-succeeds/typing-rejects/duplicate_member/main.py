@@ -1,3 +1,3 @@
-# rule: module
+# judgement: module, rule: module
 import pkg.sub
 print(pkg.sub.y)

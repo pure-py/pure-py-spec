@@ -1,4 +1,4 @@
-# rule: pat-shapes
+# judgement: match-set, rule: pat-shapes
 v: tuple[int, int] = (1, 2)
 match v:
     case (a, b):

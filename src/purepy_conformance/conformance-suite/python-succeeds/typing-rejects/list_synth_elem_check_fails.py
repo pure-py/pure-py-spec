@@ -1,2 +1,2 @@
-# rule: syn-list
+# judgement: synth
 print([[1], [[]]])

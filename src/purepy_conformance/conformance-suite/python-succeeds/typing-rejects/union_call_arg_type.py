@@ -1,4 +1,4 @@
-# rule: call-union
+# judgement: synth, rule: call
 from typing import Callable
 
 

@@ -1,4 +1,4 @@
-# rule: seq
+# judgement: stmt, rule: seq
 def foo(x: int) -> int:
     return x + 1
     return x

@@ -1,4 +1,4 @@
-# rule: ty-class
+# judgement: resolve-type, rule: ty-class
 from dataclasses import dataclass
 
 

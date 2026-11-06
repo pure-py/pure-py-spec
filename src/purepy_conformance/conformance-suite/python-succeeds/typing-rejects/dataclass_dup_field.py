@@ -1,4 +1,4 @@
-# rule: class
+# judgement: type-def, rule: class
 from dataclasses import dataclass
 
 @dataclass

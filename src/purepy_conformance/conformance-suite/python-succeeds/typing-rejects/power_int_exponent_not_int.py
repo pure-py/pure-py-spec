@@ -1,4 +1,4 @@
-# rule: check-syn
+# judgement: stmt, rule: return
 def f(n: int) -> int:
     return 2 ** n
 

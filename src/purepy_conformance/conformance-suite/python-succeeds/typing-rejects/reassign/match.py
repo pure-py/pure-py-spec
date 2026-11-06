@@ -1,4 +1,4 @@
-# rule: assign
+# judgement: stmt, rule: assign
 def f(v: int) -> int:
     match v:
         case y:

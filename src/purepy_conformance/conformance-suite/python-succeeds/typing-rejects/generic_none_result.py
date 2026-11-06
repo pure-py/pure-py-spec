@@ -1,4 +1,4 @@
-# rule: call
+# judgement: synth, rule: call
 def show[T](x: T) -> None:
     pass
 

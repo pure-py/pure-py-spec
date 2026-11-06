@@ -1,4 +1,4 @@
-# rule: check-list-none
+# judgement: check-pattern, rule: check-list-none
 def f(x: list[int] | range) -> int:
     match x:
         case [a, b]:

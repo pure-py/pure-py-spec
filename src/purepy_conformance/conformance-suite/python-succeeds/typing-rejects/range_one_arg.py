@@ -1,2 +1,2 @@
-# rule: constr
+# judgement: synth, rule: constr
 print([i for i in range(3)])

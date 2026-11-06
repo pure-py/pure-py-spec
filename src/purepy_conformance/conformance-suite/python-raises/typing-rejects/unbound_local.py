@@ -1,4 +1,4 @@
-# rule: var
+# judgement: synth, rule: var
 y: int = 7
 
 def f() -> None:
