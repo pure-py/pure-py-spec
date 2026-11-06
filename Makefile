@@ -5,7 +5,7 @@ MYPY_VERSION_TEX := tex/mypy-version.tex
 ANON_NAME_TEX := tex/anon-name.tex
 SPEC_LABELS := xref/PurePy-spec.aux
 FIGURE_NUMBERS := src/purepy_conformance/figure-numbers.json
-TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX)
+TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX)
 PDFLATEX := pdflatex -interaction=nonstopmode -halt-on-error
 ISABELLE ?= isabelle
 BUILD_AUX := *.aux *.blg *.cb *.cb2 *.cut *.fdb_latexmk *.fls *.loc *.log *.out *.soc *.toc
@@ -70,7 +70,7 @@ $(call check-log,$(1))
 endef
 
 ## Anonymised spec builds, with no undefined references or citations
-spec-anon.pdf: $(TEXFILES)
+spec-anon.pdf: $(TEXFILES) $(ANON_NAME_TEX)
 	$(call anon,spec-anon,PurePy-spec.tex)
 	rm -f $(BUILD_AUX)
 
