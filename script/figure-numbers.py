@@ -51,8 +51,8 @@ class Figures:
 
 
 def figures(text: str) -> Figures:
-    """Label of the innermost labelled figure or subfigure containing each rule, and label of each figure or
-    subfigure defining a judgement form"""
+    """Label of innermost labelled figure or subfigure containing each rule, and label of each figure or
+    subfigure defining judgement form"""
     figs = Figures()
     # Figure and subfigure environments enclosing the rule, label or judgement form being read, innermost last
     enclosing: list[Figure] = []
