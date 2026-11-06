@@ -4,7 +4,7 @@
 \auxrow{$\uniqueTo(q', q)$}{sequence of module names}{modules which strictly contain $q'$ but do not contain $q$, shortest first}{aux:unique-to}
 \auxrow{$\loads(\seq{q}, \seq{q}')$}{sequence of module names}{modules $\seq{q}$ extended by modules loaded by $\seq{q}'$, in load order}{aux:loads}
 \auxrow{$\importEnv{\mathcal{L}}(\seq{\iota})$}{environment}{environment bound by imports $\seq{\iota}$ given loaded module environments $\mathcal{L}$}{aux:import-env}
-\auxrow{$\ownFields(\phi)$, $\ownFields(\chi)$}{sequence of bindings}{\replaced{fields declared by $\phi$ or $\chi$, with type expressions}{fields declared by field list $\phi$ or class definition $\chi$, with their type expressions }}{aux:own-fields}
+\auxrow{$\ownFields(\phi)$, $\ownFields(\chi)$}{sequence of bindings}{fields declared by $\phi$ or $\chi$, with type expressions}{aux:own-fields}
 \auxrow{$\typeParams{\Sigma}(C)$}{sequence of type parameters}{type parameters of class $C$}{aux:type-params}
 \auxrow{$\base{\Sigma}(C)$}{instantiated class or $\bot$}{base class of $C$ at its declared type arguments}{aux:base}
 \auxrow{$\fields{\Sigma}(C)$}{field scheme}{fields of class $C$ with their types, inherited first, under its type parameters}{aux:fields}
@@ -15,7 +15,7 @@
 \noalign{\vskip 2mm}
 \auxgroup{Functions on values}
 \auxrow{$\typeOf(v)$}{type}{run-time type of $v$}{aux:type-of}
-\auxrow{$\realOf(n)$}{extended real number}{\replaced{denotation of number $n$ other than $\nan$}{extended real number denoted by number $n$ other than $\nan$ }}{aux:real}
+\auxrow{$\realOf(n)$}{extended real number}{denotation of number $n$ other than $\nan$}{aux:real}
 \auxrow{$\fl(x)$}{float}{real number $x$ rounded to float}{aux:fl}
 \auxrow{$\floatOp(x)$}{result}{real number $x$ rounded to float; $\aborts{\errOverflow}$ if infinite}{aux:float}
 \auxrow{$\trunc(x)$}{integer}{integer part of real number $x$}{aux:trunc}
@@ -26,9 +26,9 @@
 \auxrow{$\inOp{\Sigma}(v, v')$}{result}{whether $v$ is element of $v'$; $\errExcluded$ for range or non-string key, $\errType$ otherwise}{aux:in}
 \auxrow{$\inElems{\Sigma}(v, \seq{v})$}{result}{whether $\seq{v}$ has element equal to $v$}{aux:in-elems}
 \auxrow{$\elems(v)$}{sequence of values}{elements of list, tuple or string}{aux:elems}
-\auxrow{$\iterOp(v)$}{sequence of values}{\replaced{values drawn from $v$ by generator: keys of dictionary, $m, \ldots, n - 1$ for range with start $m$ and stop $n$}{sequence drawn from $v$ by generator; keys if $v$ is dictionary, $m, \ldots, n - 1$ if $v$ is range with start $m$ and stop $n$ }}{aux:iter}
+\auxrow{$\iterOp(v)$}{sequence of values}{values drawn from $v$ by generator: keys of dictionary, $m, \ldots, n - 1$ for range with start $m$ and stop $n$}{aux:iter}
 \auxrow{$\getitem(v, v')$}{result}{subscripting; $\errIndex$ for index out of range, $\errKey$ for missing key, $\errExcluded$ for range, Boolean index or non-string key, $\errType$ otherwise}{aux:getitem}
-\auxrow{$\result(o)$}{result}{\replaced{statement outcome as result: returned value, \pyinline{None} for normal completion, abort unchanged}{statement outcome as result: returned value, \pyinline{None} if statement completes without returning, abort unchanged }}{aux:result}
+\auxrow{$\result(o)$}{result}{statement outcome as result: returned value, \pyinline{None} for normal completion, abort unchanged}{aux:result}
 \auxrow{$\matchOp{\Sigma}(\rho, p, v)$}{match result}{bindings of pattern variables if $p$ matches $v$, $\noMatch$ if not, $\errUndef$ if equality of numeric literal pattern $p$ and $v$ undefined, $\errExcluded$ for list or tuple pattern against the other or a range, $\matchFields{\Sigma}$ for constructor pattern}{aux:match}
 \auxrow{$\matchFields{\Sigma}(\rho, C, a, \bind{\seq{z}}{\seq{v}})$}{match result}{sub-patterns of $a$ against object fields; $\errType$ for excess sub-patterns, $\errExcluded$ if fields not covered}{aux:match-fields}
 \auxrow{$\dispatch(\rho, v, \seq{p}, \seq{s})$}{bindings and statement}{case taken by \pyinline{match}, or termination kind if matching aborts}{aux:dispatch}
