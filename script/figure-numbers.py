@@ -81,7 +81,7 @@ def figures(text: str) -> Figures:
 
 
 def main() -> None:
-    # Replace TeX ligature for en dash by en dash character
+    # Replace TeX ligature by en dash
     numbers = {
         label: number.replace("--", "\u2013")
         for label, number in NEWLABEL.findall(LABELS.read_text(encoding="utf-8"))
