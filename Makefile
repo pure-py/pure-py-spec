@@ -52,7 +52,6 @@ endif
 $(SPEC_LABELS): PurePy-spec.pdf
 	@test -f $@ || $(MAKE) -B PurePy-spec.pdf
 
-# Figure numbers of the rules and judgement figures, exported by the conformance package.
 $(FIGURE_NUMBERS): script/figure-numbers.py $(SPEC_LABELS)
 	uv run --locked python script/figure-numbers.py > $@.tmp && mv $@.tmp $@
 

@@ -321,8 +321,6 @@ def suite() -> Iterator[pathlib.Path]:
 
 @dataclass(frozen=True)
 class FigureNumbers:
-    """Figure number in the specification of each rule, by name, and of each judgement figure, by label"""
-
     rules: dict[str, str]
     judgements: dict[str, str]
 
