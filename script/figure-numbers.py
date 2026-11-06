@@ -54,29 +54,29 @@ def figures(text: str) -> Figures:
     """Label of the innermost labelled figure or subfigure containing each rule, and label of each figure or
     subfigure defining a judgement form"""
     figs = Figures()
-    # Open figures and subfigures, innermost last
-    open_: list[Figure] = []
+    # Figure and subfigure environments enclosing the current position, innermost last
+    enclosing: list[Figure] = []
     for m in TOKEN.finditer(text):
         if m["begin"] == "begin":
-            open_.append(Figure())
+            enclosing.append(Figure())
         elif m["begin"] == "end":
-            fig = open_.pop()
+            fig = enclosing.pop()
             if fig.label is not None:
                 figs.rules.update((rule, fig.label) for rule in fig.rules)
                 if fig.judgement:
                     figs.judgements.append(fig.label)
             else:
-                assert open_, f"figure containing {', '.join(fig.rules)} has no label"
-                open_[-1].rules.extend(fig.rules)
-                open_[-1].judgement |= fig.judgement
-        elif not open_:
+                assert enclosing, f"figure containing {', '.join(fig.rules)} has no label"
+                enclosing[-1].rules.extend(fig.rules)
+                enclosing[-1].judgement |= fig.judgement
+        elif not enclosing:
             assert m["rule"] is None, f"rule {m['rule']} outside any figure"
         elif m["rule"] is not None:
-            open_[-1].rules.append(m["rule"])
+            enclosing[-1].rules.append(m["rule"])
         elif m["label"] is not None:
-            open_[-1].label = m["label"]
+            enclosing[-1].label = m["label"]
         else:
-            open_[-1].judgement = True
+            enclosing[-1].judgement = True
     return figs
 
 
