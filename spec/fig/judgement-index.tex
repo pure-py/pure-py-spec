@@ -28,9 +28,9 @@ $\Sigma; q; \Gamma \vdash t : R \binding \Sigma'$ & top-level statement $t$ of m
 $\Sigma; \Gamma \vdash \chi$ & type definition $\chi$ is well-formed & \figref{typing-top-level-decl} \\
 $\Sigma \vdash \Gamma, x \importsR \theta \binding \Sigma'$ & name $x$ imported from module signature $\Gamma$ has context entry $\theta$ & \figref{typing-imports} \\
 $\Sigma; q \vdash \seq{\iota} : \Gamma \binding \Sigma'$ & imports $\seq{\iota}$ of module $q$ yield context $\Gamma$ & \figref{typing-import-prefix} \\
-$\Sigma \vdash_{\mathsf{sub}} q, \Gamma, \seq{x} : \Gamma' \binding \Sigma'$ & submodule chain $\seq{x}$ extends signature $\Gamma$ of module $q$ to $\Gamma'$ & \figref{typing-import-prefix} \\
-$\Sigma \vdash_{\mathsf{mod}} q : \Gamma \binding \Sigma'$ & module $q$ checks with signature $\Gamma$ & \figref{typing-module} \\
-$\vdash \mathcal{M}$ & program $\mathcal{M}$ is well-formed & \figref{typing-module}
+$\Sigma \vdash_{\mathsf{sub}} q, \Gamma, \seq{x} : \Gamma' \binding \Sigma'$ & submodule chain $\seq{x}$ extends signature $\Gamma$ of module $q$ to $\Gamma'$ & \replaced{\figref{typing-submodules}}{\figref{typing-import-prefix} } \\
+$\Sigma \vdash_{\mathsf{mod}} q : \Gamma \binding \Sigma'$ & module $q$ checks with signature $\Gamma$ & \replaced{\figref{typing-mod}}{\figref{typing-module} } \\
+$\vdash \mathcal{M}$ & program $\mathcal{M}$ is well-formed & \replaced{\figref{typing-program}}{\figref{typing-module} }
    \\[2mm]
 \metaGroup{Evaluation} \\
 $\vdash v : \theta$ & value $v$ is well-typed at context entry $\theta$ & \figref{value-typing} \\

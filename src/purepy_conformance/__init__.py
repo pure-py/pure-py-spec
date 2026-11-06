@@ -4,6 +4,7 @@ import argparse
 import concurrent.futures
 import contextlib
 import importlib.resources
+import json
 import os
 import pathlib
 import shlex
@@ -14,8 +15,10 @@ import tempfile
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass, field
 from enum import IntEnum, StrEnum
+from functools import cache
 
 SUITE = "conformance-suite"
+FIGURE_NUMBERS = "figure-numbers.json"
 GREEN, RED, RESET = "\033[32m", "\033[31m", "\033[0m"
 
 EXPECTED = ".expected"
@@ -314,6 +317,20 @@ def tests(suite: pathlib.Path) -> Iterator[pathlib.Path]:
 def suite() -> Iterator[pathlib.Path]:
     with importlib.resources.as_file(importlib.resources.files(__package__) / SUITE) as path:
         yield path
+
+
+@dataclass(frozen=True)
+class FigureNumbers:
+    rules: dict[str, str]
+    judgements: dict[str, str]
+
+
+@cache
+def figure_numbers() -> FigureNumbers:
+    numbers = json.loads(
+        (importlib.resources.files(__package__) / FIGURE_NUMBERS).read_text(encoding="utf-8")
+    )
+    return FigureNumbers(numbers["rules"], numbers["judgements"])
 
 
 def check_conformance(argv: Sequence[str] | None = None) -> Runner:

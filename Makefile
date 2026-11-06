@@ -4,7 +4,8 @@ PYTHON_VERSION_TEX := tex/python-version.tex
 MYPY_VERSION_TEX := tex/mypy-version.tex
 ANON_NAME_TEX := tex/anon-name.tex
 SPEC_LABELS := xref/PurePy-spec.aux
-TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX)
+FIGURE_NUMBERS := src/purepy_conformance/figure-numbers.json
+TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX)
 PDFLATEX := pdflatex -interaction=nonstopmode -halt-on-error
 ISABELLE ?= isabelle
 BUILD_AUX := *.aux *.blg *.cb *.cb2 *.cut *.fdb_latexmk *.fls *.loc *.log *.out *.soc *.toc
@@ -51,6 +52,9 @@ endif
 $(SPEC_LABELS): PurePy-spec.pdf
 	@test -f $@ || $(MAKE) -B PurePy-spec.pdf
 
+$(FIGURE_NUMBERS): script/figure-numbers.py $(SPEC_LABELS)
+	uv run --locked python script/figure-numbers.py > $@.tmp && mv $@.tmp $@
+
 GRADUALITY_INPUTS := $(wildcard graduality/*.tex graduality/*/*.tex)
 ## Draft notes on gradual typing, outside the 1.0 spec and paper
 graduality.pdf: $(GRADUALITY_INPUTS)
@@ -65,7 +69,7 @@ $(call check-log,$(1))
 endef
 
 ## Anonymised spec builds, with no undefined references or citations
-spec-anon.pdf: $(TEXFILES)
+spec-anon.pdf: $(TEXFILES) $(ANON_NAME_TEX)
 	$(call anon,spec-anon,PurePy-spec.tex)
 	rm -f $(BUILD_AUX)
 
@@ -97,13 +101,13 @@ check-suite-mechanisation:
 	fi
 
 ## Wheel of the conformance suite and runner
-wheel: check-targets check-consistency check-suite-python check-suite-purepy
+wheel: check-targets check-consistency check-suite-python check-suite-purepy $(FIGURE_NUMBERS)
 	rm -rf dist && uv build --wheel
 
 ## Remove build products
 clean:
 	rm -f $(AUX) *.pdf $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX)
-	rm -rf $(dir $(SPEC_LABELS))
+	rm -rf $(dir $(SPEC_LABELS)) $(FIGURE_NUMBERS)
 
 ## Make targets documented, and workflows named after their targets
 check-targets:

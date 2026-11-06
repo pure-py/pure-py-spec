@@ -123,7 +123,9 @@ This chapter collects the notation of the specification: the metavariables
 \end{figure}
 
 \FloatBarrier
-\renewcommand*{\thefigure}{\thechapter.\arabic{figure}}
+\counterwithin*{figure}{section}
+\renewcommand*{\thefigure}{\ifnum\value{section}=0 \thechapter\else\thesection\fi--\arabic{figure}}
+\renewcommand*{\theHfigure}{\thefigure}
 
 % The shared sources use \section for what is a chapter here; shift the heading levels, innermost first,
 % and restore them afterwards.
