@@ -235,15 +235,18 @@ absent, which excludes print statements from function bodies (\ruleName{print}).
 A variable declaration $x\exAnnot{\psi}$ introduces $x$ at the type denoted by $\psi$, without assigning it
 (\ruleName{declare}); an assignment $\exAssign{x}{e}$ requires $x$ to be a declared but unassigned variable, and
 checks $e$ against its declared type (\ruleName{assign}); the form $\exAssign{x\exAnnot{\psi}}{e}$ declares and
-assigns $x$ at once (\ruleName{declare-assign}). Names introduced by declarations (\ruleName{declare}, \ruleName{declare-assign}), function definitions
-(\ruleName{defs}) or pattern variables (\ruleName{check-var}) must be unbound in the context. Variables start unbound,
-since the rules for function definitions and modules check the body under the context $\scopeS(\seq{y}, s)$
-(\S\ref{aux:scope}). The rules are unable to reject two bindings of a name in different branches of a conditional or
+assigns $x$ at once (\ruleName{declare-assign}). \deleted{Names introduced by declarations (\ruleName{declare}, \ruleName{declare-assign}), function definitions
+(\ruleName{defs}) or pattern variables (\ruleName{check-var}) must be unbound in the context. }Variables start unbound,
+since the rules for function definitions and modules check the body under the context $\scopeS(\seq{y}, s)$\added{,
+which is undefined for scopes binding a name twice, by parameter, import, declaration or pattern, unless the name is
+bound by two patterns} (\S\ref{aux:scope}). \replaced{Since $\scopeS$ rejects every redeclaration, the rules for
+declarations and function definitions place no condition on the declared name.}{The rules are unable to reject two bindings of a name in different branches of a conditional or
 cases of a match, since no context holds both. The condition therefore falls to the function $\scopeS$, which is
 undefined for scopes binding a name twice, by parameter, import, declaration or pattern, unless the name is bound by
-two patterns. Under mypy a redeclaration is an error (\secref{mypy-restrictions}), so the condition keeps well-typed
+two patterns. } Under mypy a redeclaration is an error (\secref{mypy-restrictions}), so \replaced{$\scopeS$}{the condition } keeps well-typed
 programs within those accepted by mypy. The exemption for patterns allows the cases of a match to capture the same
-name, which is also permitted by mypy.
+name, which is also permitted by mypy.\added{ A pattern variable must still be unbound in the context
+(\ruleName{check-var}), so that a name is not bound by two patterns on one path.}
 
 The conditions of \pyinline{if} and \pyinline{assert}
 check against \pyinline{bool}, and an assertion message against \pyinline{str} (\ruleName{assert}, \ruleName{assert-msg}). An assertion of the literal \pyinline{False} has outcome $\Returns$, like a \pyinline{return}
@@ -289,8 +292,8 @@ prefers a locally bound name to one visible in an enclosing scope. A variable of
 enclosing scope referenced by the body must be definitely assigned at the point at which the function is defined,
 whereas Python resolves the reference only when the body runs. As with any scope, the names declared in the function, including
 the parameters $\seq{x}$, must be distinct from one another and from any pattern variables in $s$. The function names of the mutual def region are
-declared in the enclosing scope rather than in the function, are distinct and unbound there (\ruleName{defs}),
-and must be distinct from the other names declared in that scope.
+declared in the enclosing scope rather than in the function, \replaced{and so must be distinct from one another and}{are distinct and unbound there (\ruleName{defs}),
+and must be distinct } from the other names declared in that scope.
 
 The body $s$ is checked with the
 return type denoted by $\psi$, and must have static outcome $\Returns$ unless that type is equivalent to \pyinline{None},
