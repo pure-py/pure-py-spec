@@ -1,0 +1,16 @@
+\begin{figure}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.34\textwidth}>{\raggedright\arraybackslash}p{0.2\textwidth}>{\raggedright\arraybackslash}p{0.38\textwidth}}
+\arrayrulecolor{gray!60}\hline
+\rowcolor{grammarheadcolor}Failing judgement & Citation & Example \\
+One rule with matching conclusion & Judgement and rule & Unbound variable: \ruleName{var} \\
+Several rules with matching conclusions, one with selecting premises holding & Judgement and rule & Class given too many type arguments: \ruleName{ty-class}; subscript of list: \ruleName{subscript-list} \\
+No rule applying & Judgement alone & \pyinline{x: Nonexistent = 5}: type expressions; subscript of integer: synthesis \\
+Type mismatch, with rule of subtyping applying to the two types & Subtyping and rule & \pyinline{list[str]} assigned at \pyinline{list[int]}: \ruleName{subty-list} \\
+Type mismatch, with no rule of subtyping applying & Rule asking for check, with its judgement & \pyinline{x: int = "a"}: \ruleName{declare-assign}, not \ruleName{check-syn}
+\end{tabular}
+\caption{Citation by test of ill-formed program}
+\label{fig:test-citations}
+\end{figure}
