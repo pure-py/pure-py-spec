@@ -20,16 +20,23 @@ arguments to a callee of union type cites \ruleName{call} rather than \ruleName{
 one disjunct of the callee type.
 
 The conclusion of a rule \emph{matches} a judgement if a substitution for the metavariables of the conclusion yields
-the judgement, apart from any derived type, context or value, which is absent from a failing judgement. A judgement \emph{selects} a rule if the rule is the only rule with a conclusion matching the
-judgement, or, of several rules with matching conclusions, the only rule with its \emph{selecting premises} holding.
-The selecting premises of a rule are the premises which decide between rules with matching conclusions, such as
-premises on the type synthesised by a subexpression or on the context entry of a name. The citation names the rule
-selected by the cited judgement, or only the judgement if the judgement does not select a rule
-(\figref{ill-formedness-attribution}). The selected rule has a failing premise or side condition. For example, $\exBinOp{1}{+}{\pymath{"a"}}$
-cites \ruleName{binop}, which has operator resolution as a side condition. A type mismatch cites the subtyping
-judgement between the synthesised and expected types, and the rule selected by the subtyping judgement, with a literal
-type taken as its base type except against a literal type. If the subtyping judgement does not select a rule, the
-type mismatch cites instead the judgement and rule with the subtyping judgement as a premise.
+the judgement, apart from any derived type, context or value, which is absent from a failing judgement. A judgement
+\emph{selects} a rule if the rule is the only rule with a conclusion matching the judgement, or, of several rules with
+matching conclusions, the only rule with its \emph{selecting premises} holding. The selecting premises of a rule are
+the premises which decide between rules with matching conclusions, such as premises on the type synthesised by a
+subexpression or on the context entry of a name. The citation names the rule selected by the cited judgement, or only
+the judgement if the judgement does not select a rule. The selected rule has a failing premise or side condition. For
+example, an unbound variable cites \ruleName{var}, which is the only rule for variables, and
+$\exBinOp{1}{+}{\pymath{"a"}}$ cites \ruleName{binop}, which has operator resolution as a side condition. A class
+given too many type arguments cites \ruleName{ty-class}, which is selected by the context entry of the class name, and
+a list subscripted by a string cites \ruleName{subscript-list}, which is selected by the type of the list. An
+annotation with an unbound name cites only the judgement for type expressions, and a subscripted integer cites only
+the synthesis judgement, since the selecting premises of every matching rule fail.
 
-\input{spec/fig/ill-formedness-attribution}
+A type mismatch cites the subtyping judgement between the synthesised and expected types, and the rule selected by the
+subtyping judgement, with a literal type taken as its base type except against a literal type. An expression of type
+$\tyList{\tyStr}$ assigned to a variable declared at $\tyList{\tyInt}$ cites \ruleName{subty-list}. If the subtyping
+judgement does not select a rule, the type mismatch cites instead the judgement and rule with the subtyping judgement
+as a premise. The declaration $\exAssign{x\exAnnot{\tyInt}}{\pymath{"a"}}$ cites \ruleName{declare-assign} rather
+than \ruleName{check-syn}.
 \end{AddedBlock}
