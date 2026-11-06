@@ -26,7 +26,7 @@ judgement, or, of several rules with matching conclusions, the only rule with it
 The selecting premises of a rule are the premises which decide between rules with matching conclusions, such as
 premises on the type synthesised by a subexpression or on the context entry of a name. The citation names the rule
 selected by the cited judgement, or only the judgement if the judgement does not select a rule
-(\figref{test-citations}). The selected rule has a failing premise or side condition. For example, \pyinline{1 + "a"}
+(\figref{test-citations}). The selected rule has a failing premise or side condition. For example, $\exBinOp{1}{+}{\pymath{"a"}}$
 cites \ruleName{binop}, which has operator resolution as a side condition. A type mismatch cites the subtyping
 judgement between the synthesised and expected types, and the rule selected by the subtyping judgement, with a literal
 type taken as its base type except against a literal type. If the subtyping judgement does not select a rule, the
