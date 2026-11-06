@@ -1,4 +1,4 @@
-# rule: module
+# judgement: module, rule: module
 from x import y
 import y.z
 print(y.z.b)

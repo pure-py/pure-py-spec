@@ -1,4 +1,4 @@
-# rule: var
+# judgement: synth, rule: var
 def f[T](x: T) -> T:
     y: object = T
     return x

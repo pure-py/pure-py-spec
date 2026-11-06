@@ -20,6 +20,7 @@ dev = [
 [tool.mypy]
 strict = true
 files = ["src/purepy_conformance/__init__.py", "test", "script"]
+mypy_path = "script"
 
 [tool.ruff]
 line-length = 100

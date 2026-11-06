@@ -1,4 +1,4 @@
-# rule: pat-shapes
+# judgement: match-set, rule: pat-shapes
 from typing import Literal
 x: Literal[42] = 42
 match x:

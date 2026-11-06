@@ -1,4 +1,4 @@
-# rule: callee
+# judgement: callee
 from typing import Callable
 
 def g(n: int) -> int:

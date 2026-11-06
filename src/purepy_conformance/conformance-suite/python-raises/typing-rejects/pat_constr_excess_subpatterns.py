@@ -1,4 +1,4 @@
-# rule: check-constr
+# judgement: check-pattern, rule: check-constr
 from dataclasses import dataclass
 
 

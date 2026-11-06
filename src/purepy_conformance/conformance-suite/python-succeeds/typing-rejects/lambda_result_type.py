@@ -1,4 +1,4 @@
-# rule: lambda
+# judgement: check, rule: lambda
 from typing import Callable
 
 f: Callable[[int], str] = lambda x: x + 1

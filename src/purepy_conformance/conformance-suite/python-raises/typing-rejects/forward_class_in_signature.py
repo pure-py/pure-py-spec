@@ -1,4 +1,4 @@
-# rule: def-signature
+# judgement: resolve-type
 from dataclasses import dataclass
 
 def make() -> Point:

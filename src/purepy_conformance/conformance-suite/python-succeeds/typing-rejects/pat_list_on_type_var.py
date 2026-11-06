@@ -1,4 +1,4 @@
-# rule: check-list-none
+# judgement: check-pattern, rule: check-list-none
 def f[T](x: T) -> int:
     match x:
         case [a]:

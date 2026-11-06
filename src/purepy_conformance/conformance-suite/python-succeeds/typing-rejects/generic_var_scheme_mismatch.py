@@ -1,4 +1,4 @@
-# rule: var-scheme
+# judgement: subtyping, rule: subty-callable
 from typing import Callable
 
 

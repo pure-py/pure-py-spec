@@ -1,4 +1,4 @@
-# rule: def-body
+# judgement: def-check, rule: def-body
 def f(xs: list[int]) -> int:
     match xs:
         case []:

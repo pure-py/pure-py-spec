@@ -1,4 +1,4 @@
-# rule: var
+# judgement: synth, rule: var
 from typing import Callable
 
 x: int = Callable

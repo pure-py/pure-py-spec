@@ -1,4 +1,4 @@
-# rule: call
+# judgement: subtyping, rule: subty-list
 def push[T](xs: list[T], x: T) -> list[T]:
     return xs + [x]
 

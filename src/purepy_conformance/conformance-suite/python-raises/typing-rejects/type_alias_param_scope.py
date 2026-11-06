@@ -1,4 +1,4 @@
-# rule: ty-var
+# judgement: resolve-type
 type Pair[T] = tuple[T, T]
 
 x: T = 1

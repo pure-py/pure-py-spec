@@ -1,4 +1,4 @@
-# rule: split-literal
+# judgement: match-set, rule: pat-shapes
 v: int = 1
 match v:
     case 1:

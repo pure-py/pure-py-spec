@@ -1,4 +1,4 @@
-# rule: match-partial
+# judgement: stmt, rule: match-partial
 from dataclasses import dataclass
 
 

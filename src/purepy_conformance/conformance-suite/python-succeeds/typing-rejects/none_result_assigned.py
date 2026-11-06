@@ -1,4 +1,4 @@
-# rule: call
+# judgement: synth, rule: call
 def foo() -> None:
     return
 

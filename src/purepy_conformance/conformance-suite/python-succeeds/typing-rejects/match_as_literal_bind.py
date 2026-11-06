@@ -1,4 +1,4 @@
-# rule: check-syn
+# judgement: stmt, rule: return
 def f(v: int) -> str:
     match v:
         case 1 as y:

@@ -1,4 +1,4 @@
-# rule: return
+# judgement: stmt, rule: return
 def f(b: bool) -> int:
     if b:
         assert (False,)[0]

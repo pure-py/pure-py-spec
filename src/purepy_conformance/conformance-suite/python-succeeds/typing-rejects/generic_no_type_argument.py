@@ -1,4 +1,4 @@
-# rule: callee-scheme
+# judgement: callee, rule: callee-scheme
 from typing import Callable
 
 

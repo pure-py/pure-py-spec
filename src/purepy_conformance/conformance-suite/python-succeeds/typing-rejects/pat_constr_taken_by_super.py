@@ -1,4 +1,4 @@
-# rule: split-class
+# judgement: match-set, rule: pat-shapes
 from dataclasses import dataclass
 
 

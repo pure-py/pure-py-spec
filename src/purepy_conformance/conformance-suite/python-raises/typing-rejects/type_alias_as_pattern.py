@@ -1,4 +1,4 @@
-# rule: check-constr
+# judgement: check-pattern
 type Num = int
 
 match 1:

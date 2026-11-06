@@ -1,4 +1,4 @@
-# rule: type-alias
+# judgement: resolve-type
 from dataclasses import dataclass
 
 type MaybePoint = Point | None

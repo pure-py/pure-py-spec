@@ -1,4 +1,4 @@
-# rule: check-list-none
+# judgement: check-pattern, rule: check-list-none
 def f(s: list[int] | tuple[int, int]) -> str:
     match s:
         case [a, b]:

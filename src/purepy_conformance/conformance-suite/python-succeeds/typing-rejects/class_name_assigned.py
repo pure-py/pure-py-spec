@@ -1,4 +1,4 @@
-# rule: assign
+# judgement: stmt, rule: assign
 from dataclasses import dataclass
 
 @dataclass

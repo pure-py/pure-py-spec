@@ -1,4 +1,4 @@
-# rule: callee-scheme
+# judgement: synth, rule: attr-object
 from dataclasses import dataclass
 
 

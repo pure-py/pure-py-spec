@@ -1,2 +1,2 @@
-# rule: binop
+# judgement: synth, rule: binop
 print([1] == (1,))

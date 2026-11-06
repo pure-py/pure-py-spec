@@ -19,11 +19,15 @@ from purepy_conformance import (
 )
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "script"))
+
+from spec_sources import SPEC, judgements, rules, source
+
 PYTHON_VERSION = (ROOT / ".python-version").read_text().strip()
 
-RULE_NAME = re.compile(r"\\ruleName\{([a-z0-9-]+)\}")
 RULE_DEF = re.compile(r"lab=\{\\ruleName\{([a-z0-9-]+)\}\}")
 CITATION = re.compile(r"# rule: ([a-z0-9-]+)")
+JUDGEMENT_CITATION = re.compile(r"# judgement: ([a-z0-9-]+)(?:, rule: ([a-z0-9-]+))?$")
 DELETED = re.compile(
     r"\\begin\{DeletedBlock\}.*?\\end\{DeletedBlock\}|\\deleted\{[^{}]*\}", re.DOTALL
 )
@@ -55,26 +59,38 @@ def check_unique_rule_names(r: Results) -> None:
 
 
 def check_rule_attribution(r: Results, suite_dir: pathlib.Path) -> None:
-    """Check rule citations. A test cites a rule of the spec on its first line if it is well-formed or ill-formed,
-    and cites none if the parser rejects it or it uses a feature excluded from this version."""
+    """Check citations. A test of an ill-formed program cites a judgement on its first line, with an optional
+    rule for that judgement; a well-formed test cites a rule, and a test rejected by the parser or using a
+    feature excluded from this version cites no judgement or rule."""
     with r.test("rule attribution"):
-        spec = {
-            m for f in sorted((ROOT / "spec").rglob("*.tex")) for m in RULE_NAME.findall(current(f))
-        }
+        spec_rules = rules(source(SPEC))
+        forms = judgements()
         for test in tests(suite_dir):
             path = main_module(test)
-            dirs = test.relative_to(suite_dir).parts
-            cites = dirs[1] not in (
-                PurePyOutcome.PARSER_REJECTS,
-                PurePyOutcome.EXCLUDED_FOR_NOW,
-            )
-            cited = CITATION.match(path.read_text(encoding="utf-8").split("\n", 1)[0])
-            if cited is None and cites:
-                r.fail(f"{path.relative_to(suite_dir)} cites no rule")
-            elif cited is not None and not cites:
-                r.fail(f"{path.relative_to(suite_dir)} cites {cited.group(1)}")
-            elif cited is not None and cited.group(1) not in spec:
-                r.fail(f"{path.relative_to(suite_dir)} cites {cited.group(1)}, not in the spec")
+            name = path.relative_to(suite_dir)
+            outcome = test.relative_to(suite_dir).parts[1]
+            line = path.read_text(encoding="utf-8").split("\n", 1)[0]
+            cited = CITATION.match(line)
+            judgement = JUDGEMENT_CITATION.match(line)
+            if outcome == PurePyOutcome.TYPING_REJECTS:
+                if judgement is None:
+                    r.fail(f"{name} cites no judgement")
+                elif judgement[1] not in forms:
+                    r.fail(f"{name} cites judgement {judgement[1]}, not in the spec")
+                elif judgement[2] is not None and judgement[2] not in spec_rules:
+                    r.fail(f"{name} cites {judgement[2]}, not in the spec")
+                elif (
+                    judgement[2] is not None
+                    and spec_rules[judgement[2]].judgement != forms[judgement[1]]
+                ):
+                    r.fail(f"{name} cites {judgement[2]}, not a rule for judgement {judgement[1]}")
+            elif outcome in (PurePyOutcome.PARSER_REJECTS, PurePyOutcome.EXCLUDED_FOR_NOW):
+                if cited is not None or judgement is not None:
+                    r.fail(f"{name} has a citation")
+            elif cited is None:
+                r.fail(f"{name} cites no rule")
+            elif cited[1] not in spec_rules:
+                r.fail(f"{name} cites {cited[1]}, not in the spec")
 
 
 def check_classification(r: Results, suite_dir: pathlib.Path) -> None:

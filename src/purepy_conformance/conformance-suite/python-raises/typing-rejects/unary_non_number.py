@@ -1,2 +1,2 @@
-# rule: unop
+# judgement: synth, rule: unop
 print(-"a")

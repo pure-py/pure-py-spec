@@ -1,4 +1,4 @@
-# rule: check-constr
+# judgement: instance, rule: instance-above
 from dataclasses import dataclass
 from typing import Never
 

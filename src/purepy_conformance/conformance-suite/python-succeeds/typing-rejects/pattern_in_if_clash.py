@@ -1,4 +1,4 @@
-# rule: def-body
+# judgement: stmt, rule: declare-assign
 def f(b: bool, v: int) -> int:
     if b:
         match v:

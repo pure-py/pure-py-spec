@@ -1,4 +1,4 @@
-# rule: subscript-union
+# judgement: synth
 def f(v: list[int] | int) -> int:
     return v[0]
 

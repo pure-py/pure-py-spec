@@ -1,4 +1,4 @@
-# rule: check-syn
+# judgement: subtyping, rule: subty-union
 def f(xs: list[int] | list[str]) -> int:
     match xs:
         case [a]:

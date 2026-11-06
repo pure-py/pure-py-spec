@@ -1,4 +1,4 @@
-# rule: check-tuple-none
+# judgement: check-pattern, rule: check-tuple-none
 from typing import Sized
 
 

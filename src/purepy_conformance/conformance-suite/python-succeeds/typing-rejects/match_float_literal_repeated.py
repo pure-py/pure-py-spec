@@ -1,4 +1,4 @@
-# rule: pat-literal-float
+# judgement: match-set, rule: pat-shapes
 def f(x: float) -> int:
     match x:
         case 1.5:

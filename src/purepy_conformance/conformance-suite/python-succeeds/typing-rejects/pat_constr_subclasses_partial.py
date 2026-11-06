@@ -1,4 +1,4 @@
-# rule: def-body
+# judgement: def-check, rule: def-body
 from dataclasses import dataclass
 
 @dataclass

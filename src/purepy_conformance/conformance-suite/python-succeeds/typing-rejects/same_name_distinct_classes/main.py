@@ -1,4 +1,4 @@
-# rule: check-syn
+# judgement: synth, rule: call
 import a
 import b
 

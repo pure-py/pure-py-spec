@@ -1,4 +1,4 @@
-# rule: def-body
+# judgement: def-check, rule: def-body
 def f(p: tuple[bool, bool], c: bool) -> int:
     if c:
         match p:

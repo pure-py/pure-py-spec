@@ -1,4 +1,4 @@
-# rule: return-none
+# judgement: stmt, rule: return-none
 def f(b: bool) -> int | None:
     if b:
         return 1

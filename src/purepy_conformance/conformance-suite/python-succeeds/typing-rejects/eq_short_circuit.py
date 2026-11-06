@@ -1,4 +1,4 @@
-# rule: binop
+# judgement: synth, rule: binop
 from typing import Callable
 
 def f(n: int) -> int:

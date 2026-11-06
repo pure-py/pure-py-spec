@@ -1,4 +1,4 @@
-# rule: imp-member
+# judgement: import-name, rule: imp-member
 from typing import Any
 
 x: int = 1

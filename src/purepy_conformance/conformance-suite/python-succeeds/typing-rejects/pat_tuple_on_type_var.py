@@ -1,4 +1,4 @@
-# rule: check-tuple-none
+# judgement: check-pattern, rule: check-tuple-none
 def f[T](x: T) -> int:
     match x:
         case (a, b):

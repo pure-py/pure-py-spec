@@ -1,3 +1,3 @@
-# rule: from-import
+# judgement: module
 from helper import x
 print(x)

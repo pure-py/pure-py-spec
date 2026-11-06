@@ -1,4 +1,4 @@
-# rule: instance-below
+# judgement: synth, rule: call
 from dataclasses import dataclass
 
 

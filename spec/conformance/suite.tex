@@ -4,3 +4,40 @@
 The conformance suite pairs each test with the verdict given by Python itself, and runs on CPython,
 GraalPy, and Pyodide. A test in \filename{python-raises/typing-rejects/}, for example, is a program which raises an exception other than \pyinline{SyntaxError} under Python and is rejected by the \PurePy type checker; the directory of a test names the row of \figref{taxonomy} for the outcome under Python, followed by the column for the outcome under \PurePy. \speconly{A test which fails because of a bug reported in mypy or a Python implementation is recorded as expected to fail; \figref{reported-bugs} lists these behaviours. }\todo{Reference interpreter, needed
 to detect dynamically excluded operations (\issue{64}).}
+
+\input{spec/fig/reported-bugs}
+\FloatBarrier
+
+\subsubsection{Attribution of ill-formedness}\label{sec:ill-formedness-attribution}
+
+So that rejections can be traced to the specification, tests of ill-formed programs attribute the ill-formedness to
+the judgement at which each program fails and, if possible, to a rule. Implementations can then compare diagnostics
+with the attributions. The first line of the main module of each test cites the judgement form, by the identifier
+exported for the form by the conformance package, followed optionally by a rule:
+\begin{python}
+# judgement: synth, rule: call
+\end{python}
+The cited judgement is the innermost judgement to fail in an attempted derivation. For example, a call with too few
+arguments to a callee of union type cites \ruleName{call} rather than \ruleName{call-union}, because the call fails for
+one disjunct of the callee type.
+
+The conclusion of a rule \emph{matches} a judgement if a substitution for the metavariables of the conclusion yields
+the judgement, apart from any derived type, context or value, which is absent from a failing judgement. A judgement
+\emph{selects} a rule if the rule is the only rule with a conclusion matching the judgement, or, of several rules with
+matching conclusions, the only rule with its \emph{selecting premises} holding. Selecting premises are the premises
+which decide between rules with matching conclusions, such as premises on the types synthesised by subexpressions or
+on the context entries of names. Citations name the rule selected by the cited judgement, or the judgement alone if
+the judgement does not select a rule. For example, an unbound
+variable cites \ruleName{var}, which is the only rule for variables, and $\exBinOp{1}{+}{\pymath{"a"}}$ cites
+\ruleName{binop}, which has operator resolution as a side condition. A class given too many type arguments cites
+\ruleName{ty-class}, which is selected by the context entry of the class name, and a list subscripted by a string cites
+\ruleName{subscript-list}, which is selected by the type of the list. An annotation with an unbound name cites the
+judgement for type expressions alone, and a subscripted integer cites the synthesis judgement alone, since the selecting
+premises of every matching rule fail.
+
+Type mismatches cite the subtyping judgement between the synthesised and expected types, and the rule selected by the
+subtyping judgement. In the subtyping judgement, a literal type is taken as its base type unless the other type is
+also a literal type. Thus an expression of type $\tyList{\tyStr}$ assigned to a variable declared at
+$\tyList{\tyInt}$ cites \ruleName{subty-list}. If the subtyping judgement does not select a rule, the type mismatch
+cites instead the judgement and rule with the subtyping judgement as a premise, so the declaration
+$\exAssign{x\exAnnot{\tyInt}}{\pymath{"a"}}$ cites \ruleName{declare-assign} rather than \ruleName{check-syn}.

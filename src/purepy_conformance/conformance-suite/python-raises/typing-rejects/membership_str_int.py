@@ -1,3 +1,3 @@
-# rule: binop
+# judgement: synth, rule: binop
 x: int = 1
 print(x in "abc")

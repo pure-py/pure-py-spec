@@ -1,4 +1,4 @@
-# rule: var
+# judgement: synth, rule: var
 n: int = len([1])
 len: int = 2
 print(n)

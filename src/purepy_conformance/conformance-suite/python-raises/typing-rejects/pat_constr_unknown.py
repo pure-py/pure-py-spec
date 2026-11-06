@@ -1,4 +1,4 @@
-# rule: check-constr
+# judgement: check-pattern
 def f(v: int) -> int:
     match v:
         case NotAClass():

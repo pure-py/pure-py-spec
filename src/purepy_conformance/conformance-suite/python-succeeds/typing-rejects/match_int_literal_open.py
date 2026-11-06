@@ -1,4 +1,4 @@
-# rule: match-partial
+# judgement: synth, rule: var
 x: int = 42
 y: str
 match x:

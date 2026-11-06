@@ -1,4 +1,4 @@
-# rule: match-partial
+# judgement: def-check, rule: def-body
 def f(s: str) -> int:
     match s:
         case "a":

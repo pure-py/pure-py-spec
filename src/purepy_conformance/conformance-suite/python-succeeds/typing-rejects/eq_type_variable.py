@@ -1,4 +1,4 @@
-# rule: binop
+# judgement: synth, rule: binop
 def differ[K](x: K, y: K) -> bool:
     return x != y
 

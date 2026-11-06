@@ -1,4 +1,4 @@
-# rule: module
+# judgement: module, rule: module
 type Num = int
 type Num = str
 

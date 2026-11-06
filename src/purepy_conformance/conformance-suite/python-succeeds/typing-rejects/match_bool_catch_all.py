@@ -1,4 +1,4 @@
-# rule: pat-shapes
+# judgement: match-set, rule: pat-shapes
 def f(b: bool) -> int:
     match b:
         case True:

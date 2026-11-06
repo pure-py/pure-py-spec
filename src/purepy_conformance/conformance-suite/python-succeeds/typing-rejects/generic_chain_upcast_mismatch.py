@@ -1,4 +1,4 @@
-# rule: subty-class-extend
+# judgement: subtyping, rule: subty-class-extend
 from dataclasses import dataclass
 
 @dataclass

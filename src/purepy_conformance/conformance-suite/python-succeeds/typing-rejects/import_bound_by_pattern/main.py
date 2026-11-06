@@ -1,4 +1,4 @@
-# rule: module
+# judgement: module, rule: module
 from m import x
 
 match [1]:

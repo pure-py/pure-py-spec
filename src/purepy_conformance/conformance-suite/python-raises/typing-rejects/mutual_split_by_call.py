@@ -1,4 +1,4 @@
-# rule: var
+# judgement: synth, rule: var
 def even(n: int) -> bool:
     if n == 0:
         return True

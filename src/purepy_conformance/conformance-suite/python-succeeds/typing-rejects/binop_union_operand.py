@@ -1,4 +1,4 @@
-# rule: binop
+# judgement: synth, rule: binop
 def f(x: int | str) -> int:
     return x + 1
 

@@ -1,4 +1,4 @@
-# rule: var
+# judgement: synth, rule: var
 def f(v: list[int]) -> int:
     match v:
         case [x]:

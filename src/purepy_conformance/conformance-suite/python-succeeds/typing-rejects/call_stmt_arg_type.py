@@ -1,4 +1,4 @@
-# rule: call-stmt
+# judgement: stmt, rule: call-stmt
 def foo(x: int) -> None:
     pass
 

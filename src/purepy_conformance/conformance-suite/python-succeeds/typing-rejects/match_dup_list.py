@@ -1,4 +1,4 @@
-# rule: split-list
+# judgement: match-set, rule: pat-shapes
 v: list[int] = [1, 2]
 match v:
     case [a, b]:

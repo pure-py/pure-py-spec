@@ -1,4 +1,4 @@
-# rule: ty-class
+# judgement: resolve-type
 from dataclasses import dataclass
 
 p: Point = Point(1, 2)

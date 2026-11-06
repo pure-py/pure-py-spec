@@ -1,4 +1,4 @@
-# rule: assign
+# judgement: stmt, rule: assign
 x: int
 x = "a"
 print(x)

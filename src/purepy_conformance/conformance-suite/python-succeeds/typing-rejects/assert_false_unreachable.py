@@ -1,4 +1,4 @@
-# rule: seq
+# judgement: stmt, rule: seq
 def f(b: bool) -> int:
     if b:
         return 1
