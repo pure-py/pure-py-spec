@@ -1,7 +1,7 @@
 \inferrule*[lab={\ruleName{defs}}]
 {
-  \deleted{\declaresS(\seq{d}) \text{ distinct}} \\
-  \deleted{\Gamma(f) = \Unbound \quad (\forall f \in \declaresS(\seq{d}))} \\
+  \declaresS(\seq{d}) \text{ distinct} \\
+  \Gamma(f) = \Unbound \quad (\forall f \in \declaresS(\seq{d})) \\
   \Sigma; \Gamma \vdash d_i \synth \pi_i \quad (\forall i) \\
   \Delta' = \set{\bind{\declaresS(\seq{d})}{\seq{\pi}}} \\
   \Sigma; \Gamma \override \Delta' \vdash d_i \checks \pi_i \quad (\forall i)
