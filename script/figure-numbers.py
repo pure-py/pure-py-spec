@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Figure numbers of the rules and judgement figures of the specification, as JSON on standard output, from
-its sources and the LaTeX auxiliary file of its last build"""
+"""Write figure number of each rule and judgement figure, as JSON on standard output, from specification
+sources and LaTeX auxiliary file kept from last build"""
 
 from __future__ import annotations
 
