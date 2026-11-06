@@ -27,13 +27,13 @@ the judgement, apart from any derived type, context or value, which is absent fr
 \emph{selects} a rule if the rule is the only rule with a conclusion matching the judgement, or, of several rules with
 matching conclusions, the only rule with its \emph{selecting premises} holding. Selecting premises are the premises
 which decide between rules with matching conclusions, such as premises on the types synthesised by subexpressions or
-on the context entries of names. Citations name the rule selected by the cited judgement, or only the judgement if
+on the context entries of names. Citations name the rule selected by the cited judgement, or the judgement alone if
 the judgement does not select a rule. Selected rules have a failing premise or side condition. For example, an unbound
 variable cites \ruleName{var}, which is the only rule for variables, and $\exBinOp{1}{+}{\pymath{"a"}}$ cites
 \ruleName{binop}, which has operator resolution as a side condition. A class given too many type arguments cites
 \ruleName{ty-class}, which is selected by the context entry of the class name, and a list subscripted by a string cites
-\ruleName{subscript-list}, which is selected by the type of the list. An annotation with an unbound name cites only the
-judgement for type expressions, and a subscripted integer cites only the synthesis judgement, since the selecting
+\ruleName{subscript-list}, which is selected by the type of the list. An annotation with an unbound name cites the
+judgement for type expressions alone, and a subscripted integer cites the synthesis judgement alone, since the selecting
 premises of every matching rule fail.
 
 Type mismatches cite the subtyping judgement between the synthesised and expected types, and the rule selected by the
