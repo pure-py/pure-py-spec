@@ -8,21 +8,24 @@ to detect dynamically excluded operations (\issue{64}).}
 \begin{AddedBlock}
 Each test of an ill-formed program records where in this specification the program fails, so that a rejection can
 be traced to the judgement or rule responsible, and an implementation can compare its diagnostics with the suite.
-The first line of the test cites a judgement form, by the identifier exported for the form by the conformance
-package, and optionally a rule for that form, as in \filename{\frenchspacing\# judgement: synth, rule: call}. The
-cited judgement is the innermost judgement to fail in an attempted derivation: a call with too few arguments to a
-callee of union type fails at one disjunct of the callee type, and so cites \ruleName{call} rather than
-\ruleName{call-union}.
+The first line of the main module of the test cites a judgement form, by the identifier exported for the form by the
+conformance package, and optionally a rule for that form:
+\begin{python}
+# judgement: synth, rule: call
+\end{python}
+The cited judgement is the innermost judgement to fail in an attempted derivation. For example, a call with too few
+arguments to a callee of union type cites \ruleName{call} rather than \ruleName{call-union}, because the call fails at
+one disjunct of the callee type.
 
-The cited rule is the rule applying to the judgement, and is omitted when no rule applies
-(\figref{test-citations}). A rule applies to a judgement if it is the only rule with a conclusion matching the
-judgement. The \emph{selecting premises} of a rule are the premises which decide between rules with matching
-conclusions, such as premises on the type synthesised by a subexpression or on the context entry of a name; of
-several rules with matching conclusions, a rule applies if it is the only rule with its selecting premises holding.
-The cited rule has a failing premise or side condition; for example, \pyinline{1 + "a"} cites \ruleName{binop}, since
-operator resolution is a side condition. A type mismatch cites the rule of subtyping applying to the two types, with a
-literal type taken as its base type except against a literal type, or the rule asking for the check if no rule of
-subtyping applies.
+The citation names the rule selected by the judgement, or only the judgement if no rule is selected
+(\figref{test-citations}). The \emph{selecting premises} of a rule are the premises which decide between rules with
+matching conclusions, such as premises on the type synthesised by a subexpression or on the context entry of a name. A
+judgement selects a rule if the rule is the only rule with a conclusion matching the judgement, or, of several rules
+with matching conclusions, the only rule with its selecting premises holding. The selected rule has a failing premise
+or side condition. For example, \pyinline{1 + "a"} cites \ruleName{binop}, which has operator resolution as a side
+condition. A type mismatch cites the subtyping judgement between the two types, with a literal type taken as its base
+type except against a literal type, and the rule selected by the subtyping judgement. If the subtyping judgement does
+not select a rule, the type mismatch cites the rule asking for the check.
 
 \input{spec/fig/test-citations}
 \end{AddedBlock}
