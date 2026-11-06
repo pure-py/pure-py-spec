@@ -11,6 +11,6 @@ No rule selected & Judgement alone & \pyinline{x: Nonexistent = 5}: type express
 Type mismatch, with rule selected by subtyping judgement & Subtyping and rule & \pyinline{list[str]} assigned at \pyinline{list[int]}: \ruleName{subty-list} \\
 Type mismatch, with no rule selected by subtyping judgement & Judgement and rule with subtyping premise & \pyinline{x: int = "a"}: \ruleName{declare-assign}, not \ruleName{check-syn}
 \end{tabular}
-\caption{Citation by test of ill-formed program}
-\label{fig:test-citations}
+\caption{Attribution of ill-formedness by kind of failing judgement}
+\label{fig:ill-formedness-attribution}
 \end{figure}
