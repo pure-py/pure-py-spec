@@ -17,13 +17,13 @@ The cited judgement is the innermost judgement to fail in an attempted derivatio
 arguments to a callee of union type cites \ruleName{call} rather than \ruleName{call-union}, because the call fails at
 one disjunct of the callee type.
 
-The citation names the rule selected by the judgement, or only the judgement if no rule is selected
-(\figref{test-citations}). The \emph{selecting premises} of a rule are the premises which decide between rules with
-matching conclusions, such as premises on the type synthesised by a subexpression or on the context entry of a name. A
-judgement selects a rule if the rule is the only rule with a conclusion matching the judgement, or, of several rules
-with matching conclusions, the only rule with its selecting premises holding. The selected rule has a failing premise
-or side condition. For example, \pyinline{1 + "a"} cites \ruleName{binop}, which has operator resolution as a side
-condition. A type mismatch cites the subtyping judgement between the two types, with a literal type taken as its base
+A judgement \emph{selects} a rule if the rule is the only rule with a conclusion matching the judgement, or, of
+several rules with matching conclusions, the only rule with its \emph{selecting premises} holding. The selecting
+premises of a rule are the premises which decide between rules with matching conclusions, such as premises on the type
+synthesised by a subexpression or on the context entry of a name. The citation names the rule selected by the cited
+judgement, or only the judgement if the judgement does not select a rule (\figref{test-citations}). The selected rule
+has a failing premise or side condition. For example, \pyinline{1 + "a"} cites \ruleName{binop}, which has operator
+resolution as a side condition. A type mismatch cites the subtyping judgement between the two types, with a literal type taken as its base
 type except against a literal type, and the rule selected by the subtyping judgement. If the subtyping judgement does
 not select a rule, the type mismatch cites the rule asking for the check.
 
