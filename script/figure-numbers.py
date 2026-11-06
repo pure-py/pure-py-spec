@@ -51,8 +51,8 @@ class Figures:
 
 
 def figures(text: str) -> Figures:
-    """Label of the innermost labelled figure or subfigure containing each rule, and labels of those
-    containing the box of a judgement form"""
+    """Label of the innermost labelled figure or subfigure containing each rule, and label of each figure or
+    subfigure defining a judgement form"""
     figs = Figures()
     # Open figures and subfigures, innermost last; an unlabelled one passes its contents to its parent
     open_: list[Figure] = []
