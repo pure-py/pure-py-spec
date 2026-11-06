@@ -9,7 +9,7 @@ One rule with matching conclusion & Judgement and rule & Unbound variable: \rule
 Several rules with matching conclusions, one with selecting premises holding & Judgement and rule & Class given too many type arguments: \ruleName{ty-class}; subscript of list: \ruleName{subscript-list} \\
 No rule selected & Judgement alone & \pyinline{x: Nonexistent = 5}: type expressions; subscript of integer: synthesis \\
 Type mismatch, with rule selected by subtyping judgement & Subtyping and rule & \pyinline{list[str]} assigned at \pyinline{list[int]}: \ruleName{subty-list} \\
-Type mismatch, with no rule selected by subtyping judgement & Rule asking for check, with its judgement & \pyinline{x: int = "a"}: \ruleName{declare-assign}, not \ruleName{check-syn}
+Type mismatch, with no rule selected by subtyping judgement & Judgement and rule with subtyping premise & \pyinline{x: int = "a"}: \ruleName{declare-assign}, not \ruleName{check-syn}
 \end{tabular}
 \caption{Citation by test of ill-formed program}
 \label{fig:test-citations}

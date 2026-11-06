@@ -6,30 +6,31 @@ GraalPy, and Pyodide. A test in \filename{python-raises/typing-rejects/}, for ex
 to detect dynamically excluded operations (\issue{64}).}
 
 \begin{AddedBlock}
-\subsubsection{Citation of judgements and rules}\label{sec:test-citations}
+\subsubsection{Attribution of ill-formedness}\label{sec:ill-formedness-attribution}
 
-Each test of an ill-formed program records where in this specification the program fails, so that a rejection can
-be traced to the judgement or rule responsible, and an implementation can compare its diagnostics with the suite.
-The first line of the main module of the test cites a judgement form, by the identifier exported for the form by the
-conformance package, and optionally a rule for that form:
+So that a rejection can be traced to the specification, each test of an ill-formed program attributes the
+ill-formedness to the judgement at which the program fails and, if possible, to a rule. An implementation can then
+compare diagnostics with the attributions. The first line of the main module of the test cites the judgement form, by
+the identifier exported for the form by the conformance package, and any rule:
 \begin{python}
 # judgement: synth, rule: call
 \end{python}
 The cited judgement is the innermost judgement to fail in an attempted derivation. For example, a call with too few
-arguments to a callee of union type cites \ruleName{call} rather than \ruleName{call-union}, because the call fails at
+arguments to a callee of union type cites \ruleName{call} rather than \ruleName{call-union}, because the call fails for
 one disjunct of the callee type.
 
 The conclusion of a rule \emph{matches} a judgement if a substitution for the metavariables of the conclusion yields
 the judgement, with any type, context or value derived by the judgement disregarded, since a failing judgement does
-not derive one. A judgement \emph{selects} a rule if the rule is the only rule with a conclusion matching the judgement, or, of
-several rules with matching conclusions, the only rule with its \emph{selecting premises} holding. The selecting
-premises of a rule are the premises which decide between rules with matching conclusions, such as premises on the type
-synthesised by a subexpression or on the context entry of a name. The citation names the rule selected by the cited
-judgement, or only the judgement if the judgement does not select a rule (\figref{test-citations}). The selected rule
-has a failing premise or side condition. For example, \pyinline{1 + "a"} cites \ruleName{binop}, which has operator
-resolution as a side condition. A type mismatch cites the subtyping judgement between the two types, with a literal type taken as its base
-type except against a literal type, and the rule selected by the subtyping judgement. If the subtyping judgement does
-not select a rule, the type mismatch cites the rule asking for the check.
+not derive one. A judgement \emph{selects} a rule if the rule is the only rule with a conclusion matching the
+judgement, or, of several rules with matching conclusions, the only rule with its \emph{selecting premises} holding.
+The selecting premises of a rule are the premises which decide between rules with matching conclusions, such as
+premises on the type synthesised by a subexpression or on the context entry of a name. The citation names the rule
+selected by the cited judgement, or only the judgement if the judgement does not select a rule
+(\figref{test-citations}). The selected rule has a failing premise or side condition. For example, \pyinline{1 + "a"}
+cites \ruleName{binop}, which has operator resolution as a side condition. A type mismatch cites the subtyping
+judgement between the synthesised and expected types, and the rule selected by the subtyping judgement, with a literal
+type taken as its base type except against a literal type. If the subtyping judgement does not select a rule, the
+type mismatch cites instead the judgement and rule with the subtyping judgement as a premise.
 
 \input{spec/fig/test-citations}
 \end{AddedBlock}
