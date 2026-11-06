@@ -19,6 +19,7 @@
 .venv/
 __pycache__/
 dist/
+src/purepy_conformance/figure-numbers.json
 tex/anon-name.tex
 tex/mypy-version.tex
 tex/python-version.tex

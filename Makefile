@@ -4,6 +4,7 @@ PYTHON_VERSION_TEX := tex/python-version.tex
 MYPY_VERSION_TEX := tex/mypy-version.tex
 ANON_NAME_TEX := tex/anon-name.tex
 SPEC_LABELS := xref/PurePy-spec.aux
+FIGURE_NUMBERS := src/purepy_conformance/figure-numbers.json
 TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX)
 PDFLATEX := pdflatex -interaction=nonstopmode -halt-on-error
 ISABELLE ?= isabelle
@@ -51,6 +52,10 @@ endif
 $(SPEC_LABELS): PurePy-spec.pdf
 	@test -f $@ || $(MAKE) -B PurePy-spec.pdf
 
+# Figure numbers of the rules and judgement figures, exported by the conformance package.
+$(FIGURE_NUMBERS): script/figure-numbers.py $(SPEC_LABELS)
+	uv run --locked python script/figure-numbers.py > $@.tmp && mv $@.tmp $@
+
 GRADUALITY_INPUTS := $(wildcard graduality/*.tex graduality/*/*.tex)
 ## Draft notes on gradual typing, outside the 1.0 spec and paper
 graduality.pdf: $(GRADUALITY_INPUTS)
@@ -97,13 +102,13 @@ check-suite-mechanisation:
 	fi
 
 ## Wheel of the conformance suite and runner
-wheel: check-targets check-consistency check-suite-python check-suite-purepy
+wheel: check-targets check-consistency check-suite-python check-suite-purepy $(FIGURE_NUMBERS)
 	rm -rf dist && uv build --wheel
 
 ## Remove build products
 clean:
 	rm -f $(AUX) *.pdf $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX)
-	rm -rf $(dir $(SPEC_LABELS))
+	rm -rf $(dir $(SPEC_LABELS)) $(FIGURE_NUMBERS)
 
 ## Make targets documented, and workflows named after their targets
 check-targets:
