@@ -17,7 +17,10 @@ JUDGEMENT_FIGURE = re.compile(r"\\judgementFigure\{([a-z-]+)\}\{([a-z0-9-]+)\}")
 
 def main() -> None:
     aux = LABELS.read_text(encoding="utf-8")
-    numbers = {label: number.replace(r"\nobreakdash --", "\u2013") for label, number in NEWLABEL.findall(aux)}
+    numbers = {
+        label: number.replace(r"\nobreakdash --", "\u2013")
+        for label, number in NEWLABEL.findall(aux)
+    }
     json.dump(
         {
             "rules": {
