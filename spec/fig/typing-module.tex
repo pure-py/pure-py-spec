@@ -64,6 +64,7 @@
 \end{mathpar}
 
 \subcaption{Import prefix $\seq{\iota}$ of module $q$ produces bindings $\Gamma$}
+\label{fig:typing-import-prefix}
 \end{subfigure}
 
 \vspace{2mm}
@@ -90,12 +91,14 @@
 }
 \end{mathpar}
 \subcaption{Submodule chain $\seq{x}$ extends signature $\Gamma$ of module $q$ to $\Gamma'$}
+\label{fig:typing-submodules}
 \end{subfigure}
 \caption{Import typing}
-\label{fig:typing-import-prefix}
+\label{fig:typing-import}
 \end{figure}
 
 \begin{figure}
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Sigma \vdash_{\mathsf{mod}} q : \Gamma \binding \Sigma'$}
 \begin{mathpar}
 \small
@@ -109,7 +112,13 @@
 \and
 \input{spec/rules/module}
 \end{mathpar}
+\subcaption{\added{Module $q$ checks with signature $\Gamma$}}
+\label{fig:typing-mod}
+\end{subfigure}
 
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\vdash \mathcal{M}$}
 \begin{mathpar}
 \small
@@ -121,6 +130,9 @@
   \vdash \mathcal{M}
 }
 \end{mathpar}
+\subcaption{\added{Program $\mathcal{M}$ is well-formed}}
+\label{fig:typing-program}
+\end{subfigure}
 \caption{Module typing}
 \label{fig:typing-module}
 \end{figure}
