@@ -7,14 +7,17 @@ to detect dynamically excluded operations (\issue{64}).}
 
 \begin{AddedBlock}
 The first line of a test of an ill-formed program cites the form of the innermost judgement to fail in an attempted
-derivation, by its identifier in the conformance package, together with a rule if exactly one rule for that form
-has a conclusion matching the judgement, as in \filename{\# judgement: synth, rule: call}. The cited rule then has a
-failing premise or side condition: a call with too few arguments to a callee of union type cites \ruleName{call}, an
-unbound variable cites \ruleName{var}, and \pyinline{1 + "a"} cites \ruleName{binop}, since operator resolution is a
-side condition. The judgement form is cited alone if the conclusions of several of its rules or of none match the
-judgement: \pyinline{x: Nonexistent = 5} cites the form for type expressions, and a subscript of an integer cites the
-form for synthesis. A type mismatch cites the rule of subtyping matching both types, with a literal type taken as its
-base type except against a literal type, so a test assigning a \pyinline{list[str]} to a variable declared at
-\pyinline{list[int]} cites \ruleName{subty-list}. If no single rule of subtyping matches both types, the mismatch cites
-the rule asking for the check: \pyinline{x: int = "a"} cites \ruleName{declare-assign}, not \ruleName{check-syn}.
+derivation, by its identifier in the conformance package, together with the rule applying to the judgement if there
+is one, as in \filename{\# judgement: synth, rule: call}. A rule applies if it is the only rule with a conclusion
+matching the judgement, so that an unbound variable cites \ruleName{var}, or if it is the only one of several such
+rules with its selecting premises holding, such as the type synthesised by a subexpression or the context entry of a
+name, so that a class given too many type arguments cites \ruleName{ty-class} and a subscript of a list cites
+\ruleName{subscript-list}. The cited rule then has a failing premise or side condition: a call with too few arguments
+to a callee of union type cites \ruleName{call}, and \pyinline{1 + "a"} cites \ruleName{binop}, since operator
+resolution is a side condition. The judgement form is cited alone if no rule applies: \pyinline{x: Nonexistent = 5}
+cites the form for type expressions, and a subscript of an integer cites the form for synthesis. A type mismatch
+cites the rule of subtyping matching both types, with a literal type taken as its base type except against a literal
+type, so a test assigning a \pyinline{list[str]} to a variable declared at \pyinline{list[int]} cites
+\ruleName{subty-list}. If no single rule of subtyping matches both types, the mismatch cites the rule asking for the
+check: \pyinline{x: int = "a"} cites \ruleName{declare-assign}, not \ruleName{check-syn}.
 \end{AddedBlock}
