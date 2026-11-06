@@ -21,7 +21,7 @@ jobs:
         with:
           enable-cache: true
 
-      # The wheel exports figure numbers taken from the labels of a build of the specification.
+      # Specification built for the figure numbers exported by the wheel
       - name: Generate Python and mypy version macros
         run: make tex/python-version.tex tex/mypy-version.tex
 

@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
-"""Figure number of each rule of the specification and of each judgement figure label, as JSON on standard
-output, from the specification sources and the labels of its last build. A rule belongs to the innermost
-labelled figure or subfigure containing it, and a judgement figure is a labelled figure or subfigure containing
-the box of a judgement form."""
+"""Figure numbers of the rules and judgement figures of the specification, as JSON on standard output, from
+its sources and the LaTeX auxiliary file of its last build"""
 
 from __future__ import annotations
 
@@ -53,7 +51,8 @@ class Figures:
 
 
 def figures(text: str) -> Figures:
-    """Label of the figure of each rule, and the judgement figure labels"""
+    """Label of the innermost labelled figure or subfigure containing each rule, and labels of those
+    containing the box of a judgement form"""
     figs = Figures()
     # Open figures and subfigures, innermost last; an unlabelled one passes its contents to its parent
     open_: list[Figure] = []
