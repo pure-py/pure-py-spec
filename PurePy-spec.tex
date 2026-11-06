@@ -62,6 +62,10 @@
 \usepackage{refcount}
 \usepackage{xstring}
 \newcommand*{\annexref}[1]{Annex~\ref{sec:#1}}
+\makeatletter
+\newcommand*{\judgementFigref}[2]{\protected@write\@auxout{}{\string\judgementFigure{#1}{#2}}\figref{#2}}
+\makeatother
+\newcommand*{\judgementFigure}[2]{}
 \renewcommand*{\secref}[1]{\IfBeginWith{\getrefbykeydefault{sec:#1}{anchor}{}}{chapter.}{Chapter~\ref{sec:#1}}{\S\ref{sec:#1}}}
 
 \theoremstyle{plain}
