@@ -1,0 +1,37 @@
+\begin{figure}
+\setlength{\jot}{2pt}
+\flushleft \shadebox{$\Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{instance-above}}]
+{
+  \Sigma \vdash \tau \subty C[\seq{\sigma}] \\
+  \seq{\sigma}' \tyEquiv \seq{\sigma} \text{ whenever } \Sigma \vdash \tau \subty C[\seq{\sigma}']
+}
+{
+  \Sigma \vdash C[\seq{\sigma}] \instanceAt \tau
+}
+\and
+\added{\inferrule*[lab={\ruleName{instance-object}}]
+{
+  \typeParams{\Sigma}(C) = \varepsilon
+}
+{
+  \Sigma \vdash C[] \instanceAt \tyObject
+}}
+\and
+\inferrule*[lab={\ruleName{instance-below}}]
+{
+  \replaced{\typeParams{\Sigma}(C) = \seq{\alpha}}{\Sigma \vdash C[\seq{\sigma}] \subty \tau} \\
+  \replaced{\ancestor{\Sigma}(C[\seq{\alpha}], D) = D[\seq{\rho}]}{\seq{\sigma}' \tyEquiv \seq{\sigma} \text{ whenever } \Sigma \vdash C[\seq{\sigma}'] \subty \tau} \\
+  \added{\matchArgs(\seq{\rho}, \seq{\sigma}') = \gamma} \\
+  \added{\gamma(\alpha_i) = \sigma_i \quad (\forall i)} \\
+  \added{\Sigma \vdash C[\seq{\sigma}] \subty D[\seq{\sigma}']}
+}
+{
+  \Sigma \vdash C[\seq{\sigma}] \instanceAt \replaced{D[\seq{\sigma}']}{\tau}
+}
+\end{mathpar}
+\caption{Instance of a class at a type}
+\label{fig:instance}
+\end{figure}

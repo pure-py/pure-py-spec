@@ -53,6 +53,7 @@
 \inferrule*[lab={\ruleName{class-extend}}]
 {
   \Gamma \vdash q' : \Type{D} \\
+  \added{D \neq \clsRange} \\
   \Sigma; \Gamma \vdash q'[\seq{\psi}'] \synth D[\seq{\sigma}'] \\
   \\
   \bind{\pyinline{dataclass}}{\predefName} \in \Gamma \\

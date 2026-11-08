@@ -227,6 +227,8 @@
 \newcommand*{\TypeAlias}[4][]{\mathsf{TypeAlias}_{#1}(#2, #3, #4)}
 \newcommand*{\TypeVar}{\mathsf{TypeVar}}
 \newcommand*{\Unbound}{\mathsf{Unbound}}
+\newcommand*{\clash}{\mathsf{clash}}
+\newcommand*{\undetermined}{\mathsf{undetermined}}
 
 % Context and environment operations
 \newcommand*{\baseType}{\mathrm{base\text{-}type}}
@@ -243,6 +245,7 @@
 \newcommand*{\headList}[1]{\pyinline{list}_{#1}}
 \newcommand*{\instanceAt}{\mathrel{\asymp}}
 \newcommand*{\joinTy}[3]{#2 \vee_{#1} #3}
+\newcommand*{\matchArgs}{\mathrm{match\text{-}args}}
 \newcommand*{\matchedAs}[1]{\mathrm{matched\text{-}as}_{#1}}
 \newcommand*{\meetTy}[3]{#2 \wedge_{#1} #3}
 \newcommand*{\merge}{\mathbin{\oplus}}
@@ -308,6 +311,7 @@
 \newcommand*{\typeEntry}[1]{\mathrm{type\text{-}entry}_{#1}}
 
 % Metafunctions: classes
+\newcommand*{\ancestor}[1]{\mathrm{ancestor}_{#1}}
 \newcommand*{\ancestors}[1]{\mathrm{ancestors}_{#1}}
 \newcommand*{\base}[1]{\mathrm{base}_{#1}}
 \newcommand*{\fieldMap}[1]{\mathrm{field\text{-}map}_{#1}}

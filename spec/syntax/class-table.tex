@@ -9,6 +9,12 @@ once, so class names identify classes\speconly{, and we write ``class $C$'' for 
 A \emph{class table} $\Sigma$ maps each
 class name $C$ in its domain to a \emph{class entry} $\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$ (\figref{context-entries}), which records the class
 definition $\chi_i$ of mutual type region $\seq{\chi}$ of module $q$ defining $C$, and the context $\Gamma$ in which
-the region appears. Every class named in $\Sigma$ is in $\dom(\Sigma)$, and the base-class relation on
+the region appears. Every class named in $\Sigma$ is in $\dom(\Sigma)$, \added{the type parameters of each class in $\dom(\Sigma)$ are distinct, the base class of a class, if any, is a well-formed type (Definition~\ref{def:well-formed-type}) other than $\clsRange[]$ with no free type variables beyond the type parameters of the class, }and the base-class relation on
 $\dom(\Sigma)$ is acyclic.%
 \end{specdefinition}
+\begin{AddedBlock}
+\begin{specdefinition}{Well-formed type}%
+\label{def:well-formed-type}%
+A type $\tau$ is \emph{well-formed} in $\Sigma$ when every class named in $\tau$ is in $\dom(\Sigma)$ and is applied to as many type arguments as it has type parameters.%
+\end{specdefinition}
+\end{AddedBlock}
