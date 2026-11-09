@@ -1,3 +1,4 @@
 Modules $\seq{q}$ loaded so far, extended in load order by the modules loaded by $\seq{q}'$, by importing names
-$\seq{x}$ from $q$, or by imports $\seq{\iota}$ or import $\iota$ of $q$, excluding predefined modules. Defined for
-well-formed programs, which do not have import cycles.
+$\seq{x}$ from $q$, or by imports $\seq{\iota}$ or import $\iota$ of $q$, excluding predefined modules. Importing names
+from a predefined module loads none of its submodules, as typing checks none. Defined for well-formed programs, which
+do not have import cycles.
