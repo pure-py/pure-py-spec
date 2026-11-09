@@ -1,8 +1,0 @@
-python-succeeds/parser-rejects/soft_keyword_match.py	pure-py/isabelle-purepy#41
-python-succeeds/parser-rejects/soft_keyword_case.py	pure-py/isabelle-purepy#41
-python-succeeds/parser-rejects/soft_keyword_type.py	pure-py/isabelle-purepy#41
-python-succeeds/parser-rejects/underscore_variable.py	pure-py/isabelle-purepy#41
-python-succeeds/parser-rejects/underscore_generator.py	pure-py/isabelle-purepy#41
-python-succeeds/typing-rejects/power_float_exponent.py	pure-py/isabelle-purepy#41
-python-succeeds/excluded-for-now/pat_head_int.py	pure-py/isabelle-purepy#36
-python-raises/excluded-for-now/pat_head_int_two_positional.py	pure-py/isabelle-purepy#36
