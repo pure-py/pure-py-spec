@@ -110,7 +110,7 @@ RUNTIME_QUERY = "import platform, sys; print(platform.python_implementation(), s
 
 
 def runtime(interpreter: list[str]) -> Runtime | None:
-    """None for an interpreter which is not Python, such as a PurePy implementation"""
+    """None unless interpreter reports itself as a known Python implementation"""
     answer = run([*interpreter, "-c", RUNTIME_QUERY]).stdout.split()
     if len(answer) != 2:
         return None
