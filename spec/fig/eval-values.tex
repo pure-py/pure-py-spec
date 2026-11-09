@@ -1,10 +1,13 @@
 \begin{figure}
 \small
 \paperonly{\footnotesize}
-\begin{center}
-\input{spec/grammar/values}\paperonly{\hfill}\speconly{\\[3mm]}
+\paperonly{\begin{minipage}[t]{0.40\textwidth}\input{spec/grammar/values}\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.58\textwidth}\input{spec/grammar/results}\end{minipage}}%
+\speconly{\begin{center}
+\input{spec/grammar/values}\\[3mm]
 \input{spec/grammar/results}
-\end{center}
+\end{center}}
 \caption{Values, environments, outcomes and results}
 \label{fig:values}
 \end{figure}
