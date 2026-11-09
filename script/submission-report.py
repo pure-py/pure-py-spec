@@ -93,6 +93,7 @@ def main() -> None:
                 ["make", target, *options],
                 capture_output=True,
                 text=True,
+                errors="replace",
                 check=False,
                 env={**os.environ, "REPORT": "1"},
             )
