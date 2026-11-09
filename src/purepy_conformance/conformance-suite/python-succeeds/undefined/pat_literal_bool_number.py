@@ -1,5 +1,5 @@
 # rule: eval-match-abort
-x: object = True
+x: int | bool = True
 match x:
     case 1:
         print("one")

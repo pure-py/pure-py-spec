@@ -1,4 +1,4 @@
-# rule: split-class
+# judgement: instance, rule: instance-below
 from dataclasses import dataclass
 
 @dataclass
