@@ -71,8 +71,10 @@ jobs:
         with:
           ref: ${{ steps.version.outputs.tag }}
 
-      - name: Generate Python and mypy version macros
-        run: make tex/python-version.tex tex/mypy-version.tex
+      - name: Generate LaTeX macros and anonymised root file
+        run: |
+          make tex/python-version.tex tex/mypy-version.tex tex/anon-name.tex
+          printf '\\def\\anonmode{}\\input{PurePy-spec}\n' > spec-anon.tex
 
       - name: Build LaTeX document
         uses: xu-cheng/latex-action@v4
@@ -82,9 +84,14 @@ jobs:
       - name: Keep LaTeX auxiliary file of specification
         run: mkdir -p xref && cp PurePy-spec.aux xref/
 
-      # The PDF is served from GitHub Pages rather than attached to the release, since GitHub serves release files
+      - name: Build anonymised LaTeX document
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: spec-anon.tex
+
+      # The PDFs are served from GitHub Pages rather than attached to the release, since GitHub serves release files
       # as downloads, which drops the destination named in a link such as PurePy-spec.pdf#fig:typing-synth.
-      - name: Publish PDF to GitHub Pages
+      - name: Publish PDFs to GitHub Pages
         run: |
           TAG="${{ steps.version.outputs.tag }}"
           git config user.name "github-actions[bot]"
@@ -92,8 +99,8 @@ jobs:
           git fetch origin gh-pages:refs/remotes/origin/gh-pages
           git worktree add -B gh-pages pages origin/gh-pages
           mkdir -p "pages/$TAG" pages/latest
-          cp PurePy-spec.pdf "pages/$TAG/"
-          cp PurePy-spec.pdf pages/latest/
+          cp PurePy-spec.pdf spec-anon.pdf "pages/$TAG/"
+          cp PurePy-spec.pdf spec-anon.pdf pages/latest/
           cd pages
           bash ../.github/scripts/pages-index.sh
           git add -A
