@@ -187,42 +187,24 @@
 
 \begin{figure}
 \begin{AddedBlock}
-\flushleft \shadebox{$\Sigma \vdash \ClassDef[\Gamma]{q}{\seq{\chi}}{i} \wf$}
+\flushleft \shadebox{$\Sigma \vdash C \wfClass$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{wf-class-def}}]
 {
-  \chi_i = \exDataclass{c[\seq{\alpha}]}{\phi} \\
+  \Sigma(C) = \ClassDef[\Gamma]{q}{\seq{\chi}}{i} \\
   \Sigma \vdash \Gamma \wf \\
-  \tyvars(\Gamma) = \varnothing \\\\
+  \tyvars(\Gamma) = \varnothing \\
   \dom(\classTable{\Gamma}(q, \seq{\chi})) \subseteq \dom(\Sigma) \\\\
-  \fields{\Sigma}(q.c) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}} \\
+  \Sigma \vdash D[\seq{\sigma}] \wf, \; D \neq \clsRange \text{ and } \fv(D[\seq{\sigma}]) \subseteq
+  \typeParams{\Sigma}(C) \text{ if } \base{\Sigma}(C) = D[\seq{\sigma}] \\\\
+  \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}} \\
   \Sigma \vdash \tau_j \wf \quad \fv(\tau_j) \subseteq \seq{\alpha} \quad (\forall j) \\
   \seq{\alpha} \text{ distinct} \\
   \seq{x} \text{ distinct}
 }
 {
-  \Sigma \vdash \ClassDef[\Gamma]{q}{\seq{\chi}}{i} \wf
-}
-\and
-\inferrule*[lab={\ruleName{wf-class-def-extend}}]
-{
-  \chi_i = \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}]}{\phi} \\
-  \Sigma \vdash \Gamma \wf \\
-  \tyvars(\Gamma) = \varnothing \\\\
-  \dom(\classTable{\Gamma}(q, \seq{\chi})) \subseteq \dom(\Sigma) \\\\
-  \base{\Sigma}(q.c) = D[\seq{\sigma}] \\
-  \Sigma \vdash D[\seq{\sigma}] \wf \\
-  D \neq \clsRange \\
-  \fv(D[\seq{\sigma}]) \subseteq \seq{\alpha} \\\\
-  \tyInst{\fields{\Sigma}(D)}{\seq{\sigma}} = \bind{\seq{y}}{\seq{\sigma}'} \\
-  \fields{\Sigma}(q.c) = \scheme{\seq{\alpha}}{(\bind{\seq{y}}{\seq{\sigma}'} \concat \bind{\seq{x}}{\seq{\tau}})} \\\\
-  \Sigma \vdash \tau_j \wf \quad \fv(\tau_j) \subseteq \seq{\alpha} \quad (\forall j) \\
-  \seq{\alpha} \text{ distinct} \\
-  \seq{y}\,\seq{x} \text{ distinct}
-}
-{
-  \Sigma \vdash \ClassDef[\Gamma]{q}{\seq{\chi}}{i} \wf
+  \Sigma \vdash C \wfClass
 }
 \end{mathpar}
 
@@ -231,13 +213,13 @@
 \small
 \inferrule*[lab={\ruleName{wf-class-table}}]
 {
-  \Sigma \vdash \Sigma(C) \wf \quad (\forall C \in \dom(\Sigma))
+  \Sigma \vdash C \wfClass \quad (\forall C \in \dom(\Sigma))
 }
 {
   \vdash \Sigma \wf
 }
 \end{mathpar}
 \end{AddedBlock}
-\caption{\added{Well-formed class entries and class tables}}
+\caption{\added{Well-formed classes and class tables}}
 \label{fig:well-formed-class-table}
 \end{figure}
