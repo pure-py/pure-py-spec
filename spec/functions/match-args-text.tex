@@ -1,9 +1,6 @@
-Type arguments for the type variables of $\rho$, found by one-way matching of $\rho$ against $\sigma$ and given as a
-context binding type variables at types, or for a sequence $\seq{\rho}$ against $\seq{\sigma}$. A type variable in $\rho$ is
-bound to the type at the same position in $\sigma$. A union in $\rho$ does not bind any type variable. Lists,
-dictionaries, tuples, callables and instantiations of one class are matched componentwise, and the contexts given by
-the components are composed by $\override$. Two equal types match with the empty context. The clauses apply in
-order. The matching is undefined in every other case, such as a type variable or union in $\sigma$ at the position
-of a type of another form in $\rho$, and is undefined for a sequence if it is undefined for a component. The
-instance of a class below an instantiation of one of its base classes is found by matching
-(\ruleName{instance-below}).
+Type arguments for the type variables of $\rho$, found by one-way matching of $\rho$ against $\sigma$, or of
+$\seq{\rho}$ against $\seq{\sigma}$. A union in $\rho$ does not bind any type variable, since the disjunct matched by
+the type at the same position in $\sigma$ is not determined. The matching is undefined for a type variable or union in
+$\sigma$ at the position of a type of another form in $\rho$, since the two types may or may not be equivalent at some
+instantiation of the type variables of $\rho$. The clauses apply in order. The instance of a class below an
+instantiation of one of its ancestors is found by matching (\ruleName{instance-below}).

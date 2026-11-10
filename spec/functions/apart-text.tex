@@ -1,6 +1,4 @@
-Whether $\rho$ and $\sigma$ differ at some position outside type variables and unions, or $\seq{\rho}$ and
-$\seq{\sigma}$ at some component, so that no instantiation of the type variables of $\rho$ makes $\rho$ equivalent to
-$\sigma$. Two types at the same position differ if neither is a type variable or union and the types differ in form,
-in primitive type or in class. Two sequences differ if their lengths differ or a component differs. The clauses apply
-in order. A class is incomparable with an instantiation of one of its ancestors if the type arguments of the two
-instantiations of the ancestor are apart (\ruleName{incomparable-below}).
+Whether $\rho$ and $\sigma$, or $\seq{\rho}$ and $\seq{\sigma}$, differ at some position outside type variables and
+unions, in which case no instantiation of the type variables of $\rho$ makes $\rho$ equivalent to $\sigma$. The
+clauses apply in order. A class is incomparable with an instantiation of one of its ancestors if the type arguments of
+the two instantiations of the ancestor are apart (\ruleName{incomparable-below}).
