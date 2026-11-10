@@ -136,12 +136,36 @@
   \Sigma \vdash \TypeAlias[\Gamma]{q}{\seq{\chi}}{i} \wf
 }
 \and
-\inferrule*[lab={\ruleName{wf-other}}]
+\inferrule*[lab={\ruleName{wf-unbound}}]
 {
-  \theta \in \set{\Unbound, \TypeVar, \modStub{q}, \predefName}
+  \strut
 }
 {
-  \Sigma \vdash \theta \wf
+  \Sigma \vdash \Unbound \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-type-var}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \TypeVar \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-mod}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \modStub{q} \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-predef}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \predefName \wf
 }
 \end{mathpar}
 
