@@ -31,8 +31,9 @@ purepy-conformance --type-checker "purepy --check" purepy
 ```
 
 The type checker rejects a program by exit status 5 if it uses a feature excluded from this version, and otherwise
-by 1 if outside the syntax of PurePy and 3 if ill-formed. The interpreter must give the recorded Python outcome, or
-report undefined behaviour by exit status 4 when the run has undefined behaviour in PurePy.
+by 1 if outside the syntax of PurePy and 3 if ill-formed. The interpreter must give the recorded Python outcome,
+except that a PurePy implementation must exit with status 4 on the tests under `undefined`. A PurePy implementation
+identifies itself by printing `purepy` when given the option `--implementation`.
 
 ## Release workflow
 
