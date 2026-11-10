@@ -196,10 +196,10 @@
   \Sigma \vdash \Gamma \wf \\
   \tyvars(\Gamma) = \varnothing \\
   \dom(\classTable{\Gamma}(q, \seq{\chi})) \subseteq \dom(\Sigma) \\\\
-  \Sigma \vdash D[\seq{\sigma}] \wf, \; D \neq \clsRange, \; \fv(D[\seq{\sigma}]) \subseteq \seq{\alpha} \text{ if }
-  \base{\Sigma}(C) = D[\seq{\sigma}] \\\\
+  \Sigma \vdash D[\seq{\sigma}] \wf \quad D \neq \clsRange \quad \fv(D[\seq{\sigma}]) \subseteq \seq{\alpha} \quad
+  (\text{if } \base{\Sigma}(C) = D[\seq{\sigma}]) \\\\
   \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}} \\
-  \Sigma \vdash \tau_j \wf, \; \fv(\tau_j) \subseteq \seq{\alpha} \quad (\forall j) \\
+  \Sigma \vdash \tau_j \wf \quad \fv(\tau_j) \subseteq \seq{\alpha} \quad (\forall j) \\
   \seq{x} \text{ distinct}
 }
 {
