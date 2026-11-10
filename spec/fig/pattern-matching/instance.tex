@@ -32,6 +32,39 @@
   \Sigma \vdash C[\seq{\sigma}] \instanceAt \replaced{D[\seq{\sigma}']}{\tau}
 }
 \end{mathpar}
-\caption{Instance of a class at a type}
+\begin{AddedBlock}
+\flushleft \shadebox{$\Sigma \vdash C \parallel \tau$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{incomparable-unrelated}}]
+{
+  C \notin \ancestors{\Sigma}(D) \\
+  D \notin \ancestors{\Sigma}(C)
+}
+{
+  \Sigma \vdash C \parallel D[\seq{\sigma}]
+}
+\and
+\inferrule*[lab={\ruleName{incomparable-below}}]
+{
+  \typeParams{\Sigma}(C) = \seq{\alpha} \\
+  \ancestor{\Sigma}(C[\seq{\alpha}], D) = D[\seq{\rho}] \\
+  \apart(\seq{\rho}, \seq{\sigma})
+}
+{
+  \Sigma \vdash C \parallel D[\seq{\sigma}]
+}
+\and
+\inferrule*[lab={\ruleName{incomparable-other}}]
+{
+  \tau \text{ a list, dictionary, tuple, callable or literal type,} \\\\
+  \text{or a primitive type other than } \tyObject \text{ and } \tyNever
+}
+{
+  \Sigma \vdash C \parallel \tau
+}
+\end{mathpar}
+\end{AddedBlock}
+\caption{Instance of a class at a type\added{, and class incomparable with a type}}
 \label{fig:instance}
 \end{figure}

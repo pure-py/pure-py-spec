@@ -2,8 +2,7 @@ Type arguments for the type variables of $\rho$, found by one-way matching of $\
 context binding type variables at types, or for a sequence $\seq{\rho}$ against $\seq{\sigma}$. A type variable in $\rho$ is
 bound to the type at the same position in $\sigma$, and a union in $\rho$ binds nothing; lists, dictionaries, tuples,
 callables and instantiations of one class are matched componentwise, with the contexts of the components composed
-by $\override$; and two equal types match with the empty context. The matching is $\undetermined$ when a type
-variable or union in $\sigma$ meets a type of another form in $\rho$, which may or may not be equivalent to it at some
-instantiation of the type variables of $\rho$, and $\clash$ when two types of other forms differ, which no
-instantiation makes equivalent. The clauses apply in order. The instance of a class below an instantiation of one
-of its base classes is found by matching (\ruleName{instance-below}).
+by $\override$; and two equal types match with the empty context. The clauses apply in order. The matching is
+undefined in every other case, such as a type variable or union in $\sigma$ at the position of a type of another form
+in $\rho$, and is undefined for a sequence if it is undefined for a component. The instance of a class below an
+instantiation of one of its base classes is found by matching (\ruleName{instance-below}).

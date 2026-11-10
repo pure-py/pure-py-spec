@@ -11,6 +11,7 @@ $\Sigma; \Gamma \vdash k, p \matches K, L$ & pattern $p$ matches shapes $K$ of $
 $\Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L$ & patterns $\seq{p}$ match shapes $K$ of $\seq{k}$, leaving $L$ & \judgementFigref{match-shapes}{typing-pat-seq} \\
 $\Sigma; \Gamma \vdash L, p \matches K, L'$ & pattern $p$ matches shapes $K$ of $L$, leaving $L'$ & \judgementFigref{match-set}{typing-pat-set} \\
 $\Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$ & $C[\seq{\sigma}]$ is the instance of $C$ at $\tau$ & \judgementFigref{instance}{instance} \\
+\added{$\Sigma \vdash C \parallel \tau$} & \added{class $C$ is incomparable with $\tau$} & \added{\judgementFigref{incomparable}{instance}} \\
 $\Sigma \vdash \tau \needsEq \xi$ & equality at $\tau$ needs equality at type variable $\xi$, or at a callable type if $\xi$ is $\varepsilon$ & \judgementFigref{needs-eq-type}{needs-eq-type} \\
 $\Sigma \vdash C \needsEq \xi$ & equality at class $C$ needs equality at its type parameter $\xi$, or at a callable type if $\xi$ is $\varepsilon$ & \judgementFigref{needs-eq-class}{needs-eq-class} \\
 $\Sigma; \Gamma \vdash p \checks \tau \binding \Delta$ & pattern $p$ checks against type $\tau$, binding $\Delta$ & \judgementFigref{check-pattern}{checking-pat} \\
