@@ -245,7 +245,7 @@ wheels = [
 
 [[package]]
 name = "purepy-conformance"
-version = "0.27.5"
+version = "0.27.6"
 source = { editable = "." }
 
 [package.dev-dependencies]
