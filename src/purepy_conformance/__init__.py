@@ -120,6 +120,29 @@ def runtime(interpreter: list[str]) -> Runtime | None:
     return {"CPython": Runtime.CPYTHON, "GraalVM": Runtime.GRAALPY}.get(implementation)
 
 
+IMPLEMENTATION_OPTION = "--implementation"
+PUREPY = "purepy"
+
+
+def is_purepy(interpreter: list[str]) -> bool:
+    """Whether interpreter identifies itself as a PurePy implementation"""
+    proc = run([*interpreter, IMPLEMENTATION_OPTION])
+    return proc.returncode == 0 and proc.stdout.strip() == PUREPY
+
+
+def python_runtime(interpreter: list[str]) -> Runtime | None:
+    """Runtime of a Python implementation, None for a PurePy implementation; exit if neither or both"""
+    purepy, python = is_purepy(interpreter), runtime(interpreter)
+    name = shlex.join(interpreter)
+    if purepy and python is not None:
+        sys.exit(f"interpreter {name} identifies as both a PurePy and a Python implementation")
+    if not purepy and python is None:
+        sys.exit(
+            f"interpreter {name} identifies as neither a PurePy nor a known Python implementation"
+        )
+    return python
+
+
 def main_module(test: pathlib.Path) -> pathlib.Path:
     return test / MAIN if test.is_dir() else test
 
@@ -208,10 +231,12 @@ class Runner(Results):
     python_mode: bool
     check_messages: bool
     runtime: Runtime | None = field(init=False)
+    purepy: bool = field(init=False)
 
     def __post_init__(self) -> None:
         super().__init__()
-        self.runtime = None if self.interpreter is None else runtime(self.interpreter)
+        self.runtime = None if self.interpreter is None else python_runtime(self.interpreter)
+        self.purepy = self.interpreter is not None and self.runtime is None
 
     def run_type_checker(self, test: pathlib.Path) -> subprocess.CompletedProcess[str]:
         """Type-check copy of test, so that tests can't interfere and suite stays unchanged"""
@@ -259,16 +284,25 @@ class Runner(Results):
         args_path = path.with_suffix(ARGS)
         args = args_path.read_text().splitlines() if args_path.exists() else []
         proc = run([*self.interpreter, path.name, *args], cwd=path.parent)
+        failures = self.check_run(path, proc, outcome, undefined)
+        return failures if self.runtime is None else under_bug("run", failures, path, self.runtime)
+
+    def check_run(
+        self,
+        path: pathlib.Path,
+        proc: subprocess.CompletedProcess[str],
+        outcome: PythonOutcome,
+        undefined: bool,
+    ) -> list[str]:
+        """Exit status 4 from a PurePy implementation on exactly the undefined tests, else Python outcome"""
+        if self.purepy and (proc.returncode == Exit.UNDEFINED) != undefined:
+            expected = int(Exit.UNDEFINED) if undefined else "the Python outcome"
+            return [f"run: exit {proc.returncode}, expected {expected}: {proc.stderr.strip()}"]
+        if self.purepy and undefined:
+            return []
         both = path.with_suffix(EXPECTED).exists() and path.with_suffix(EXCEPTION_EXPECTED).exists()
         succeeds = proc.returncode == 0 if both else outcome == PythonOutcome.SUCCEEDS
-        failures = (
-            []
-            if undefined and proc.returncode == Exit.UNDEFINED
-            else check_output(path, proc)
-            if succeeds
-            else check_exception(path, proc)
-        )
-        return failures if self.runtime is None else under_bug("run", failures, path, self.runtime)
+        return check_output(path, proc) if succeeds else check_exception(path, proc)
 
     def run_test(self, suite: pathlib.Path, test: pathlib.Path) -> list[str]:
         """Run test, taking Python and PurePy outcomes from first two directories of path within suite"""
@@ -339,7 +373,13 @@ def figure_numbers() -> FigureNumbers:
 
 def check_conformance(argv: Sequence[str] | None = None) -> Runner:
     parser = argparse.ArgumentParser(prog="purepy-conformance")
-    parser.add_argument("interpreter", nargs="?", default="python3")
+    parser.add_argument(
+        "interpreter",
+        nargs="?",
+        default="python3",
+        help="command which runs the module at the path appended to it, a PurePy implementation if it "
+        f"answers {IMPLEMENTATION_OPTION} with {PUREPY}, or a Python implementation (default: python3)",
+    )
     parser.add_argument(
         "--type-checker",
         default="purepy --check",
