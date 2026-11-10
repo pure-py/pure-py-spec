@@ -46,18 +46,18 @@ are below $D[\seq{\sigma}]$, then two instantiation candidates below $D[\seq{\si
 \begin{AddedBlock}
 A pattern is checked at the disjuncts of a union separately (\ruleName{check-union}), so the type $\tau$ at which
 an instance is taken is never a union. If $\tau$ is an instantiated class $D[\seq{\sigma}]$ with $C$ an ancestor of
-$D$, the instance is the instantiation of $C$ reached from $D[\seq{\sigma}]$ along the base classes, which is unique
+$D$, the instance is the instantiation of $C$ above $D[\seq{\sigma}]$, which is unique
 because type arguments are invariant (\ruleName{instance-above}). If $D$ is an ancestor of $C$, the type arguments
-of the instance are found by matching the type arguments of the instantiation of $D$ reached from $C$ along the
-base classes against $\seq{\sigma}$ (\ruleName{instance-below}). At \tyObject{} and at \tyNever{} every
+of the instance are found by matching the type arguments of the instantiation of $D$ above $C$ applied to its type
+parameters against $\seq{\sigma}$ (\ruleName{instance-below}). At \tyObject{} and at \tyNever{} every
 instantiation of $C$ is comparable with $\tau$, so the instance is defined only if $C$ has no type parameters
 (\ruleName{instance-object}, \ruleName{instance-above}).
 
 So that no value typed at $\tau$ is an object of $C$ or of a subclass of $C$, a constructor pattern binds its
 variables at \tyNever{} only if its class $C$ is \emph{incomparable} with $\tau$ (\ruleName{check-constr-none}). A
 class is incomparable with an instantiated class if neither class is an ancestor of the other
-(\ruleName{incomparable-unrelated}), or if the type arguments of the instantiation of the ancestor reached from $C$
-are \emph{apart} from $\seq{\sigma}$, differing at some position outside type variables and unions, so that no
+(\ruleName{incomparable-unrelated}), or if the type arguments of the instantiation of the ancestor above $C$ applied to its
+type parameters are \emph{apart} from $\seq{\sigma}$, differing at some position outside type variables and unions, so that no
 instantiation of the type parameters of $C$ makes the two equivalent (\ruleName{incomparable-below}); a class is also incomparable with
 a list, dictionary, tuple, callable or literal type, and with a primitive type other than \tyObject{} and \tyNever{}
 (\ruleName{incomparable-other}). If the instance of $C$ at $\tau$ is undefined and $C$ is not incomparable with
