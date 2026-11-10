@@ -49,10 +49,10 @@ of $C$ or of a subclass of $C$, so the pattern binds its variables at \tyNever{}
 class $C$ is incomparable with an instantiated class $D[\seq{\sigma}]$ if neither class is an ancestor of the other
 (\ruleName{incomparable-unrelated}), or if the type arguments of the instantiation of $D$ above $C$ applied to its
 type parameters are \emph{apart} from $\seq{\sigma}$, differing at some position outside type variables and unions, so that no
-instantiation of the type parameters of $C$ makes the two equivalent (\ruleName{incomparable-below}). If the instance of $C$ at $\tau$ is undefined and $C$ is not incomparable with
-$\tau$, a constructor pattern naming $C$ is ill-formed. This is the case at a type variable, which may stand for
-any type, at \tyObject{} and at \tyNever{} if $C$ has type parameters, and at an instantiated class at which
-matching does not determine the instance and the type arguments are not apart.
+instantiation of the type parameters of $C$ makes the two equivalent (\ruleName{incomparable-below}). Constructor patterns are therefore ill-formed at type variables, which may stand for any type. Constructor patterns
+naming classes with type parameters are also ill-formed at \tyObject{} and \tyNever. For example,
+\pyinline{Node[int, str]} and \pyinline{Node[int, bool]} both lie below \pyinline{Tree[int]}, so a pattern naming
+\pyinline{Node} is ill-formed at \pyinline{Tree[int]}.
 \end{AddedBlock}
 
 \subsubsection{Shapes and shape typing}\label{sec:shapes}
