@@ -6,7 +6,7 @@
 \auxrow{$\typeContext{\Gamma}(q, \seq{\chi}, i)$}{context}{context resolving type expressions of definition $\chi_i$ of mutual type region $\seq{\chi}$ of module $q$ under $\Gamma$}{aux:type-context}
 \auxrow{$\classTable{\Gamma}(q, \seq{\chi}, i)$, $\classTable{\Gamma}(q, \seq{\chi})$}{class table}{class table contributed by definition $\chi_i$, or by all definitions, of mutual type region $\seq{\chi}$ of module $q$ under $\Gamma$}{aux:class-table}
 \auxrow{$\scopeS(\seq{y}, s)$}{context}{each variable declared or assigned in $s$ unbound; defined iff parameters or imported names $\seq{y}$, names declared in $s$, and pattern variables of $s$ are distinct and pairwise disjoint}{aux:scope}
-\auxrow{$\binds(p)$, $\binds(\seq{g})$, $\binds(s)$}{set of variables}{variables bound by pattern $p$, by generators of qualifiers $\seq{g}$, or by patterns within statement $s$}{aux:binds}
+\auxrow{$\binds(p)$, \added{$\binds(\seq{p})$, }$\binds(\seq{g})$, $\binds(s)$}{set of variables}{variables bound by pattern $p$, \added{by patterns $\seq{p}$, }by generators of qualifiers $\seq{g}$, or by patterns within statement $s$}{aux:binds}
 \auxrow{$\captures(e)$}{set of variables}{variables of enclosing scope captured by lambdas in $e$}{aux:captures-e}
 \auxrow{$\captures(\seq{g})$}{set of variables}{variables of enclosing scope captured by lambdas in qualifiers $\seq{g}$}{aux:captures}
 \auxrow{$\fv(e)$, $\fv(\seq{e})$, $\fv(\tau)$}{set of variables}{free variables of expression $e$, or of each expression in $\seq{e}$; type variables of type $\tau$}{aux:fv}
