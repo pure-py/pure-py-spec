@@ -58,9 +58,7 @@ variables at \tyNever{} only if its class $C$ is \emph{incomparable} with $\tau$
 class $C$ is incomparable with an instantiated class $D[\seq{\sigma}]$ if neither class is an ancestor of the other
 (\ruleName{incomparable-unrelated}), or if the type arguments of the instantiation of $D$ above $C$ applied to its
 type parameters are \emph{apart} from $\seq{\sigma}$, differing at some position outside type variables and unions, so that no
-instantiation of the type parameters of $C$ makes the two equivalent (\ruleName{incomparable-below}); a class is also incomparable with
-a list, dictionary, tuple, callable or literal type, and with a primitive type other than \tyObject{} and \tyNever{}
-(\ruleName{incomparable-other}). If the instance of $C$ at $\tau$ is undefined and $C$ is not incomparable with
+instantiation of the type parameters of $C$ makes the two equivalent (\ruleName{incomparable-below}). If the instance of $C$ at $\tau$ is undefined and $C$ is not incomparable with
 $\tau$, a constructor pattern naming $C$ is ill-formed. This is the case at a type variable, which may stand for
 any type, at \tyObject{} and at \tyNever{} if $C$ has type parameters, and at an instantiated class at which
 matching does not determine the instance and the type arguments are not apart.

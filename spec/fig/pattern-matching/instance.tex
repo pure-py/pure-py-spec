@@ -63,13 +63,52 @@
   \Sigma \vdash C \parallel D[\seq{\sigma}]
 }
 \and
-\inferrule*[lab={\ruleName{incomparable-other}}]
+\inferrule*[lab={\ruleName{incomparable-list}}]
 {
-  \tau \text{ a list, dictionary, tuple, callable or literal type,} \\\\
-  \text{or a primitive type other than } \tyObject \text{ and } \tyNever
+  \strut
 }
 {
-  \Sigma \vdash C \parallel \tau
+  \Sigma \vdash C \parallel \tyList{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{incomparable-dict}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash C \parallel \tyDict{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{incomparable-tuple}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash C \parallel \tyTuple{\seq{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{incomparable-callable}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash C \parallel \tyCallable{\seq{\sigma}}{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{incomparable-literal}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash C \parallel \tyLiteral{\ell}
+}
+\and
+\inferrule*[lab={\ruleName{incomparable-prim}}]
+{
+  \nu \notin \set{\tyObject, \tyNever}
+}
+{
+  \Sigma \vdash C \parallel \nu
 }
 \end{mathpar}
 \subcaption{Class $C$ is incomparable with $\tau$}
