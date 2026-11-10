@@ -73,7 +73,7 @@ jobs:
 
       - name: Generate LaTeX macros and anonymised root file
         run: |
-          make tex/python-version.tex tex/mypy-version.tex tex/anon-name.tex
+          make tex/python-version.tex tex/mypy-version.tex tex/anon-name.tex tex/mechanisation-names.tex
           printf '\\def\\anonmode{}\\input{PurePy-spec}\n' > spec-anon.tex
 
       - name: Build LaTeX document

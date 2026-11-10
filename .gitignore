@@ -23,3 +23,5 @@ src/purepy_conformance/figure-numbers.json
 tex/anon-name.tex
 tex/mypy-version.tex
 tex/python-version.tex
+.mechanisation/
+tex/mechanisation-names.tex
