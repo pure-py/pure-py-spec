@@ -55,12 +55,28 @@
   \Sigma \vdash \tyUnion{\sigma}{\tau} \wf
 }
 \and
-\inferrule*[lab={\ruleName{wf-ty-other}}]
+\inferrule*[lab={\ruleName{wf-ty-prim}}]
 {
-  \tau \text{ a primitive type, literal type or type variable}
+  \strut
 }
 {
-  \Sigma \vdash \tau \wf
+  \Sigma \vdash \nu \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-ty-literal}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \tyLiteral{\ell} \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-ty-var}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \alpha \wf
 }
 \end{mathpar}
 
