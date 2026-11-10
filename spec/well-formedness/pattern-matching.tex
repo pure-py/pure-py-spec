@@ -55,8 +55,8 @@ instantiation of $C$ is comparable with $\tau$, so the instance is defined only 
 
 So that no value typed at $\tau$ is an object of $C$ or of a subclass of $C$, a constructor pattern binds its
 variables at \tyNever{} only if its class $C$ is \emph{incomparable} with $\tau$ (\ruleName{check-constr-none}). A
-class is incomparable with an instantiated class if neither class is an ancestor of the other
-(\ruleName{incomparable-unrelated}), or if the type arguments of the instantiation of the ancestor above $C$ applied to its
+class $C$ is incomparable with an instantiated class $D[\seq{\sigma}]$ if neither class is an ancestor of the other
+(\ruleName{incomparable-unrelated}), or if the type arguments of the instantiation of $D$ above $C$ applied to its
 type parameters are \emph{apart} from $\seq{\sigma}$, differing at some position outside type variables and unions, so that no
 instantiation of the type parameters of $C$ makes the two equivalent (\ruleName{incomparable-below}); a class is also incomparable with
 a list, dictionary, tuple, callable or literal type, and with a primitive type other than \tyObject{} and \tyNever{}
