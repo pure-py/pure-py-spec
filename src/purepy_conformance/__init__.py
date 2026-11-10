@@ -109,11 +109,15 @@ class Runtime(StrEnum):
 RUNTIME_QUERY = "import platform, sys; print(platform.python_implementation(), sys.platform)"
 
 
-def runtime(interpreter: list[str]) -> Runtime:
-    implementation, system = run([*interpreter, "-c", RUNTIME_QUERY]).stdout.split()
+def runtime(interpreter: list[str]) -> Runtime | None:
+    """None unless interpreter reports itself as a known Python implementation"""
+    answer = run([*interpreter, "-c", RUNTIME_QUERY]).stdout.split()
+    if len(answer) != 2:
+        return None
+    implementation, system = answer
     if system == "emscripten":
         return Runtime.PYODIDE
-    return {"CPython": Runtime.CPYTHON, "GraalVM": Runtime.GRAALPY}[implementation]
+    return {"CPython": Runtime.CPYTHON, "GraalVM": Runtime.GRAALPY}.get(implementation)
 
 
 def main_module(test: pathlib.Path) -> pathlib.Path:

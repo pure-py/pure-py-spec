@@ -52,10 +52,8 @@ the statement rules. A final
 premise needs no propagation rule; earlier premises have one each, recording the subexpressions evaluated
 before the failing one (\specfigref{eval-propagation}). The sequence judgement uses 
 results carrying a sequence of values in place of a value.
-\paperinput{paper/operational-semantics/evaluation-example}
 
-\specinput{spec/operational-semantics/auxiliary}
-\paperinput{paper/operational-semantics/operators}
+\input{spec/operational-semantics/auxiliary}
 
 \subsection{Expressions and statements}
 \label{sec:eval-expressions}
@@ -69,71 +67,69 @@ function at closed types}{Values typed at a type scheme are also typed at the in
 (\ruleName{val-inst}) }, matching the instantiation of names bound at a scheme by the \ruleName{var-scheme} rule.
 The statement evaluation judgement $\rho, s \Rightarrow o$ says that $s$ evaluates
 to outcome $o$ in $\rho$ (\specfigrefTwo{eval-block-outcome}{eval-block-fails}). An \pyinline{if} or
-\pyinline{assert} statement aborts with $\errExcluded$ when a condition evaluates to a non-Boolean\speconly{ (\ruleName{eval-if-nonbool}, \ruleName{eval-if-else-nonbool}, \ruleName{eval-assert-nonbool},
-\ruleName{eval-assert-msg-nonbool})}, and a failing \pyinline{assert} statement also aborts with $\errExcluded$ when
-its message is not a string\speconly{ (\ruleName{eval-assert-msg-nonstr})}. Top-level statements
+\pyinline{assert} statement aborts with $\errExcluded$ when a condition evaluates to a non-Boolean (\ruleName{eval-if-nonbool}, \ruleName{eval-if-else-nonbool}, \ruleName{eval-assert-nonbool},
+\ruleName{eval-assert-msg-nonbool}), and a failing \pyinline{assert} statement also aborts with $\errExcluded$ when
+its message is not a string (\ruleName{eval-assert-msg-nonstr}). Top-level statements
 are evaluated by a separate judgement, $q, \rho, t \Rightarrow o$ (\specfigref{eval-top-level}), mirroring the static
-judgement (\specfigref{typing-top-level}): a sequence composes in the same way as a statement sequence, a mutual type region binds each of its names to $\typeEntry{\Gamma}(q, \seq{\chi}, i)$\speconly{ (\ruleName{eval-types})}, since
-class and alias entries are also values, and a plain statement is evaluated by the statement judgement\speconly{
-(\ruleName{eval-top-stmt})}. Function definitions delimit
-the scope of sequential-composition effects, so as black boxes functions are always pure. The auxiliary function $\result$\speconly{ (\S\ref{aux:result})} reads the outcome of a statement as
-the result of a call\speconly{; if the statement completes without returning, the result is $\val{\pyinline{None}}$.}\paperonly{:}
-\paperinput{paper/operational-semantics/result}
+judgement (\specfigref{typing-top-level}): a sequence composes in the same way as a statement sequence, a mutual type region binds each of its names to $\typeEntry{\Gamma}(q, \seq{\chi}, i)$ (\ruleName{eval-types}), since
+class and alias entries are also values, and a plain statement is evaluated by the statement judgement
+(\ruleName{eval-top-stmt}). Function definitions delimit
+the scope of sequential-composition effects, so as black boxes functions are always pure. The auxiliary function $\result$ (\S\ref{aux:result}) reads the outcome of a statement as
+the result of a call; if the statement completes without returning, the result is $\val{\pyinline{None}}$.
 
 The expression evaluation judgement $\rho, e \Rightarrow r$ (\specfigrefTwo{eval-result}{eval-fails}) says that $e$ evaluates to
 result $r$ in $\rho$, where $r$ is either $\val{v}$ or $\aborts{\kappa}$ (\figref{values}). A variable
-not bound in $\rho$, or bound to $\Unbound$, aborts with $\errName$\speconly{ (\ruleName{eval-var-unknown},
-\ruleName{eval-var-unbound})}. Function calls and constructor calls share one syntactic form, as do subscripting a container and applying a class to
+not bound in $\rho$, or bound to $\Unbound$, aborts with $\errName$ (\ruleName{eval-var-unknown},
+\ruleName{eval-var-unbound}). Function calls and constructor calls share one syntactic form, as do subscripting a container and applying a class to
 type arguments; the semantics distinguishes them by the value of the callee or subject. A call whose
 callee evaluates to a class is a constructor call, and a subscript expression whose subject evaluates to a class evaluates to the
-class itself, since values carry no type arguments\speconly{ (\ruleName{eval-constr}, \ruleName{eval-class-type-args})}. A call of a value other than a closure, primitive or class, a call with the wrong number
+class itself, since values carry no type arguments (\ruleName{eval-constr}, \ruleName{eval-class-type-args}). A call of a value other than a closure, primitive or class, a call with the wrong number
 of arguments, and a constructor call with arguments which do not cover the fields of the class, abort with
-$\errType$\speconly{ (\ruleName{eval-call-nonfun}, \ruleName{eval-call-lambda-arity}, \ruleName{eval-call-def-arity},
-\ruleName{eval-constr-arity})}, and a reference to an attribute absent from an object or a loaded module aborts with $\errAttr$\speconly{
-(\ruleName{eval-attr-object-missing}, \ruleName{eval-attr-module-missing})}, as in Python. The operators
+$\errType$ (\ruleName{eval-call-nonfun}, \ruleName{eval-call-lambda-arity}, \ruleName{eval-call-def-arity},
+\ruleName{eval-constr-arity}), and a reference to an attribute absent from an object or a loaded module aborts with $\errAttr$
+(\ruleName{eval-attr-object-missing}, \ruleName{eval-attr-module-missing}), as in Python. The operators
 \pyinline{and} and \pyinline{or} evaluate their second operand only when the first leaves the result open, aborting with $\errExcluded$ if the first operand is
-not a Boolean\speconly{ (\ruleName{eval-and-nonbool}, \ruleName{eval-or-nonbool})}, and
+not a Boolean (\ruleName{eval-and-nonbool}, \ruleName{eval-or-nonbool}), and
 a conditional expression requires its condition to be a Boolean, like the
-\pyinline{if} statement\speconly{ (\ruleName{eval-if})}, aborting with $\errExcluded$ otherwise\speconly{
-(\ruleName{eval-cond-nonbool})}.
+\pyinline{if} statement (\ruleName{eval-if}), aborting with $\errExcluded$ otherwise
+(\ruleName{eval-cond-nonbool}).
 
 A comprehension evaluates its body once for each binding produced by its qualifiers, and
 concatenates the results; a generator draws its bindings from the elements of a value, given by the auxiliary
-function $\iterOp$\speconly{ (\S\ref{aux:iter})}: the elements of a
+function $\iterOp$ (\S\ref{aux:iter}): the elements of a
 list, tuple, string or range, and the keys of a dictionary, as in Python. A generator over a
-value other than a list, tuple, string, dictionary or range aborts with $\errType$\speconly{
-(\ruleName{eval-qual-generator-nonseq})}, as in Python, and a guard aborts with $\errExcluded$ if it
-evaluates to a non-Boolean\speconly{ (\ruleName{eval-qual-guard-nonbool})}.
+value other than a list, tuple, string, dictionary or range aborts with $\errType$
+(\ruleName{eval-qual-generator-nonseq}), as in Python, and a guard aborts with $\errExcluded$ if it
+evaluates to a non-Boolean (\ruleName{eval-qual-guard-nonbool}).
 Dictionary expressions and comprehensions with keys other than strings abort with
-$\errExcluded$\speconly{ (\ruleName{eval-dict-nonstr}, \ruleName{eval-dict-comp-nonstr})}, as do subscripting and
+$\errExcluded$ (\ruleName{eval-dict-nonstr}, \ruleName{eval-dict-comp-nonstr}), as do subscripting and
 membership with such a key; Python raises \pyinline{TypeError} only for keys it cannot hash, such as lists, but \PurePy
 has no notion of hashing and cannot distinguish them from other keys.
 Subscripting is given by the auxiliary function $\getitem$, and membership by
-$\inOp{\Sigma}$\speconly{ (\S\ref{aux:getitem}, \S\ref{aux:in})}; both abort with $\errExcluded$ for a range, as does
+$\inOp{\Sigma}$ (\S\ref{aux:getitem}, \S\ref{aux:in}); both abort with $\errExcluded$ for a range, as does
 subscripting for a Boolean index, which Python treats as the integer 0 or 1. An attribute reference on a
-value other than a module or object aborts with $\errExcluded$\speconly{ (\ruleName{eval-attr-nonobject})}. In this version of \PurePy such values have no attributes, whereas in Python a string, for example, has methods; a reference rejected by Python with \pyinline{AttributeError} also aborts with $\errExcluded$, since \PurePy does not keep track of which attributes Python provides.
+value other than a module or object aborts with $\errExcluded$ (\ruleName{eval-attr-nonobject}). In this version of \PurePy such values have no attributes, whereas in Python a string, for example, has methods; a reference rejected by Python with \pyinline{AttributeError} also aborts with $\errExcluded$, since \PurePy does not keep track of which attributes Python provides.
 
-\specinput{spec/fig/value-env-typing}
+\input{spec/fig/value-env-typing}
 
-\specinput{spec/fig/eval-outcome}
+\input{spec/fig/eval-outcome}
 
 \subsection{Pattern matching}
 \label{sec:eval-patterns}
 
 A \pyinline{match} statement takes the first case whose pattern matches the value, running its body under
 the bindings produced by the pattern, and does nothing if no case matches; the auxiliary function
-$\dispatch$\speconly{ (\S\ref{aux:dispatch})} selects the matching case.
-\paperinput{paper/operational-semantics/match}%
-Whether a pattern matches is determined by the auxiliary function $\matchOp{\Sigma}(\rho, p, v)$\speconly{
-(\S\ref{aux:match})}. A \emph{match result} $m$ is
+$\dispatch$ (\S\ref{aux:dispatch}) selects the matching case.
+Whether a pattern matches is determined by the auxiliary function $\matchOp{\Sigma}(\rho, p, v)$
+(\S\ref{aux:match}). A \emph{match result} $m$ is
 $\matchOk{\rho'}$, a match, where $\rho'$ binds the variables of the pattern to the values that they matched;
 $\noMatch$, a failure to match; or a termination kind $\kappa$, if matching aborts, such as $\errUndef$ for a numeric literal pattern if the equality of the literal and the value is undefined. When
-matching aborts with $\kappa$ before any pattern matches, $\dispatch$ gives $\kappa$, and the run aborts with $\kappa$\speconly{ (\ruleName{eval-match-abort})}.
-\speconly{Matching a list pattern against a tuple, a tuple pattern against a list, or either against a range
+matching aborts with $\kappa$ before any pattern matches, $\dispatch$ gives $\kappa$, and the run aborts with $\kappa$ (\ruleName{eval-match-abort}).
+Matching a list pattern against a tuple, a tuple pattern against a list, or either against a range
 aborts with $\errExcluded$ (\S\ref{aux:match}); a constructor pattern against an object aborts with $\errType$ or
 $\errExcluded$ when the sub-patterns do not cover the fields of the class (\S\ref{aux:match-fields}). A constructor pattern
 whose head does not denote a class aborts with $\errName$, $\errAttr$ or $\errType$, as in Python, or with $\errExcluded$
-for a predefined class such as \pyinline{int}, which Python matches by an instance test (\S\ref{aux:match}).}
+for a predefined class such as \pyinline{int}, which Python matches by an instance test (\S\ref{aux:match}).
 \begin{specdefinition}{Composition of match results}
 The match results of sub-patterns compose with
 $\override$, matching sequentially, so that the first failure or abort determines the result:
@@ -145,38 +141,34 @@ $\override$, matching sequentially, so that the first failure or abort determine
 
 \noindent with $\matchOk{\varnothing}$ as left and right unit.
 \end{specdefinition}
-\paperinput{paper/operational-semantics/pattern-list}%
 A constructor pattern matches any object
 whose class has the pattern's class among its ancestors, and its sub-patterns bind the fields of the
-pattern's class\paperonly{:}\speconly{.}
-\paperinput{paper/operational-semantics/pattern-constr}%
+pattern's class.
 Since an object records its class by name, the class test of $\matchOp{\Sigma}$ is a comparison of
 fully-qualified names.
 
 \subsection{Modules and programs}\label{sec:eval-programs}
 
-\speconly{Module and program evaluation are defined in \figref{eval-modules}.}\paperonly{Module and program evaluation
-are defined in full in \specfigref{eval-modules}.} A program runs each module body once, after its imports have loaded,
-in \emph{load order}\speconly{ (\specref{aux:loads})}. Load order is fixed by the imports alone, since imports
+Module and program evaluation are defined in \figref{eval-modules}. A program runs each module body once, after its imports have loaded,
+in \emph{load order} (\specref{aux:loads}). Load order is fixed by the imports alone, since imports
 precede statements and so cannot depend on the outcome of a statement. Module evaluation
 $q, \mathcal{L} \Rightarrow_{\mathsf{mod}} o$ runs the body of module $q$ given the \emph{loaded module environments}
 $\mathcal{L}$, a finite map from module names to the environments of the modules loaded so far. The body runs in the
-environment corresponding to the context in which the body was checked\speconly{ (\ruleName{eval-module})}.\speconly{
+environment corresponding to the context in which the body was checked (\ruleName{eval-module}).
 Import bindings combine by context extension (Definition~\ref{def:context-extension}), which is extended to
 environments by the same equations, but with values in place of context entries and environments in place of
-contexts.}
+contexts.
 
 Evaluation of a sequence of module bodies extends $\mathcal{L}$ with the environment of each module in
-turn\speconly{ (\ruleName{eval-modules-cons})}. Following the \ruleName{module} rule (\specfigref{typing-mod}), the
+turn (\ruleName{eval-modules-cons}). Following the \ruleName{module} rule (\specfigref{typing-mod}), the
 environment of a module $q$ consists of a stub for each submodule of $q$, overridden by the environment assigned by the
 body of $q$. The program rules start from the environments $\mathcal{E}(\mathcal{A})$ of the predefined modules, given
-the command-line arguments $\mathcal{A}$\speconly{ (\ruleName{eval-program} and \ruleName{eval-program-abort})}.
+the command-line arguments $\mathcal{A}$ (\ruleName{eval-program} and \ruleName{eval-program-abort}).
 
 A program evaluates to a \emph{program result} $(\seq{v}, \kappa)$, pairing its output $\seq{v}$ with a termination
 kind $\kappa$ (\figref{values}). The output is the concatenation of the values printed by the module bodies, and the
 termination kind is $\errExit{0}$ if every module body completes normally, and otherwise the kind of the first module body to abort,
-after which nothing more is printed. $\errExit{n}$ is a run that exited with status $n$\paperonly{:}\speconly{.}
-\paperinput{paper/operational-semantics/program}%
+after which nothing more is printed. $\errExit{n}$ is a run that exited with status $n$.
 
 \begin{specdefinition}{Conformance}
 An implementation \emph{conforms} to the semantics if, for every well-formed program $\mathcal{M}$, arguments $\mathcal{A}$
@@ -187,7 +179,6 @@ $\seq{v}$ in order, each as by Python's \pyinline{str} followed by a newline, an
 
 \noindent The form in which an implementation reports the termination kind is not prescribed. An implementation also conforms if it meets this definition with the result of \pyinline{**} on floats being the nearest float below or above the exact power, not necessarily the nearer of the two. Python implementations conform, since they compute \pyinline{**} on floats with functions such as \pyinline{pow} in C and \pyinline{Math.pow} in Java, which meet this requirement.
 
-\specinput{spec/fig/eval-modules}
+\input{spec/fig/eval-modules}
 
-\specinput{spec/operational-semantics/type-soundness}
-\paperinput{paper/operational-semantics/metatheory}
+\input{spec/operational-semantics/type-soundness}
