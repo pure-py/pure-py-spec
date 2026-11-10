@@ -14,9 +14,9 @@ $\dom(\Sigma)$ is acyclic. }\added{A class table satisfies the following conditi
 \begin{AddedBlock}
 \begin{itemize}
 \item $\base{\Sigma}(C)$, if not $\bot$, is a well-formed type (Definition~\ref{def:well-formed-type}) other than
-$\clsRange$, with free type variables among $\typeParams{\Sigma}(C)$
-\item the field types in $\fields{\Sigma}(C)$ are well-formed types with free type variables among
-$\typeParams{\Sigma}(C)$
+$\clsRange$, with $\fv(\base{\Sigma}(C)) \subseteq \typeParams{\Sigma}(C)$
+\item each field type $\tau$ in $\fields{\Sigma}(C)$ is a well-formed type, with $\fv(\tau) \subseteq
+\typeParams{\Sigma}(C)$
 \item the type parameters in $\typeParams{\Sigma}(C)$ are distinct, and the field names in $\fields{\Sigma}(C)$ are
 distinct
 \item the base-class relation on $\dom(\Sigma)$ is acyclic
