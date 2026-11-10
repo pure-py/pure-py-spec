@@ -13,24 +13,24 @@
   \Sigma \vdash C[\seq{\sigma}] \instanceAt \tau
 }
 \and
-\added{\inferrule*[lab={\ruleName{instance-object}}]
+\inferrule*[lab={\ruleName{instance-object}}]
 {
   \typeParams{\Sigma}(C) = \varepsilon
 }
 {
   \Sigma \vdash C[] \instanceAt \tyObject
-}}
+}
 \and
 \inferrule*[lab={\ruleName{instance-below}}]
 {
-  \replaced{\typeParams{\Sigma}(C) = \seq{\alpha}}{\Sigma \vdash C[\seq{\sigma}] \subty \tau} \\
-  \replaced{\ancestorArgs{\Sigma}(C[\seq{\alpha}], D) = \seq{\tau}}{\seq{\sigma}' \tyEquiv \seq{\sigma} \text{ whenever } \Sigma \vdash C[\seq{\sigma}'] \subty \tau} \\
-  \added{\matchArgs(\seq{\tau}, \seq{\sigma}') = \gamma} \\
-  \added{\gamma(\alpha_i) = \sigma_i \quad (\forall i)} \\
-  \added{\Sigma \vdash C[\seq{\sigma}] \subty D[\seq{\sigma}']}
+  \typeParams{\Sigma}(C) = \seq{\alpha} \\
+  \ancestorArgs{\Sigma}(C[\seq{\alpha}], D) = \seq{\tau} \\
+  \matchArgs(\seq{\tau}, \seq{\sigma}') = \gamma \\
+  \gamma(\alpha_i) = \sigma_i \quad (\forall i) \\
+  \Sigma \vdash C[\seq{\sigma}] \subty D[\seq{\sigma}']
 }
 {
-  \Sigma \vdash C[\seq{\sigma}] \instanceAt \replaced{D[\seq{\sigma}']}{\tau}
+  \Sigma \vdash C[\seq{\sigma}] \instanceAt D[\seq{\sigma}']
 }
 \end{mathpar}
 \subcaption{$C[\seq{\sigma}]$ is the instance of $C$ at $\tau$}
@@ -39,7 +39,6 @@
 
 \vspace{2mm}
 
-\begin{AddedBlock}
 \begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Sigma \vdash C \parallel \tau$}
 \begin{mathpar}
@@ -208,7 +207,6 @@
 \subcaption{Types $\tau$ and $\sigma$, or sequences $\seq{\tau}$ and $\seq{\sigma}$, are apart}
 \label{fig:apart}
 \end{subfigure}
-\end{AddedBlock}
-\caption{\replaced{Instance of a class, incomparability and apartness}{Instance of a class at a type}}
+\caption{Instance of a class, incomparability and apartness}
 \label{fig:instance}
 \end{figure}

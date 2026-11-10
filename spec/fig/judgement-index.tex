@@ -4,11 +4,11 @@
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.55\textwidth}>{\raggedright\arraybackslash}p{0.13\textwidth}}
 \textbf{Judgement} & \textbf{Reading} & \textbf{Defined in} \\[1mm]
 \metaGroup{Well-formedness} \\
-\added{$\Sigma \vdash \tau \wf$} & \added{type $\tau$ is well-formed} & \added{\judgementFigref{wf-type}{well-formed}} \\
-\added{$\Sigma \vdash \theta \wf$} & \added{context entry $\theta$ is well-formed} & \added{\judgementFigref{wf-entry}{well-formed}} \\
-\added{$\Sigma \vdash \Gamma \wf$} & \added{context $\Gamma$ is well-formed} & \added{\judgementFigref{wf-cxt}{well-formed}} \\
-\added{$\Sigma \vdash C \wfClass$} & \added{class $C$ is well-formed} & \added{\judgementFigref{wf-class-def}{well-formed-class-table}} \\
-\added{$\vdash \Sigma \wf$} & \added{class table $\Sigma$ is well-formed} & \added{\judgementFigref{wf-class-table}{well-formed-class-table}} \\
+$\Sigma \vdash \tau \wf$ & type $\tau$ is well-formed & \judgementFigref{wf-type}{well-formed} \\
+$\Sigma \vdash \theta \wf$ & context entry $\theta$ is well-formed & \judgementFigref{wf-entry}{well-formed} \\
+$\Sigma \vdash \Gamma \wf$ & context $\Gamma$ is well-formed & \judgementFigref{wf-cxt}{well-formed} \\
+$\Sigma \vdash C \wfClass$ & class $C$ is well-formed & \judgementFigref{wf-class-def}{well-formed-class-table} \\
+$\vdash \Sigma \wf$ & class table $\Sigma$ is well-formed & \judgementFigref{wf-class-table}{well-formed-class-table} \\
 $\Sigma \vdash h : \tau$ & head $h$ has type $\tau$ & \judgementFigref{head}{head-typing} \\
 $\Sigma \vdash k : \tau$ & shape $k$ has type $\tau$ & \judgementFigref{shape}{shape-typing} \\
 $\Sigma; \Gamma \vdash k, p \splits K, L$ & shape $k$ splits at the head tested by $p$, giving $K$ and $L$ & \judgementFigref{split}{split} \\
@@ -16,8 +16,8 @@ $\Sigma; \Gamma \vdash k, p \matches K, L$ & pattern $p$ matches shapes $K$ of $
 $\Sigma; \Gamma \vdash \seq{k}, \seq{p} \matches K, L$ & patterns $\seq{p}$ match shapes $K$ of $\seq{k}$, leaving $L$ & \judgementFigref{match-shapes}{typing-pat-seq} \\
 $\Sigma; \Gamma \vdash L, p \matches K, L'$ & pattern $p$ matches shapes $K$ of $L$, leaving $L'$ & \judgementFigref{match-set}{typing-pat-set} \\
 $\Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$ & $C[\seq{\sigma}]$ is the instance of $C$ at $\tau$ & \judgementFigref{instance}{instance-at} \\
-\added{$\Sigma \vdash C \parallel \tau$} & \added{class $C$ is incomparable with $\tau$} & \added{\judgementFigref{incomparable}{incomparable}} \\
-\added{$\tau \mathrel{\#} \sigma$} & \added{$\tau$ and $\sigma$ are apart} & \added{\judgementFigref{apart}{apart}} \\
+$\Sigma \vdash C \parallel \tau$ & class $C$ is incomparable with $\tau$ & \judgementFigref{incomparable}{incomparable} \\
+$\tau \mathrel{\#} \sigma$ & $\tau$ and $\sigma$ are apart & \judgementFigref{apart}{apart} \\
 $\Sigma \vdash \tau \needsEq \xi$ & equality at $\tau$ needs equality at type variable $\xi$, or at a callable type if $\xi$ is $\varepsilon$ & \judgementFigref{needs-eq-type}{needs-eq-type} \\
 $\Sigma \vdash C \needsEq \xi$ & equality at class $C$ needs equality at its type parameter $\xi$, or at a callable type if $\xi$ is $\varepsilon$ & \judgementFigref{needs-eq-class}{needs-eq-class} \\
 $\Sigma; \Gamma \vdash p \checks \tau \binding \Delta$ & pattern $p$ checks against type $\tau$, binding $\Delta$ & \judgementFigref{check-pattern}{checking-pat} \\

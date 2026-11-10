@@ -21,7 +21,7 @@
 \and
 \inferrule*[lab={\ruleName{check-literal}}]
 {
-  \replaced{\tau \text{ has no float values if } \ell \text{ an int literal}}{\strut}
+  \tau \text{ has no float values if } \ell \text{ an int literal}
 }
 {
   \Sigma; \Gamma \vdash \ell \checks \tau \binding \varnothing
@@ -57,10 +57,10 @@
 {
   \tau \text{ has no list or range values} \\
   \text{no disjunct of } \tau \text{ a tuple type of length } |\seq{p}| \\
-  \added{\Gamma(x) = \Unbound \quad (\forall x \in \binds(\seq{p}))}
+  \Gamma(x) = \Unbound \quad (\forall x \in \binds(\seq{p}))
 }
 {
-  \Sigma; \Gamma \vdash \patTuple{\seq{p}} \checks \tau \binding \set{\bind{x}{\tyNever} \mid x \in \binds(\replaced{\seq{p}}{\patTuple{\seq{p}}})}
+  \Sigma; \Gamma \vdash \patTuple{\seq{p}} \checks \tau \binding \set{\bind{x}{\tyNever} \mid x \in \binds(\seq{p})}
 }
 \and
 \inferrule*[lab={\ruleName{check-list}}]
@@ -75,10 +75,10 @@
 {
   \tau \text{ has no tuple or range values} \\
   \text{no disjunct of } \tau \text{ a list type} \\
-  \added{\Gamma(x) = \Unbound \quad (\forall x \in \binds(\seq{p}))}
+  \Gamma(x) = \Unbound \quad (\forall x \in \binds(\seq{p}))
 }
 {
-  \Sigma; \Gamma \vdash \patList{\seq{p}} \checks \tau \binding \set{\bind{x}{\tyNever} \mid x \in \binds(\replaced{\seq{p}}{\patList{\seq{p}}})}
+  \Sigma; \Gamma \vdash \patList{\seq{p}} \checks \tau \binding \set{\bind{x}{\tyNever} \mid x \in \binds(\seq{p})}
 }
 \and
 \inferrule*[lab={\ruleName{check-dict}}]
@@ -91,11 +91,11 @@
 \and
 \inferrule*[lab={\ruleName{check-dict-none}}]
 {
-  \replaced{\tau \text{ has no dictionary values}}{\text{no disjunct of } \tau \text{ a dictionary type}} \\
-  \added{\Gamma(x) = \Unbound \quad (\forall x \in \binds(\seq{p}))}
+  \tau \text{ has no dictionary values} \\
+  \Gamma(x) = \Unbound \quad (\forall x \in \binds(\seq{p}))
 }
 {
-  \Sigma; \Gamma \vdash \patDict{\bind{\seq{w}}{\seq{p}}} \checks \tau \binding \set{\bind{x}{\tyNever} \mid x \in \binds(\replaced{\seq{p}}{\patDict{\bind{\seq{w}}{\seq{p}}}})}
+  \Sigma; \Gamma \vdash \patDict{\bind{\seq{w}}{\seq{p}}} \checks \tau \binding \set{\bind{x}{\tyNever} \mid x \in \binds(\seq{p})}
 }
 \and
 \inferrule*[lab={\ruleName{check-constr}}]
@@ -113,8 +113,8 @@
 \inferrule*[lab={\ruleName{check-constr-none}}]
 {
   \Gamma \vdash q : \Type{C} \\
-  \replaced{\Sigma \vdash C \parallel \tau}{\Sigma \nvdash \tau \subty C[\seq{\sigma}] \text{ and } \Sigma \nvdash C[\seq{\sigma}] \subty \tau \quad (\forall \seq{\sigma})} \\
-  \added{\Gamma(x) = \Unbound \quad (\forall x \in \binds(\patConstr{q}{a}))}
+  \Sigma \vdash C \parallel \tau \\
+  \Gamma(x) = \Unbound \quad (\forall x \in \binds(\patConstr{q}{a}))
 }
 {
   \Sigma; \Gamma \vdash \patConstr{q}{a} \checks \tau \binding \set{\bind{x}{\tyNever} \mid x \in \binds(\patConstr{q}{a})}
