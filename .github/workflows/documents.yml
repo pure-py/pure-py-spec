@@ -50,6 +50,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.2.0
+
+      # Outside the LaTeX container, which lacks uv
+      - name: Generate mechanisation names
+        run: make tex/mechanisation-names.tex
+
       # Make as compiler, for its checks of unresolved references; the root file, passed by the action as a further
       # target, is already up to date
       - name: Build specification
