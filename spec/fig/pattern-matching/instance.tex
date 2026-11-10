@@ -1,0 +1,212 @@
+\begin{figure}
+\setlength{\jot}{2pt}
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{instance-above}}]
+{
+  \Sigma \vdash \tau \subty C[\seq{\sigma}] \\
+  \seq{\sigma}' \tyEquiv \seq{\sigma} \text{ whenever } \Sigma \vdash \tau \subty C[\seq{\sigma}']
+}
+{
+  \Sigma \vdash C[\seq{\sigma}] \instanceAt \tau
+}
+\and
+\inferrule*[lab={\ruleName{instance-object}}]
+{
+  \typeParams{\Sigma}(C) = \varepsilon
+}
+{
+  \Sigma \vdash C[] \instanceAt \tyObject
+}
+\and
+\inferrule*[lab={\ruleName{instance-below}}]
+{
+  \typeParams{\Sigma}(C) = \seq{\alpha} \\
+  \ancestorArgs{\Sigma}(C[\seq{\alpha}], D) = \seq{\tau} \\
+  \matchArgs(\seq{\tau}, \seq{\sigma}') = \gamma \\
+  \gamma(\alpha_i) = \sigma_i \quad (\forall i) \\
+  \Sigma \vdash C[\seq{\sigma}] \subty D[\seq{\sigma}']
+}
+{
+  \Sigma \vdash C[\seq{\sigma}] \instanceAt D[\seq{\sigma}']
+}
+\end{mathpar}
+\subcaption{$C[\seq{\sigma}]$ is the instance of $C$ at $\tau$}
+\label{fig:instance-at}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\Sigma \vdash C \parallel \tau$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{incomparable-unrelated}}]
+{
+  C \notin \ancestors{\Sigma}(D) \\
+  D \notin \ancestors{\Sigma}(C)
+}
+{
+  \Sigma \vdash C \parallel D[\seq{\sigma}]
+}
+\and
+\inferrule*[lab={\ruleName{incomparable-below}}]
+{
+  \typeParams{\Sigma}(C) = \seq{\alpha} \\
+  \ancestorArgs{\Sigma}(C[\seq{\alpha}], D) = \seq{\tau} \\
+  \seq{\tau} \mathrel{\#} \seq{\sigma}
+}
+{
+  \Sigma \vdash C \parallel D[\seq{\sigma}]
+}
+\and
+\inferrule*[lab={\ruleName{incomparable-list}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash C \parallel \tyList{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{incomparable-dict}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash C \parallel \tyDict{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{incomparable-tuple}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash C \parallel \tyTuple{\seq{\tau}}
+}
+\and
+\inferrule*[lab={\ruleName{incomparable-callable}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash C \parallel \tyCallable{\seq{\sigma}}{\tau}
+}
+\and
+\inferrule*[lab={\ruleName{incomparable-literal}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash C \parallel \tyLiteral{\ell}
+}
+\and
+\inferrule*[lab={\ruleName{incomparable-prim}}]
+{
+  \nu \notin \set{\tyObject, \tyNever}
+}
+{
+  \Sigma \vdash C \parallel \nu
+}
+\end{mathpar}
+\subcaption{Class $C$ is incomparable with $\tau$}
+\label{fig:incomparable}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\tau \mathrel{\#} \sigma$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{apart-list}}]
+{
+  \tau \mathrel{\#} \sigma
+}
+{
+  \tyList{\tau} \mathrel{\#} \tyList{\sigma}
+}
+\and
+\inferrule*[lab={\ruleName{apart-dict}}]
+{
+  \tau \mathrel{\#} \sigma
+}
+{
+  \tyDict{\tau} \mathrel{\#} \tyDict{\sigma}
+}
+\and
+\inferrule*[lab={\ruleName{apart-tuple}}]
+{
+  \seq{\tau} \mathrel{\#} \seq{\sigma}
+}
+{
+  \tyTuple{\seq{\tau}} \mathrel{\#} \tyTuple{\seq{\sigma}}
+}
+\and
+\inferrule*[lab={\ruleName{apart-callable}}]
+{
+  (\tau \cons \seq{\tau}) \mathrel{\#} (\sigma \cons \seq{\sigma})
+}
+{
+  \tyCallable{\seq{\tau}}{\tau} \mathrel{\#} \tyCallable{\seq{\sigma}}{\sigma}
+}
+\and
+\inferrule*[lab={\ruleName{apart-class}}]
+{
+  \seq{\tau} \mathrel{\#} \seq{\sigma}
+}
+{
+  C[\seq{\tau}] \mathrel{\#} C[\seq{\sigma}]
+}
+\and
+\inferrule*[lab={\ruleName{apart-literal}}]
+{
+  \ell \neq \ell'
+}
+{
+  \tyLiteral{\ell} \mathrel{\#} \tyLiteral{\ell'}
+}
+\and
+\inferrule*[lab={\ruleName{apart-differ}}]
+{
+  \text{neither } \tau \text{ nor } \sigma \text{ a type variable or union} \\
+  \tau, \sigma \text{ with different outermost type constructors}
+}
+{
+  \tau \mathrel{\#} \sigma
+}
+\end{mathpar}
+\flushleft \shadebox{$\seq{\tau} \mathrel{\#} \seq{\sigma}$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{apart-head}}]
+{
+  \tau \mathrel{\#} \sigma
+}
+{
+  (\tau \cons \seq{\tau}) \mathrel{\#} (\sigma \cons \seq{\sigma})
+}
+\and
+\inferrule*[lab={\ruleName{apart-tail}}]
+{
+  \seq{\tau} \mathrel{\#} \seq{\sigma}
+}
+{
+  (\tau \cons \seq{\tau}) \mathrel{\#} (\sigma \cons \seq{\sigma})
+}
+\and
+\inferrule*[lab={\ruleName{apart-length}}]
+{
+  |\seq{\tau}| \neq |\seq{\sigma}|
+}
+{
+  \seq{\tau} \mathrel{\#} \seq{\sigma}
+}
+\end{mathpar}
+\subcaption{Types $\tau$ and $\sigma$, or sequences $\seq{\tau}$ and $\seq{\sigma}$, are apart}
+\label{fig:apart}
+\end{subfigure}
+\caption{Instance of a class, incomparability and apartness}
+\label{fig:instance}
+\end{figure}

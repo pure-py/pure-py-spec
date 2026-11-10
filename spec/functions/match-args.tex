@@ -1,0 +1,10 @@
+\matchArgs(\alpha, \sigma) &{}= \set{\bind{\alpha}{\sigma}} \\*
+\matchArgs(\tyUnion{\tau}{\tau'}, \sigma) &{}= \varnothing \\*
+\matchArgs(\tyList{\tau}, \tyList{\sigma}) &{}= \matchArgs(\tau, \sigma) \\*
+\matchArgs(\tyDict{\tau}, \tyDict{\sigma}) &{}= \matchArgs(\tau, \sigma) \\*
+\matchArgs(\tyTuple{\seq{\tau}}, \tyTuple{\seq{\sigma}}) &{}= \matchArgs(\seq{\tau}, \seq{\sigma}) \\*
+\matchArgs(\tyCallable{\seq{\tau}}{\tau}, \tyCallable{\seq{\sigma}}{\sigma}) &{}= \matchArgs(\tau \cons \seq{\tau}, \sigma \cons \seq{\sigma}) \\*
+\matchArgs(C[\seq{\tau}], C[\seq{\sigma}]) &{}= \matchArgs(\seq{\tau}, \seq{\sigma}) \\*
+\matchArgs(\tau, \tau) &{}= \varnothing \clausegap
+\matchArgs(\varepsilon, \varepsilon) &{}= \varnothing \\*
+\matchArgs(\tau \cons \seq{\tau}, \sigma \cons \seq{\sigma}) &{}= \matchArgs(\tau, \sigma) \override \matchArgs(\seq{\tau}, \seq{\sigma})

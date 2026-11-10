@@ -1,4 +1,5 @@
 \setPadWidth{\matchOk{\varnothing}}%
+\matchOp{\Sigma}(\rho, n, v) &{}= \padded{\errExcluded} \quad \text{if } n \text{ an int literal and } v \text{ a float} \\
 \matchOp{\Sigma}(\rho, \ell, v) &{}= \padded{\matchOk{\varnothing}} \quad \text{if } \eqOp{\Sigma}(\ell, v) = \val{\pyinline{True}} \\
 \matchOp{\Sigma}(\rho, \ell, v) &{}= \padded{\noMatch} \quad \text{if } \eqOp{\Sigma}(\ell, v) = \val{\pyinline{False}} \\
 \matchOp{\Sigma}(\rho, \pyinline{True}, n) &{}= \noMatch \\

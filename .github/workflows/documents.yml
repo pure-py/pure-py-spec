@@ -47,16 +47,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - name: Install packages
-        run: |
-          sudo apt-get update -q
-          sudo apt-get install -y -q --no-install-recommends \
-            make \
-            texlive-latex-extra texlive-fonts-extra texlive-science \
-            texlive-publishers texlive-bibtex-extra texlive-plain-generic
-
       - name: Checkout repository
         uses: actions/checkout@v7
 
+      # Make as compiler, for its checks of unresolved references; the root file, passed by the action as a further
+      # target, is already up to date
       - name: Build specification
-        run: make PurePy-spec.pdf spec-anon.pdf graduality.pdf
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: Makefile
+          compiler: make
+          args: PurePy-spec.pdf spec-anon.pdf graduality.pdf
+          extra_system_packages: make

@@ -1,4 +1,4 @@
-# rule: split-literal
+# judgement: check-pattern, rule: check-literal
 def f(x: float) -> int:
     match x:
         case 1:
@@ -8,4 +8,3 @@ def f(x: float) -> int:
 
 
 print(f(1.0))
-print(f(2.5))

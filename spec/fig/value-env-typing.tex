@@ -5,97 +5,100 @@
 \small
 \inferrule*[lab={\ruleName{val-lit}}]
 {
-  \strut
+  \Sigma \vdash \tyLiteral{\ell} \subty \tau
 }
 {
-  \vdash \ell : \tyLiteral{\ell}
+  \vdash \ell : \tau
 }
 \and
 \inferrule*[lab={\ruleName{val-lit-float}}]
 {
-  n \text{ a float literal}
+  n \text{ a float literal} \\
+  \Sigma \vdash \tyFloat \subty \tau
 }
 {
-  \vdash n : \tyFloat
+  \vdash n : \tau
 }
 \and
 \inferrule*[lab={\ruleName{val-list}}]
 {
-  \vdash v_i : \tau \quad (\forall i)
+  \vdash v_i : \sigma \quad (\forall i) \\
+  \Sigma \vdash \tyList{\sigma} \subty \tau
 }
 {
-  \vdash \exList{\seq{v}} : \tyList{\tau}
+  \vdash \exList{\seq{v}} : \tau
 }
 \and
 \inferrule*[lab={\ruleName{val-tuple}}]
 {
-  \vdash v_i : \tau_i \quad (\forall i)
+  \vdash v_i : \sigma_i \quad (\forall i) \\
+  \Sigma \vdash \tyTuple{\seq{\sigma}} \subty \tau
 }
 {
-  \vdash \exTuple{\seq{v}} : \tyTuple{\seq{\tau}}
+  \vdash \exTuple{\seq{v}} : \tau
 }
 \and
 \inferrule*[lab={\ruleName{val-dict}}]
 {
-  \vdash v_i : \tau \quad (\forall i) \\
-  \seq{w} \text{ distinct}
+  \vdash v_i : \sigma \quad (\forall i) \\
+  \seq{w} \text{ distinct} \\
+  \Sigma \vdash \tyDict{\sigma} \subty \tau
 }
 {
-  \vdash \exDict{\bind{\seq{w}}{\seq{v}}} : \tyDict{\tau}
+  \vdash \exDict{\bind{\seq{w}}{\seq{v}}} : \tau
 }
 \and
 \inferrule*[lab={\ruleName{val-lambda}}]
 {
   \vdash \rho : \Gamma \\
-  \Gamma \override \set{\bind{\seq{x}}{\seq{\sigma}}} \vdash e \checks \tau
+  \Gamma \override \set{\bind{\seq{x}}{\seq{\sigma}}} \vdash e \checks \tau \\
+  \Sigma \vdash \tyCallable{\seq{\sigma}}{\tau} \subty \tau'
 }
 {
-  \vdash \exLamClosure[\Gamma]{\rho}{\seq{x}}{e} : \tyCallable{\seq{\sigma}}{\tau}
+  \vdash \exLamClosure[\Gamma]{\rho}{\seq{x}}{e} : \tau'
 }
 \and
 \inferrule*[lab={\ruleName{val-def}}]
 {
   \vdash \rho : \Gamma \\
   \declaresS(\seq{d}) = \seq{f} \\
-  \Gamma \vdash \seq{d} : \Assigns{\Delta}
+  \Gamma \vdash \seq{d} : \Assigns{\Delta} \\
+  \fv(\sigma_j) = \varnothing \quad (\forall j) \\
+  \Sigma \vdash \tyInst{\Delta(f_i)}{\seq{\sigma}} \subty \tau
 }
 {
-  \vdash \exDefClosure[\Gamma]{\rho}{\seq{d}}{i} : \Delta(f_i)
+  \vdash \exDefClosure[\Gamma]{\rho}{\seq{d}}{i} : \tau
+}
+\and
+\inferrule*[lab={\ruleName{val-def-scheme}}]
+{
+  \vdash \rho : \Gamma \\
+  \declaresS(\seq{d}) = \seq{f} \\
+  \Gamma \vdash \seq{d} : \Assigns{\Delta} \\
+  \Delta(f_i) = \scheme{\seq{\alpha}}{\sigma} \\
+  \seq{\alpha} \text{ non-empty}
+}
+{
+  \vdash \exDefClosure[\Gamma]{\rho}{\seq{d}}{i} : \scheme{\seq{\alpha}}{\sigma}
 }
 \and
 \inferrule*[lab={\ruleName{val-obj}}]
 {
-  \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}} \\
-  \vdash v_i : \tau_i \quad (\forall i)
+  \tyInst{\fields{\Sigma}(C)}{\seq{\sigma}} = \bind{\seq{x}}{\seq{\sigma}'} \\
+  \vdash v_i : \sigma'_i \quad (\forall i) \\
+  \Sigma \vdash C[\seq{\sigma}] \subty \tau
 }
 {
-  \vdash \exObj{C}{\bind{\seq{x}}{\seq{v}}} : C
-}
-\and
-\inferrule*[lab={\ruleName{val-sub}}]
-{
-  \vdash v : \sigma \\
-  \Sigma \vdash \sigma \subty \tau
-}
-{
-  \vdash v : \tau
-}
-\and
-\inferrule*[lab={\ruleName{val-inst}}]
-{
-  \vdash v : \scheme{\seq{\alpha}}{\sigma} \\
-  \fv(\tau_i) = \varnothing \quad (\forall i)
-}
-{
-  \vdash v : \subst{\seq{\tau}}{\seq{\alpha}}{\sigma}
+  \vdash \exObj{C}{\bind{\seq{x}}{\seq{v}}} : \tau
 }
 \and
 \inferrule*[lab={\ruleName{val-prim}}]
 {
-  \mathcal{E}(\mathcal{A})(q)(x) = \primVal{\primFn}
+  \mathcal{E}(\mathcal{A})(q)(x) = \primVal{\primFn} \\
+  \Sigma \vdash \mathcal{P}(q)(x) \subty \tau
 }
 {
-  \vdash \primVal{\primFn} : \mathcal{P}(q)(x)
+  \vdash \primVal{\primFn} : \tau
 }
 \and
 \inferrule*[lab={\ruleName{val-predef}}]

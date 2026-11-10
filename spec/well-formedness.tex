@@ -35,6 +35,12 @@ inferred from its body. Within a type expression, a class name applied to as man
 literal type, taking $\tyLiteral{42}$ to \pyinline{int} and otherwise acting as the identity
 (\S\ref{aux:base-type}).
 
+Lemmas about subtyping assume well-formed types and a well-formed class table (\specfigrefTwo{well-formed}{well-formed-class-table}). The
+base-class relation is acyclic by the definition of a class table rather than by well-formedness, since the auxiliary
+functions on classes are defined by recursion on that relation.
+
+\specinput{spec/fig/well-formed}
+
 \subsubsection{Subtyping}\label{sec:subtyping}%
 
 Subtyping (\specfigref{subtyping}) has every type below itself, a literal type below its base type, and an instantiated class $C[\seq{\tau}]$ below every type that its base class is below, once $\seq{\tau}$ is substituted into the arguments of the base (\ruleName{subty-class-extend}), and below $C[\seq{\sigma}]$ when $\seq{\tau}$ and $\seq{\sigma}$ are equivalent (\ruleName{subty-class}), so that type arguments are invariant, as for lists and dictionaries; a type variable is below itself and \pyinline{object} alone, with \pyinline{object} above every type and \pyinline{Never} below every type. A type that is not a union has one \emph{disjunct}, the type itself; the disjuncts of a union $\tyUnion{\sigma}{\tau}$ are the disjuncts of $\sigma$ together with the disjuncts of $\tau$. A union is above
@@ -48,7 +54,7 @@ Python treats it as one.
 
 \input{spec/well-formedness/subtyping-transitive}
 
-\noindent Subtyping is therefore a preorder: reflexive and transitive but not antisymmetric,
+\noindent Subtyping of well-formed types is therefore a preorder: reflexive and transitive but not antisymmetric,
 because distinct types such as $\tyUnion{\sigma}{\tau}$ and $\tyUnion{\tau}{\sigma}$ are
 equivalent.
 
@@ -329,7 +335,7 @@ Each definition $\chi_i$ is checked under the extended class table and the conte
 every name of the type region for a \pyinline{type} statement and only the earlier names for a class definition, as above.
 
 The judgement $\Sigma; \Gamma \vdash \chi$ checks a class definition by resolving the field annotations, which may mention the type parameters of the class, and requiring the fields it declares to be distinct and, when it extends
-another class, the base class to name a class rather than an alias and to resolve to an instantiated class, and the additional fields not to repeat an inherited field
+another class, the base class to name a class rather than an alias, not to name \pyinline{range}, which Python rejects as a base class, and to resolve to an instantiated class, and the additional fields not to repeat an inherited field
 (\ruleName{class}, \ruleName{class-extend}). Class definitions also require the predefined name \pyinline{dataclass} (\figref{predefined-signatures}) to be in
 scope; every \PurePy class must declare itself a dataclass. A \pyinline{type} statement $\exTypeAlias{x[\seq{\alpha}]}{\psi}$, such as \pyinline{type Pair[T] = tuple[T, T]},
 declares $x$ as an alias of the type denoted by $\psi$ with the type parameters $\seq{\alpha}$ in scope
@@ -426,8 +432,8 @@ shadows a builtin throughout the module, so a use of the name before its declara
 use instead resolves to the builtin, following Python's run-time lookup. As with any scope, the names declared in the
 module, including its imported names, must be distinct from one another and from any pattern variables in its
 body. Since every module declares \pyinline{__name__} (\secref{modules-programs}), a module is ill-formed if its body
-declares that name again, imports it, or binds it in a pattern.\added{ The declaration of \pyinline{__name__} is annotated with
-\pyinline{str}, so a module is also ill-formed if its body binds \pyinline{str}.}
+declares that name again, imports it, or binds it in a pattern. The declaration of \pyinline{__name__} is annotated with
+\pyinline{str}, so a module is also ill-formed if its body binds \pyinline{str}.
 
 \input{spec/fig/typing-module}
 
