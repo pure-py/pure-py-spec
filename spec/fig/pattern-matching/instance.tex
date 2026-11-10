@@ -147,7 +147,7 @@
 \and
 \inferrule*[lab={\ruleName{apart-callable}}]
 {
-  \tau \cons \seq{\tau} \mathrel{\#} \sigma \cons \seq{\sigma}
+  (\tau \cons \seq{\tau}) \mathrel{\#} (\sigma \cons \seq{\sigma})
 }
 {
   \tyCallable{\seq{\tau}}{\tau} \mathrel{\#} \tyCallable{\seq{\sigma}}{\sigma}
@@ -186,7 +186,7 @@
   \tau \mathrel{\#} \sigma
 }
 {
-  \tau \cons \seq{\tau} \mathrel{\#} \sigma \cons \seq{\sigma}
+  (\tau \cons \seq{\tau}) \mathrel{\#} (\sigma \cons \seq{\sigma})
 }
 \and
 \inferrule*[lab={\ruleName{apart-tail}}]
@@ -194,7 +194,7 @@
   \seq{\tau} \mathrel{\#} \seq{\sigma}
 }
 {
-  \tau \cons \seq{\tau} \mathrel{\#} \sigma \cons \seq{\sigma}
+  (\tau \cons \seq{\tau}) \mathrel{\#} (\sigma \cons \seq{\sigma})
 }
 \and
 \inferrule*[lab={\ruleName{apart-length}}]
