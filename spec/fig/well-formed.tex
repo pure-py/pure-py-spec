@@ -130,7 +130,7 @@
   \Sigma \vdash \Gamma \wf \\
   \tyvars(\Gamma) = \varnothing \\
   \chi_i = \exTypeAlias{x[\seq{\alpha}]}{\psi} \\\\
-  q.c \in \dom(\Sigma) \text{ for each class definition of } c \text{ in } \seq{\chi}
+  \dom(\classTable{\Gamma}(q, \seq{\chi})) \subseteq \dom(\Sigma)
 }
 {
   \Sigma \vdash \TypeAlias[\Gamma]{q}{\seq{\chi}}{i} \wf
@@ -171,7 +171,7 @@
   \chi_i = \exDataclass{c[\seq{\alpha}]}{\phi} \\
   \Sigma \vdash \Gamma \wf \\
   \tyvars(\Gamma) = \varnothing \\\\
-  q.c' \in \dom(\Sigma) \text{ for each class definition of } c' \text{ in } \seq{\chi} \\\\
+  \dom(\classTable{\Gamma}(q, \seq{\chi})) \subseteq \dom(\Sigma) \\\\
   \fields{\Sigma}(q.c) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}} \\
   \Sigma \vdash \tau_j \wf \quad \fv(\tau_j) \subseteq \seq{\alpha} \quad (\forall j) \\
   \seq{\alpha} \text{ distinct} \\
@@ -186,7 +186,7 @@
   \chi_i = \exDataclassExtend{c[\seq{\alpha}]}{q'[\seq{\psi}]}{\phi} \\
   \Sigma \vdash \Gamma \wf \\
   \tyvars(\Gamma) = \varnothing \\\\
-  q.c' \in \dom(\Sigma) \text{ for each class definition of } c' \text{ in } \seq{\chi} \\\\
+  \dom(\classTable{\Gamma}(q, \seq{\chi})) \subseteq \dom(\Sigma) \\\\
   \base{\Sigma}(q.c) = D[\seq{\sigma}] \\
   \Sigma \vdash D[\seq{\sigma}] \wf \\
   D \neq \clsRange \\
