@@ -1,6 +1,6 @@
 Type arguments for the type variables of $\rho$, found by one-way matching of $\rho$ against $\sigma$, or of
 $\seq{\rho}$ against $\seq{\sigma}$. A union in $\rho$ does not bind any type variable, since the disjunct matched by
 the type at the same position in $\sigma$ is not determined. The matching is undefined for a type variable or union in
-$\sigma$ at the position of a type of another form in $\rho$, since the two types may or may not be equivalent at some
+$\sigma$ at the position of a type in $\rho$ other than a type variable or union, since the two types may or may not be equivalent at some
 instantiation of the type variables of $\rho$. The clauses apply in order. The instance of a class below an
 instantiation of one of its ancestors is found by matching (\ruleName{instance-below}).
