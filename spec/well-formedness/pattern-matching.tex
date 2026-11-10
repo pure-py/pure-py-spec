@@ -44,8 +44,8 @@ are below $D[\seq{\sigma}]$, then two instantiation candidates below $D[\seq{\si
 \end{lemma}
 \end{DeletedBlock}
 \begin{AddedBlock}
-So that no value typed at $\tau$ is an object of $C$ or of a subclass of $C$, a constructor pattern binds its
-variables at \tyNever{} only if its class $C$ is \emph{incomparable} with $\tau$ (\ruleName{check-constr-none}). A
+If the class $C$ of a constructor pattern is \emph{incomparable} with $\tau$, no value of type $\tau$ is an object
+of $C$ or of a subclass of $C$, so the pattern binds its variables at \tyNever{} (\ruleName{check-constr-none}). A
 class $C$ is incomparable with an instantiated class $D[\seq{\sigma}]$ if neither class is an ancestor of the other
 (\ruleName{incomparable-unrelated}), or if the type arguments of the instantiation of $D$ above $C$ applied to its
 type parameters are \emph{apart} from $\seq{\sigma}$, differing at some position outside type variables and unions, so that no
