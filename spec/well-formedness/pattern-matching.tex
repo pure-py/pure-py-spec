@@ -16,7 +16,7 @@ So list types, $\tySized$ and $\tyObject$ have list values; tuple types, $\tySiz
 The conditions on \replaced{tuple, list and int literal}{tuple and list } patterns ensure that pattern matching always has a result. Under the evaluation rules, matching a tuple pattern against a list or a list pattern against a tuple, or either against a range, \added{or an int literal pattern against a float, }aborts with $\errExcluded$ (\S\ref{aux:match}), although Python permits all of these. \replaced{Tuple and list patterns}{Both forms of pattern } therefore fail at $\tyList{\tyInt} \mathbin{|} \tyTuple{\tyInt, \tyInt}$, at $\tySized \mathbin{|} \tyTuple{\tyInt, \tyInt}$, at $\tyList{\tyInt} \mathbin{|} \clsRange[]$, and at a type variable. \added{A dictionary pattern at $\tyObject$ or $\tySized$, which have dictionary values, is ill-formed, since the pattern may match a dictionary and yet its variables would be bound at $\tyNever$. The int literal pattern \pyinline{1} narrows to $\tyLiteral{1}$, but Python also matches the pattern against the float \pyinline{1.0}, which is not a value of $\tyLiteral{1}$. An int literal pattern at a type with float values is therefore ill-formed (\ruleName{check-literal}).}
 
 A constructor pattern cannot name $\clsRange$ (\ruleName{pat-constr}). Python rejects positional sub-patterns
-for that class, and \PurePy excludes the keyword form as well, for uniformity. The condition on constructor patterns supplies the type arguments omitted by the pattern: they are recovered by the judgement $\Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$ from the type $\tau$ at which the pattern is checked, the \emph{instance} of $C$ at $\tau$ being the instantiation of $C$ above $\tau$, or the instantiation below $\tau$\replaced{ found by matching}{, when there is one up to equivalence} (\ruleName{instance-above}, \ruleName{instance-below}). Below $C$ the base classes of the type determine the instance: at \pyinline{IntLeaf}, a subclass of \pyinline{Leaf[int]}, the instance of \pyinline{Leaf} is \pyinline{Leaf[int]}. Above $C$ the base arguments of $C$ determine \replaced{the instance}{it }: at \pyinline{Tree[int]} the instance of \pyinline{Leaf} is \pyinline{Leaf[int]}, because \pyinline{Leaf[T]} extends \pyinline{Tree[T]}, whereas at \tyObject{} \replaced{the instance of a class with type parameters is undefined}{a class with type parameters has no instance}, since every instantiation lies below \tyObject.
+for that class, and \PurePy excludes the keyword form as well, for uniformity. The condition on constructor patterns supplies the type arguments omitted by the pattern: they are recovered by the judgement $\Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$ from the type $\tau$ at which the pattern is checked, the \emph{instance} of $C$ at $\tau$ being the instantiation of $C$ above $\tau$, or the instantiation below $\tau$\replaced{ found by matching}{, when there is one up to equivalence} (\ruleName{instance-above}, \ruleName{instance-below}). Below $C$ the base classes of the type determine the instance: at \pyinline{IntLeaf}, a subclass of \pyinline{Leaf[int]}, the instance of \pyinline{Leaf} is \pyinline{Leaf[int]}. Above $C$ the base arguments of $C$ determine \replaced{the instance}{it }: at \pyinline{Tree[int]} the instance of \pyinline{Leaf} is \pyinline{Leaf[int]}, because \pyinline{Leaf[T]} extends \pyinline{Tree[T]}, whereas at \tyObject{} \replaced{the instance of a class with type parameters is undefined}{a class with type parameters has no instance}, since every instantiation lies below \tyObject\added{ (\ruleName{instance-object})}.
 \begin{DeletedBlock}
 The instance judgement is decided as follows. A pattern is checked at the disjuncts of a union separately
 (\ruleName{check-union}), so the type $\tau$ at which an instance is taken is never a union. If $\tau$ is an
@@ -44,14 +44,11 @@ are below $D[\seq{\sigma}]$, then two instantiation candidates below $D[\seq{\si
 \end{lemma}
 \end{DeletedBlock}
 \begin{AddedBlock}
-A pattern is checked at the disjuncts of a union separately (\ruleName{check-union}), so the type $\tau$ at which
-an instance is taken is never a union. If $\tau$ is an instantiated class $D[\seq{\sigma}]$ with $C$ an ancestor of
-$D$, the instance is the instantiation of $C$ above $D[\seq{\sigma}]$, which is unique
-because type arguments are invariant (\ruleName{instance-above}). If $D$ is an ancestor of $C$, the type arguments
-of the instance are found by matching the type arguments of the instantiation of $D$ above $C$ applied to its type
-parameters against $\seq{\sigma}$ (\ruleName{instance-below}). At \tyObject{} and at \tyNever{} every
-instantiation of $C$ is comparable with $\tau$, so the instance is defined only if $C$ has no type parameters
-(\ruleName{instance-object}, \ruleName{instance-above}).
+A pattern at a union is checked at each disjunct (\ruleName{check-union}), so an instance is never taken at a
+union. Below $C$ the instance is unique, because type arguments are invariant (\ruleName{instance-above}). Above
+$C$ the type arguments of $\tau$ may not determine the instance (\ruleName{instance-below}): at
+\pyinline{Tree[int]} the instance of a class \pyinline{Node[T, U]} extending \pyinline{Tree[T]} is undefined,
+because \pyinline{U} does not occur in \pyinline{Tree[T]}.
 
 So that no value typed at $\tau$ is an object of $C$ or of a subclass of $C$, a constructor pattern binds its
 variables at \tyNever{} only if its class $C$ is \emph{incomparable} with $\tau$ (\ruleName{check-constr-none}). A
