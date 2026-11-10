@@ -30,15 +30,17 @@ A type $\tau$ is \emph{well-formed} in $\Sigma$ when $C \in \dom(\Sigma)$ and $|
 \end{specdefinition}
 \begin{specdefinition}{Well-formed context}%
 \label{def:well-formed-context}%
-A context $\Gamma$ is \emph{well-formed} in $\Sigma$ when the entries of $\Gamma$ satisfy the following conditions:
+A context $\Gamma$ is \emph{well-formed} in $\Sigma$ when, for each $x \in \dom(\Gamma)$:
 \begin{itemize}
-\item $\tau$, $\DU{\tau}$ or $\PU{\tau}$: $\tau$ is well-formed
-\item $\scheme{\seq{\alpha}}{\tau}$ or $\PU{\scheme{\seq{\alpha}}{\tau}}$: $\tau$ is a well-formed callable type
-\item $\Type{C}$: $C \in \dom(\Sigma)$
-\item $\modLoaded{q}{\Gamma'}$: $\Gamma'$ is well-formed, with $\tyvars(\Gamma') = \varnothing$
-\item $\TypeAlias[\Gamma']{q}{\seq{\chi}}{i}$: $\Gamma'$ is well-formed, with $\tyvars(\Gamma') = \varnothing$,
-$\chi_i$ is a \pyinline{type} statement, and $q.c \in \dom(\Sigma)$ for each class definition of $c$ in $\seq{\chi}$
+\item if $\Gamma(x)$ is $\tau$, $\DU{\tau}$ or $\PU{\tau}$, then $\tau$ is well-formed
+\item if $\Gamma(x)$ is $\scheme{\seq{\alpha}}{\tau}$ or $\PU{\scheme{\seq{\alpha}}{\tau}}$, then $\tau$ is a well-formed
+callable type
+\item if $\Gamma(x) = \Type{C}$, then $C \in \dom(\Sigma)$
+\item if $\Gamma(x) = \modLoaded{q}{\Gamma'}$, then $\Gamma'$ is well-formed, with $\tyvars(\Gamma') = \varnothing$
+\item if $\Gamma(x) = \TypeAlias[\Gamma']{q}{\seq{\chi}}{i}$, then $\Gamma'$ is well-formed, with $\tyvars(\Gamma') =
+\varnothing$, $\chi_i$ is a \pyinline{type} statement, and $q.c \in \dom(\Sigma)$ for each class definition of $c$ in
+$\seq{\chi}$
 \end{itemize}
-Other entries are not constrained.%
+%
 \end{specdefinition}
 \end{AddedBlock}
