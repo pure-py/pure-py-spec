@@ -161,11 +161,18 @@
   C[\seq{\tau}] \mathrel{\#} C[\seq{\sigma}]
 }
 \and
+\inferrule*[lab={\ruleName{apart-literal}}]
+{
+  \ell \neq \ell'
+}
+{
+  \tyLiteral{\ell} \mathrel{\#} \tyLiteral{\ell'}
+}
+\and
 \inferrule*[lab={\ruleName{apart-differ}}]
 {
-  \tau \neq \sigma \\
-  \tau, \sigma \text{ not type variables or unions} \\\\
-  \tau, \sigma \text{ not both list, dictionary, tuple or callable types, or instantiations of one class}
+  \tau, \sigma \text{ not type variables or unions} \\
+  \tau, \sigma \text{ with different outermost type constructors}
 }
 {
   \tau \mathrel{\#} \sigma
