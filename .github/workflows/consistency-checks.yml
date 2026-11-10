@@ -22,8 +22,8 @@ jobs:
           enable-cache: true
 
       # Specification built for the figure numbers exported by the wheel
-      - name: Generate Python and mypy version macros
-        run: make tex/python-version.tex tex/mypy-version.tex
+      - name: Generate LaTeX macros
+        run: make tex/python-version.tex tex/mypy-version.tex tex/mechanisation-names.tex
 
       - name: Build LaTeX document
         uses: xu-cheng/latex-action@v4
