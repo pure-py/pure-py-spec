@@ -100,47 +100,37 @@ def run(cmd: list[str], cwd: pathlib.Path | None = None) -> subprocess.Completed
     return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, check=False)
 
 
-class Runtime(StrEnum):
+class Implementation(StrEnum):
     CPYTHON = "cpython"
     GRAALPY = "graalpy"
     PYODIDE = "pyodide"
+    PUREPY = "purepy"
 
 
-RUNTIME_QUERY = "import platform, sys; print(platform.python_implementation(), sys.platform)"
+PYTHON_QUERY = "import platform, sys; print(platform.python_implementation(), sys.platform)"
+PUREPY_QUERY = "--implementation"
 
 
-def runtime(interpreter: list[str]) -> Runtime | None:
-    """None unless interpreter reports itself as a known Python implementation"""
-    answer = run([*interpreter, "-c", RUNTIME_QUERY]).stdout.split()
+def python_implementation(interpreter: list[str]) -> Implementation | None:
+    answer = run([*interpreter, "-c", PYTHON_QUERY]).stdout.split()
     if len(answer) != 2:
         return None
-    implementation, system = answer
+    name, system = answer
     if system == "emscripten":
-        return Runtime.PYODIDE
-    return {"CPython": Runtime.CPYTHON, "GraalVM": Runtime.GRAALPY}.get(implementation)
+        return Implementation.PYODIDE
+    return {"CPython": Implementation.CPYTHON, "GraalVM": Implementation.GRAALPY}.get(name)
 
 
-IMPLEMENTATION_OPTION = "--implementation"
-PUREPY = "purepy"
-
-
-def is_purepy(interpreter: list[str]) -> bool:
-    """Whether interpreter identifies itself as a PurePy implementation"""
-    proc = run([*interpreter, IMPLEMENTATION_OPTION])
-    return proc.returncode == 0 and proc.stdout.strip() == PUREPY
-
-
-def python_runtime(interpreter: list[str]) -> Runtime | None:
-    """Runtime of a Python implementation, None for a PurePy implementation; exit if neither or both"""
-    purepy, python = is_purepy(interpreter), runtime(interpreter)
-    name = shlex.join(interpreter)
-    if purepy and python is not None:
-        sys.exit(f"interpreter {name} identifies as both a PurePy and a Python implementation")
-    if not purepy and python is None:
+def implementation(interpreter: list[str]) -> Implementation:
+    """Exit unless interpreter identifies as exactly one implementation"""
+    purepy = run([*interpreter, PUREPY_QUERY]).stdout.strip() == Implementation.PUREPY
+    python = python_implementation(interpreter)
+    if purepy == (python is not None):
         sys.exit(
-            f"interpreter {name} identifies as neither a PurePy nor a known Python implementation"
+            f"interpreter {shlex.join(interpreter)} identifies as "
+            f"{'both PurePy and' if purepy else 'neither PurePy nor'} Python"
         )
-    return python
+    return Implementation.PUREPY if python is None else python
 
 
 def main_module(test: pathlib.Path) -> pathlib.Path:
@@ -230,13 +220,11 @@ class Runner(Results):
     interpreter: list[str] | None  # None: tests not run
     python_mode: bool
     check_messages: bool
-    runtime: Runtime | None = field(init=False)
-    purepy: bool = field(init=False)
+    implementation: Implementation | None = field(init=False)
 
     def __post_init__(self) -> None:
         super().__init__()
-        self.runtime = None if self.interpreter is None else python_runtime(self.interpreter)
-        self.purepy = self.interpreter is not None and self.runtime is None
+        self.implementation = None if self.interpreter is None else implementation(self.interpreter)
 
     def run_type_checker(self, test: pathlib.Path) -> subprocess.CompletedProcess[str]:
         """Type-check copy of test, so that tests can't interfere and suite stays unchanged"""
@@ -285,7 +273,11 @@ class Runner(Results):
         args = args_path.read_text().splitlines() if args_path.exists() else []
         proc = run([*self.interpreter, path.name, *args], cwd=path.parent)
         failures = self.check_run(path, proc, outcome, undefined)
-        return failures if self.runtime is None else under_bug("run", failures, path, self.runtime)
+        return (
+            failures
+            if self.implementation is None
+            else under_bug("run", failures, path, self.implementation)
+        )
 
     def check_run(
         self,
@@ -295,10 +287,11 @@ class Runner(Results):
         undefined: bool,
     ) -> list[str]:
         """Exit status 4 from a PurePy implementation on exactly the undefined tests, else Python outcome"""
-        if self.purepy and (proc.returncode == Exit.UNDEFINED) != undefined:
+        purepy = self.implementation == Implementation.PUREPY
+        if purepy and (proc.returncode == Exit.UNDEFINED) != undefined:
             expected = int(Exit.UNDEFINED) if undefined else "the Python outcome"
             return [f"run: exit {proc.returncode}, expected {expected}: {proc.stderr.strip()}"]
-        if self.purepy and undefined:
+        if purepy and undefined:
             return []
         both = path.with_suffix(EXPECTED).exists() and path.with_suffix(EXCEPTION_EXPECTED).exists()
         succeeds = proc.returncode == 0 if both else outcome == PythonOutcome.SUCCEEDS
