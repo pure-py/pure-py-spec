@@ -23,8 +23,8 @@
 \inferrule*[lab={\ruleName{instance-below}}]
 {
   \replaced{\typeParams{\Sigma}(C) = \seq{\alpha}}{\Sigma \vdash C[\seq{\sigma}] \subty \tau} \\
-  \replaced{\ancestor{\Sigma}(C[\seq{\alpha}], D) = D[\seq{\rho}]}{\seq{\sigma}' \tyEquiv \seq{\sigma} \text{ whenever } \Sigma \vdash C[\seq{\sigma}'] \subty \tau} \\
-  \added{\matchArgs(\seq{\rho}, \seq{\sigma}') = \gamma} \\
+  \replaced{\ancestor{\Sigma}(C[\seq{\alpha}], D) = D[\seq{\tau}]}{\seq{\sigma}' \tyEquiv \seq{\sigma} \text{ whenever } \Sigma \vdash C[\seq{\sigma}'] \subty \tau} \\
+  \added{\matchArgs(\seq{\tau}, \seq{\sigma}') = \gamma} \\
   \added{\gamma(\alpha_i) = \sigma_i \quad (\forall i)} \\
   \added{\Sigma \vdash C[\seq{\sigma}] \subty D[\seq{\sigma}']}
 }
@@ -48,8 +48,8 @@
 \inferrule*[lab={\ruleName{incomparable-below}}]
 {
   \typeParams{\Sigma}(C) = \seq{\alpha} \\
-  \ancestor{\Sigma}(C[\seq{\alpha}], D) = D[\seq{\rho}] \\
-  \apart(\seq{\rho}, \seq{\sigma})
+  \ancestor{\Sigma}(C[\seq{\alpha}], D) = D[\seq{\tau}] \\
+  \apart(\seq{\tau}, \seq{\sigma})
 }
 {
   \Sigma \vdash C \parallel D[\seq{\sigma}]

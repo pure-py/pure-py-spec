@@ -17,8 +17,8 @@
 \auxrow{$\joinTy{\Sigma}{\sigma}{\tau}$, $\bigJoinTy{\Sigma}{\seq{\tau}}$}{type}{larger type if comparable, and union otherwise}{aux:join}
 \auxrow{$\meetTy{\Sigma}{\sigma}{\tau}$}{type}{greatest type below both}{aux:meet}
 \deleted{$\subterms(\tau)$, $\subterms(\seq{\tau})$} & \deleted{set of types} & \deleted{subterms of $\tau$, or of each type in $\seq{\tau}$, other than unions} & \deleted{\S\ref{aux:subterms}} \\
-\added{$\matchArgs(\rho, \sigma)$, $\matchArgs(\seq{\rho}, \seq{\sigma})$} & \added{context binding type variables at types} & \added{type arguments from one-way matching of $\rho$ against $\sigma$, or of $\seq{\rho}$ against $\seq{\sigma}$} & \added{\S\ref{aux:match-args}} \\
-\added{$\apart(\rho, \sigma)$, $\apart(\seq{\rho}, \seq{\sigma})$} & \added{truth value} & \added{whether $\rho$ and $\sigma$, or $\seq{\rho}$ and $\seq{\sigma}$, differ outside type variables and unions} & \added{\S\ref{aux:apart}} \\
+\added{$\matchArgs(\tau, \sigma)$, $\matchArgs(\seq{\tau}, \seq{\sigma})$} & \added{context binding type variables at types} & \added{type arguments from one-way matching of $\tau$ against $\sigma$, or of $\seq{\tau}$ against $\seq{\sigma}$} & \added{\S\ref{aux:match-args}} \\
+\added{$\apart(\tau, \sigma)$, $\apart(\seq{\tau}, \seq{\sigma})$} & \added{truth value} & \added{whether $\tau$ and $\sigma$, or $\seq{\tau}$ and $\seq{\sigma}$, differ outside type variables and unions} & \added{\S\ref{aux:apart}} \\
 \auxrow{$\typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau)$, $\typeArgs{\Sigma}(\seq{\alpha}, \seq{\sigma}, \seq{\tau})$}{context binding type variables at types}{type arguments from one-way unification of $\sigma$ with $\tau$, or of $\seq{\sigma}$ with $\seq{\tau}$}{aux:type-args}
 \auxrow{$\elemTy{\Sigma}(\tau)$}{type}{type of elements drawn from $\tau$ by generator}{aux:elem-type}
 \auxrow{$\shapes{\Sigma}(\tau, H)$, $\shapes{\Sigma}(\seq{\tau})$}{ordered set of shapes or of shape sequences}{shapes of $\tau$ once heads in $H$ are excluded; sequences of shapes of $\seq{\tau}$}{aux:shapes}
