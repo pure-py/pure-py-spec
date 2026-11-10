@@ -13,13 +13,11 @@ the region appears. \deleted{Every class named in $\Sigma$ is in $\dom(\Sigma)$,
 $\dom(\Sigma)$ is acyclic. }\added{A class table satisfies the following conditions, for each $C \in \dom(\Sigma)$:}
 \begin{AddedBlock}
 \begin{itemize}
-\item $\base{\Sigma}(C)$, if not $\bot$, is a well-formed type (Definition~\ref{def:well-formed-type}) other than
+\item $\base{\Sigma}(C)$, if not $\bot$, is well-formed (Definition~\ref{def:well-formed-type}) and not
 $\clsRange$, with $\fv(\base{\Sigma}(C)) \subseteq \typeParams{\Sigma}(C)$
-\item each field type $\tau$ in $\fields{\Sigma}(C)$ is a well-formed type, with $\fv(\tau) \subseteq
-\typeParams{\Sigma}(C)$
-\item $\typeParams{\Sigma}(C)$ consists of distinct type parameters, and the field names in $\fields{\Sigma}(C)$
-are distinct
-\item the base-class relation on $\dom(\Sigma)$ is acyclic
+\item each field type $\tau$ in $\fields{\Sigma}(C)$ is well-formed, with $\fv(\tau) \subseteq \typeParams{\Sigma}(C)$
+\item type parameters of $C$ are distinct, and field names of $C$ are distinct
+\item base-class relation on $\dom(\Sigma)$ is acyclic
 \end{itemize}
 \end{AddedBlock}
 \end{specdefinition}
