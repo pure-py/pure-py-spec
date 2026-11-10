@@ -1,4 +1,4 @@
-An implementation conforms if it accepts exactly the well-formed programs and, on every run with defined behaviour,
+A language implementation conforms to the \PurePy specification if it accepts exactly\paperonly{\dnoteM{does exactly mean `and nothing else'?}} the well-formed programs and, on every run with defined behaviour,
 produces the Python result; on any other run it may either abort and report $\errUndef$, following the semantics, or
 produce the Python result. For each rejected program which is syntactically valid, a conforming implementation also
 reports whether the rejection is by design or for an exclusion from this version\speconly{
