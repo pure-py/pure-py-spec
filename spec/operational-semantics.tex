@@ -63,8 +63,10 @@ results carrying a sequence of values in place of a value.
 The value typing judgement $\vdash v : \theta$ says that value $v$ is well-typed at context entry $\theta$,
 and the environment typing judgement $\vdash \rho : \Gamma$ says that environment $\rho$ is well-typed at context
 $\Gamma$, meaning every value in $\rho$ is well-typed at the corresponding entry in $\Gamma$ (\specfigref{value-env-typing}).
-Values typed at a type scheme are also typed at the instances of the scheme at closed types
-(\ruleName{val-inst}), matching the instantiation of names bound at a scheme by the \ruleName{var-scheme} rule.
+\replaced{So that the form of a value and the context entry determine the rule by which the value is typed, the rules
+typing a value at a type have a subtyping premise. The \ruleName{val-def} rule instantiates the type scheme of a
+function at closed types}{Values typed at a type scheme are also typed at the instances of the scheme at closed types
+(\ruleName{val-inst}) }, matching the instantiation of names bound at a scheme by the \ruleName{var-scheme} rule.
 The statement evaluation judgement $\rho, s \Rightarrow o$ says that $s$ evaluates
 to outcome $o$ in $\rho$ (\specfigrefTwo{eval-block-outcome}{eval-block-fails}). An \pyinline{if} or
 \pyinline{assert} statement aborts with $\errExcluded$ when a condition evaluates to a non-Boolean\speconly{ (\ruleName{eval-if-nonbool}, \ruleName{eval-if-else-nonbool}, \ruleName{eval-assert-nonbool},

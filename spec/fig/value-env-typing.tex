@@ -5,97 +5,118 @@
 \small
 \inferrule*[lab={\ruleName{val-lit}}]
 {
-  \strut
+  \replaced{\Sigma \vdash \tyLiteral{\ell} \subty \tau}{\strut}
 }
 {
-  \vdash \ell : \tyLiteral{\ell}
+  \vdash \ell : \replaced{\tau}{\tyLiteral{\ell}}
 }
 \and
 \inferrule*[lab={\ruleName{val-lit-float}}]
 {
-  n \text{ a float literal}
+  n \text{ a float literal} \\
+  \added{\Sigma \vdash \tyFloat \subty \tau}
 }
 {
-  \vdash n : \tyFloat
+  \vdash n : \replaced{\tau}{\tyFloat}
 }
 \and
 \inferrule*[lab={\ruleName{val-list}}]
 {
-  \vdash v_i : \tau \quad (\forall i)
+  \vdash v_i : \replaced{\sigma}{\tau} \quad (\forall i) \\
+  \added{\Sigma \vdash \tyList{\sigma} \subty \tau}
 }
 {
-  \vdash \exList{\seq{v}} : \tyList{\tau}
+  \vdash \exList{\seq{v}} : \replaced{\tau}{\tyList{\tau}}
 }
 \and
 \inferrule*[lab={\ruleName{val-tuple}}]
 {
-  \vdash v_i : \tau_i \quad (\forall i)
+  \vdash v_i : \replaced{\sigma_i}{\tau_i} \quad (\forall i) \\
+  \added{\Sigma \vdash \tyTuple{\seq{\sigma}} \subty \tau}
 }
 {
-  \vdash \exTuple{\seq{v}} : \tyTuple{\seq{\tau}}
+  \vdash \exTuple{\seq{v}} : \replaced{\tau}{\tyTuple{\seq{\tau}}}
 }
 \and
 \inferrule*[lab={\ruleName{val-dict}}]
 {
-  \vdash v_i : \tau \quad (\forall i) \\
-  \seq{w} \text{ distinct}
+  \vdash v_i : \replaced{\sigma}{\tau} \quad (\forall i) \\
+  \seq{w} \text{ distinct} \\
+  \added{\Sigma \vdash \tyDict{\sigma} \subty \tau}
 }
 {
-  \vdash \exDict{\bind{\seq{w}}{\seq{v}}} : \tyDict{\tau}
+  \vdash \exDict{\bind{\seq{w}}{\seq{v}}} : \replaced{\tau}{\tyDict{\tau}}
 }
 \and
 \inferrule*[lab={\ruleName{val-lambda}}]
 {
   \vdash \rho : \Gamma \\
-  \Gamma \override \set{\bind{\seq{x}}{\seq{\sigma}}} \vdash e \checks \tau
+  \Gamma \override \set{\bind{\seq{x}}{\seq{\sigma}}} \vdash e \checks \tau \\
+  \added{\Sigma \vdash \tyCallable{\seq{\sigma}}{\tau} \subty \tau'}
 }
 {
-  \vdash \exLamClosure[\Gamma]{\rho}{\seq{x}}{e} : \tyCallable{\seq{\sigma}}{\tau}
+  \vdash \exLamClosure[\Gamma]{\rho}{\seq{x}}{e} : \replaced{\tau'}{\tyCallable{\seq{\sigma}}{\tau}}
 }
 \and
 \inferrule*[lab={\ruleName{val-def}}]
 {
   \vdash \rho : \Gamma \\
   \declaresS(\seq{d}) = \seq{f} \\
-  \Gamma \vdash \seq{d} : \Assigns{\Delta}
+  \Gamma \vdash \seq{d} : \Assigns{\Delta} \\
+  \added{\fv(\sigma_j) = \varnothing \quad (\forall j)} \\
+  \added{\Sigma \vdash \tyInst{\Delta(f_i)}{\seq{\sigma}} \subty \tau}
 }
 {
-  \vdash \exDefClosure[\Gamma]{\rho}{\seq{d}}{i} : \Delta(f_i)
+  \vdash \exDefClosure[\Gamma]{\rho}{\seq{d}}{i} : \replaced{\tau}{\Delta(f_i)}
 }
+\and
+\added{\inferrule*[lab={\ruleName{val-def-scheme}}]
+{
+  \vdash \rho : \Gamma \\
+  \declaresS(\seq{d}) = \seq{f} \\
+  \Gamma \vdash \seq{d} : \Assigns{\Delta} \\
+  \Delta(f_i) = \scheme{\seq{\alpha}}{\sigma} \\
+  \seq{\alpha} \text{ non-empty}
+}
+{
+  \vdash \exDefClosure[\Gamma]{\rho}{\seq{d}}{i} : \scheme{\seq{\alpha}}{\sigma}
+}}
 \and
 \inferrule*[lab={\ruleName{val-obj}}]
 {
-  \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}} \\
-  \vdash v_i : \tau_i \quad (\forall i)
+  \replaced{\tyInst{\fields{\Sigma}(C)}{\seq{\sigma}} = \bind{\seq{x}}{\seq{\sigma}'}}{\fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}}} \\
+  \vdash v_i : \replaced{\sigma'_i}{\tau_i} \quad (\forall i) \\
+  \added{\Sigma \vdash C[\seq{\sigma}] \subty \tau}
 }
 {
-  \vdash \exObj{C}{\bind{\seq{x}}{\seq{v}}} : C
+  \vdash \exObj{C}{\bind{\seq{x}}{\seq{v}}} : \replaced{\tau}{C}
 }
 \and
-\inferrule*[lab={\ruleName{val-sub}}]
+\deleted{\inferrule*[lab={\ruleName{val-sub}}]
 {
   \vdash v : \sigma \\
   \Sigma \vdash \sigma \subty \tau
 }
 {
   \vdash v : \tau
-}
+}}
 \and
-\inferrule*[lab={\ruleName{val-inst}}]
+\deleted{\inferrule*[lab={\ruleName{val-inst}}]
 {
   \vdash v : \scheme{\seq{\alpha}}{\sigma} \\
   \fv(\tau_i) = \varnothing \quad (\forall i)
 }
 {
   \vdash v : \subst{\seq{\tau}}{\seq{\alpha}}{\sigma}
-}
+}}
 \and
 \inferrule*[lab={\ruleName{val-prim}}]
 {
-  \mathcal{E}(\mathcal{A})(q)(x) = \primVal{\primFn}
+  \mathcal{E}(\mathcal{A})(q)(x) = \primVal{\primFn} \\
+  \added{\Sigma \vdash \mathcal{P}(q)(x) \subty \tau}
 }
 {
-  \vdash \primVal{\primFn} : \mathcal{P}(q)(x)
+  \vdash \primVal{\primFn} : \replaced{\tau}{\mathcal{P}(q)(x)}
 }
 \and
 \inferrule*[lab={\ruleName{val-predef}}]
