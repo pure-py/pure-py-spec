@@ -10,12 +10,14 @@ A \emph{class table} $\Sigma$ maps each
 class name $C$ in its domain to a \emph{class entry} $\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$ (\figref{context-entries}), which records the class
 definition $\chi_i$ of mutual type region $\seq{\chi}$ of module $q$ defining $C$, and the context $\Gamma$ in which
 the region appears. \deleted{Every class named in $\Sigma$ is in $\dom(\Sigma)$, and the base-class relation on
-$\dom(\Sigma)$ is acyclic. }\added{The base-class relation on $\dom(\Sigma)$ is acyclic, and for each $C \in \dom(\Sigma)$:}
+$\dom(\Sigma)$ is acyclic. }\added{The base-class relation on $\dom(\Sigma)$ is acyclic, and for each $C \in \dom(\Sigma)$, with $\Sigma(C) = \ClassDef[\Gamma]{q}{\seq{\chi}}{i}$:}
 \begin{AddedBlock}
 \begin{itemize}
+\item $\Gamma$ is well-formed (Definition~\ref{def:well-formed-context}), with $\tyvars(\Gamma) = \varnothing$, and
+$q.c \in \dom(\Sigma)$ for each class definition of $c$ in $\seq{\chi}$
 \item if $\base{\Sigma}(C) = D[\seq{\sigma}]$, then $D[\seq{\sigma}]$ is well-formed
 (Definition~\ref{def:well-formed-type}), $D \neq \clsRange$ and $\fv(D[\seq{\sigma}]) \subseteq \typeParams{\Sigma}(C)$
-\item each field type $\tau$ in $\fields{\Sigma}(C)$ is well-formed, with $\fv(\tau) \subseteq \typeParams{\Sigma}(C)$
+\item each field type $\tau$ declared by $C$ in $\fields{\Sigma}(C)$ is well-formed, with $\fv(\tau) \subseteq \typeParams{\Sigma}(C)$
 \item $\typeParams{\Sigma}(C)$ is distinct, and field names in $\fields{\Sigma}(C)$ are distinct
 \end{itemize}
 \end{AddedBlock}
@@ -23,6 +25,20 @@ $\dom(\Sigma)$ is acyclic. }\added{The base-class relation on $\dom(\Sigma)$ is 
 \begin{AddedBlock}
 \begin{specdefinition}{Well-formed type}%
 \label{def:well-formed-type}%
-A type $\tau$ is \emph{well-formed} in $\Sigma$ when every class named in $\tau$ is in $\dom(\Sigma)$ and is applied to as many type arguments as it has type parameters.%
+A type $\tau$ is \emph{well-formed} in $\Sigma$ when $C \in \dom(\Sigma)$ and $|\seq{\sigma}| =
+|\typeParams{\Sigma}(C)|$ for each instantiated class $C[\seq{\sigma}]$ in $\tau$.%
+\end{specdefinition}
+\begin{specdefinition}{Well-formed context}%
+\label{def:well-formed-context}%
+A context $\Gamma$ is \emph{well-formed} in $\Sigma$ when each entry of $\Gamma$ satisfies the condition for its form:
+\begin{itemize}
+\item $\tau$, $\DU{\tau}$ or $\PU{\tau}$: $\tau$ is well-formed
+\item $\scheme{\seq{\alpha}}{\tau}$ or $\PU{\scheme{\seq{\alpha}}{\tau}}$: $\tau$ is a well-formed callable type
+\item $\Type{C}$: $C \in \dom(\Sigma)$
+\item $\modLoaded{q}{\Gamma'}$: $\Gamma'$ is well-formed, with $\tyvars(\Gamma') = \varnothing$
+\item $\TypeAlias[\Gamma']{q}{\seq{\chi}}{i}$: $\Gamma'$ is well-formed, with $\tyvars(\Gamma') = \varnothing$,
+$\chi_i$ is a \pyinline{type} statement, and $q.c \in \dom(\Sigma)$ for each class definition of $c$ in $\seq{\chi}$
+\end{itemize}
+Other entries are not constrained.%
 \end{specdefinition}
 \end{AddedBlock}
