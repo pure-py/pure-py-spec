@@ -57,7 +57,8 @@ So that no value typed at $\tau$ is an object of $C$ or of a subclass of $C$, a 
 variables at \tyNever{} only if its class $C$ is \emph{incomparable} with $\tau$ (\ruleName{check-constr-none}). A
 class is incomparable with an instantiated class if neither class is an ancestor of the other
 (\ruleName{incomparable-unrelated}), or if the type arguments of the instantiation of the ancestor reached from $C$
-are apart from $\seq{\sigma}$ (\ruleName{incomparable-below}, \S\ref{aux:apart}); a class is also incomparable with
+are \emph{apart} from $\seq{\sigma}$, differing at some position outside type variables and unions, so that no
+instantiation of the type parameters of $C$ makes the two equivalent (\ruleName{incomparable-below}); a class is also incomparable with
 a list, dictionary, tuple, callable or literal type, and with a primitive type other than \tyObject{} and \tyNever{}
 (\ruleName{incomparable-other}). If the instance of $C$ at $\tau$ is undefined and $C$ is not incomparable with
 $\tau$, a constructor pattern naming $C$ is ill-formed. This is the case at a type variable, which may stand for

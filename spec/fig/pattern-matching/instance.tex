@@ -49,7 +49,7 @@
 {
   \typeParams{\Sigma}(C) = \seq{\alpha} \\
   \ancestor{\Sigma}(C[\seq{\alpha}], D) = D[\seq{\tau}] \\
-  \apart(\seq{\tau}, \seq{\sigma})
+  \seq{\tau} \mathrel{\#} \seq{\sigma}
 }
 {
   \Sigma \vdash C \parallel D[\seq{\sigma}]
@@ -64,7 +64,84 @@
   \Sigma \vdash C \parallel \tau
 }
 \end{mathpar}
+\flushleft \shadebox{$\tau \mathrel{\#} \sigma$} \quad \shadebox{$\seq{\tau} \mathrel{\#} \seq{\sigma}$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{apart-list}}]
+{
+  \tau \mathrel{\#} \sigma
+}
+{
+  \tyList{\tau} \mathrel{\#} \tyList{\sigma}
+}
+\and
+\inferrule*[lab={\ruleName{apart-dict}}]
+{
+  \tau \mathrel{\#} \sigma
+}
+{
+  \tyDict{\tau} \mathrel{\#} \tyDict{\sigma}
+}
+\and
+\inferrule*[lab={\ruleName{apart-tuple}}]
+{
+  \seq{\tau} \mathrel{\#} \seq{\sigma}
+}
+{
+  \tyTuple{\seq{\tau}} \mathrel{\#} \tyTuple{\seq{\sigma}}
+}
+\and
+\inferrule*[lab={\ruleName{apart-callable}}]
+{
+  \tau \cons \seq{\tau} \mathrel{\#} \sigma \cons \seq{\sigma}
+}
+{
+  \tyCallable{\seq{\tau}}{\tau} \mathrel{\#} \tyCallable{\seq{\sigma}}{\sigma}
+}
+\and
+\inferrule*[lab={\ruleName{apart-class}}]
+{
+  \seq{\tau} \mathrel{\#} \seq{\sigma}
+}
+{
+  C[\seq{\tau}] \mathrel{\#} C[\seq{\sigma}]
+}
+\and
+\inferrule*[lab={\ruleName{apart-differ}}]
+{
+  \tau \neq \sigma \\
+  \tau, \sigma \text{ not type variables or unions} \\\\
+  \tau, \sigma \text{ not both list, dictionary, tuple or callable types, or instantiations of one class}
+}
+{
+  \tau \mathrel{\#} \sigma
+}
+\and
+\inferrule*[lab={\ruleName{apart-head}}]
+{
+  \tau \mathrel{\#} \sigma
+}
+{
+  \tau \cons \seq{\tau} \mathrel{\#} \sigma \cons \seq{\sigma}
+}
+\and
+\inferrule*[lab={\ruleName{apart-tail}}]
+{
+  \seq{\tau} \mathrel{\#} \seq{\sigma}
+}
+{
+  \tau \cons \seq{\tau} \mathrel{\#} \sigma \cons \seq{\sigma}
+}
+\and
+\inferrule*[lab={\ruleName{apart-length}}]
+{
+  |\seq{\tau}| \neq |\seq{\sigma}|
+}
+{
+  \seq{\tau} \mathrel{\#} \seq{\sigma}
+}
+\end{mathpar}
 \end{AddedBlock}
-\caption{Instance of a class at a type\added{, and class incomparable with a type}}
+\caption{Instance of a class at a type\added{, class incomparable with a type, and apart types}}
 \label{fig:instance}
 \end{figure}
