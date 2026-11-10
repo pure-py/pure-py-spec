@@ -10,14 +10,16 @@ A \emph{class table} $\Sigma$ maps each
 class name $C$ in its domain to a \emph{class entry} $\ClassDef[\Gamma]{q}{\seq{\chi}}{i}$ (\figref{context-entries}), which records the class
 definition $\chi_i$ of mutual type region $\seq{\chi}$ of module $q$ defining $C$, and the context $\Gamma$ in which
 the region appears. \deleted{Every class named in $\Sigma$ is in $\dom(\Sigma)$, and the base-class relation on
-$\dom(\Sigma)$ is acyclic. }\added{A class table satisfies the following conditions:}
+$\dom(\Sigma)$ is acyclic. }\added{A class table satisfies the following conditions, for each $C \in \dom(\Sigma)$:}
 \begin{AddedBlock}
 \begin{itemize}
-\item every class named in $\Sigma$ is in $\dom(\Sigma)$
-\item $\typeParams{\Sigma}(C)$ distinct for each $C \in \dom(\Sigma)$
-\item $\base{\Sigma}(C)$, if not $\bot$, a well-formed type (Definition~\ref{def:well-formed-type}) other than
-$\clsRange[]$, with free type variables among $\typeParams{\Sigma}(C)$, for each $C \in \dom(\Sigma)$
-\item base-class relation on $\dom(\Sigma)$ acyclic
+\item $\base{\Sigma}(C)$, if not $\bot$, is a well-formed type (Definition~\ref{def:well-formed-type}) other than
+$\clsRange$, with free type variables among $\typeParams{\Sigma}(C)$
+\item the field types in $\fields{\Sigma}(C)$ are well-formed types with free type variables among
+$\typeParams{\Sigma}(C)$
+\item the type parameters in $\typeParams{\Sigma}(C)$ are distinct, and the field names in $\fields{\Sigma}(C)$ are
+distinct
+\item the base-class relation on $\dom(\Sigma)$ is acyclic
 \end{itemize}
 \end{AddedBlock}
 \end{specdefinition}
