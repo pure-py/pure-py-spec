@@ -13,8 +13,8 @@ the region appears. \deleted{Every class named in $\Sigma$ is in $\dom(\Sigma)$,
 $\dom(\Sigma)$ is acyclic. }\added{The base-class relation on $\dom(\Sigma)$ is acyclic, and for each $C \in \dom(\Sigma)$:}
 \begin{AddedBlock}
 \begin{itemize}
-\item $\base{\Sigma}(C)$, if not $\bot$, is well-formed (Definition~\ref{def:well-formed-type}) and not
-$\clsRange$, with $\fv(\base{\Sigma}(C)) \subseteq \typeParams{\Sigma}(C)$
+\item if $\base{\Sigma}(C) = D[\seq{\sigma}]$, then $D[\seq{\sigma}]$ is well-formed
+(Definition~\ref{def:well-formed-type}), $D \neq \clsRange$ and $\fv(D[\seq{\sigma}]) \subseteq \typeParams{\Sigma}(C)$
 \item each field type $\tau$ in $\fields{\Sigma}(C)$ is well-formed, with $\fv(\tau) \subseteq \typeParams{\Sigma}(C)$
 \item $\typeParams{\Sigma}(C)$ is distinct, and field names in $\fields{\Sigma}(C)$ are distinct
 \end{itemize}
