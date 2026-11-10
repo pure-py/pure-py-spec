@@ -377,8 +377,7 @@ def check_conformance(argv: Sequence[str] | None = None) -> Runner:
         "interpreter",
         nargs="?",
         default="python3",
-        help="command which runs the module at the path appended to it, a PurePy implementation if it "
-        f"answers {IMPLEMENTATION_OPTION} with {PUREPY}, or a Python implementation (default: python3)",
+        help="command which runs the module at the path appended to it (default: python3)",
     )
     parser.add_argument(
         "--type-checker",
