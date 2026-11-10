@@ -1,0 +1,220 @@
+\begin{figure}
+\flushleft \shadebox{$\Sigma \vdash \tau \wf$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{wf-ty-prim}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \nu \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-ty-literal}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \tyLiteral{\ell} \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-ty-var}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \alpha \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-ty-list}}]
+{
+  \Sigma \vdash \tau \wf
+}
+{
+  \Sigma \vdash \tyList{\tau} \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-ty-dict}}]
+{
+  \Sigma \vdash \tau \wf
+}
+{
+  \Sigma \vdash \tyDict{\tau} \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-ty-tuple}}]
+{
+  \Sigma \vdash \tau_i \wf \quad (\forall i)
+}
+{
+  \Sigma \vdash \tyTuple{\seq{\tau}} \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-ty-callable}}]
+{
+  \Sigma \vdash \sigma_i \wf \quad (\forall i) \\
+  \Sigma \vdash \tau \wf
+}
+{
+  \Sigma \vdash \tyCallable{\seq{\sigma}}{\tau} \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-ty-class}}]
+{
+  C \in \dom(\Sigma) \\
+  |\seq{\tau}| = |\typeParams{\Sigma}(C)| \\
+  \Sigma \vdash \tau_i \wf \quad (\forall i)
+}
+{
+  \Sigma \vdash C[\seq{\tau}] \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-ty-union}}]
+{
+  \Sigma \vdash \sigma \wf \\
+  \Sigma \vdash \tau \wf
+}
+{
+  \Sigma \vdash \tyUnion{\sigma}{\tau} \wf
+}
+\end{mathpar}
+
+\flushleft \shadebox{$\Sigma \vdash \theta \wf$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{wf-unbound}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \Unbound \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-type-var}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \TypeVar \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-mod}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \modStub{q} \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-predef}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \predefName \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-du}}]
+{
+  \Sigma \vdash \tau \wf
+}
+{
+  \Sigma \vdash \DU{\tau} \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-pu}}]
+{
+  \Sigma \vdash \theta \wf \\
+  \theta \in \set{\tau, \scheme{\seq{\alpha}}{\tau}}
+}
+{
+  \Sigma \vdash \PU{\theta} \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-scheme}}]
+{
+  \Sigma \vdash \tyCallable{\seq{\sigma}}{\tau} \wf
+}
+{
+  \Sigma \vdash \scheme{\seq{\alpha}}{\tyCallable{\seq{\sigma}}{\tau}} \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-class}}]
+{
+  C \in \dom(\Sigma)
+}
+{
+  \Sigma \vdash \Type{C} \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-mod-loaded}}]
+{
+  \Sigma \vdash \Gamma \wf \\
+  \tyvars(\Gamma) = \varnothing
+}
+{
+  \Sigma \vdash \modLoaded{q}{\Gamma} \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-type-alias}}]
+{
+  \Sigma \vdash \Gamma \wf \\
+  \tyvars(\Gamma) = \varnothing \\
+  \chi_i = \exTypeAlias{x[\seq{\alpha}]}{\psi} \\\\
+  \dom(\classTable{\Gamma}(q, \seq{\chi})) \subseteq \dom(\Sigma)
+}
+{
+  \Sigma \vdash \TypeAlias[\Gamma]{q}{\seq{\chi}}{i} \wf
+}
+\end{mathpar}
+
+\flushleft \shadebox{$\Sigma \vdash \Gamma \wf$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{wf-cxt}}]
+{
+  \Sigma \vdash \Gamma(x) \wf \quad (\forall x \in \dom(\Gamma))
+}
+{
+  \Sigma \vdash \Gamma \wf
+}
+\end{mathpar}
+\caption{Well-formed types, context entries and contexts}
+\label{fig:well-formed}
+\end{figure}
+
+\begin{figure}
+\flushleft \shadebox{$\Sigma \vdash C \wfClass$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{wf-class-def}}]
+{
+  \Sigma(C) = \ClassDef[\Gamma]{q}{\seq{\chi}}{i} \\
+  \Sigma \vdash \Gamma \wf \\
+  \tyvars(\Gamma) = \varnothing \\
+  \dom(\classTable{\Gamma}(q, \seq{\chi})) \subseteq \dom(\Sigma) \\\\
+  \Sigma \vdash D[\seq{\sigma}] \wf \quad D \neq \clsRange \quad \fv(D[\seq{\sigma}]) \subseteq \seq{\alpha} \quad
+  (\text{if } \base{\Sigma}(C) = D[\seq{\sigma}]) \\\\
+  \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}} \\
+  \Sigma \vdash \tau_j \wf \quad \fv(\tau_j) \subseteq \seq{\alpha} \quad (\forall j) \\
+  \seq{x} \text{ distinct}
+}
+{
+  \Sigma \vdash C \wfClass
+}
+\end{mathpar}
+
+\flushleft \shadebox{$\vdash \Sigma \wf$}
+\begin{mathpar}
+\small
+\inferrule*[lab={\ruleName{wf-class-table}}]
+{
+  \Sigma \vdash C \wfClass \quad (\forall C \in \dom(\Sigma))
+}
+{
+  \vdash \Sigma \wf
+}
+\end{mathpar}
+\caption{Well-formed classes and class tables}
+\label{fig:well-formed-class-table}
+\end{figure}

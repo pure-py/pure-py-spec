@@ -1,1 +1,1 @@
-case {'a': x} is unreachable
+dictionary pattern at object, which has dictionary values

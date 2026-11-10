@@ -1,34 +1,5 @@
 \begin{figure}
 \setlength{\jot}{2pt}
-\begin{subfigure}{\textwidth}
-\flushleft \shadebox{$\Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$}
-\begin{mathpar}
-\small
-\inferrule*[lab={\ruleName{instance-above}}]
-{
-  \Sigma \vdash \tau \subty C[\seq{\sigma}] \\
-  \seq{\sigma}' \tyEquiv \seq{\sigma} \text{ whenever } \Sigma \vdash \tau \subty C[\seq{\sigma}']
-}
-{
-  \Sigma \vdash C[\seq{\sigma}] \instanceAt \tau
-}
-\and
-\inferrule*[lab={\ruleName{instance-below}}]
-{
-  \Sigma \vdash C[\seq{\sigma}] \subty \tau \\
-  \seq{\sigma}' \tyEquiv \seq{\sigma} \text{ whenever } \Sigma \vdash C[\seq{\sigma}'] \subty \tau
-}
-{
-  \Sigma \vdash C[\seq{\sigma}] \instanceAt \tau
-}
-\end{mathpar}
-\subcaption{$C[\seq{\sigma}]$ is the instance of $C$ at $\tau$}
-\label{fig:instance}
-\end{subfigure}
-
-\vspace{2mm}
-
-\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Sigma; \Gamma \vdash p \checks \tau \binding \Delta$}
 \begin{mathpar}
 \small
@@ -50,7 +21,7 @@
 \and
 \inferrule*[lab={\ruleName{check-literal}}]
 {
-  \strut
+  \tau \text{ has no float values if } \ell \text{ an int literal}
 }
 {
   \Sigma; \Gamma \vdash \ell \checks \tau \binding \varnothing
@@ -85,10 +56,11 @@
 \inferrule*[lab={\ruleName{check-tuple-none}}]
 {
   \tau \text{ has no list or range values} \\
-  \text{no disjunct of } \tau \text{ a tuple type of length } |\seq{p}|
+  \text{no disjunct of } \tau \text{ a tuple type of length } |\seq{p}| \\
+  \Gamma(x) = \Unbound \quad (\forall x \in \binds(\seq{p}))
 }
 {
-  \Sigma; \Gamma \vdash \patTuple{\seq{p}} \checks \tau \binding \set{\bind{x}{\tyNever} \mid x \in \binds(\patTuple{\seq{p}})}
+  \Sigma; \Gamma \vdash \patTuple{\seq{p}} \checks \tau \binding \set{\bind{x}{\tyNever} \mid x \in \binds(\seq{p})}
 }
 \and
 \inferrule*[lab={\ruleName{check-list}}]
@@ -102,10 +74,11 @@
 \inferrule*[lab={\ruleName{check-list-none}}]
 {
   \tau \text{ has no tuple or range values} \\
-  \text{no disjunct of } \tau \text{ a list type}
+  \text{no disjunct of } \tau \text{ a list type} \\
+  \Gamma(x) = \Unbound \quad (\forall x \in \binds(\seq{p}))
 }
 {
-  \Sigma; \Gamma \vdash \patList{\seq{p}} \checks \tau \binding \set{\bind{x}{\tyNever} \mid x \in \binds(\patList{\seq{p}})}
+  \Sigma; \Gamma \vdash \patList{\seq{p}} \checks \tau \binding \set{\bind{x}{\tyNever} \mid x \in \binds(\seq{p})}
 }
 \and
 \inferrule*[lab={\ruleName{check-dict}}]
@@ -118,10 +91,11 @@
 \and
 \inferrule*[lab={\ruleName{check-dict-none}}]
 {
-  \text{no disjunct of } \tau \text{ a dictionary type}
+  \tau \text{ has no dictionary values} \\
+  \Gamma(x) = \Unbound \quad (\forall x \in \binds(\seq{p}))
 }
 {
-  \Sigma; \Gamma \vdash \patDict{\bind{\seq{w}}{\seq{p}}} \checks \tau \binding \set{\bind{x}{\tyNever} \mid x \in \binds(\patDict{\bind{\seq{w}}{\seq{p}}})}
+  \Sigma; \Gamma \vdash \patDict{\bind{\seq{w}}{\seq{p}}} \checks \tau \binding \set{\bind{x}{\tyNever} \mid x \in \binds(\seq{p})}
 }
 \and
 \inferrule*[lab={\ruleName{check-constr}}]
@@ -139,15 +113,13 @@
 \inferrule*[lab={\ruleName{check-constr-none}}]
 {
   \Gamma \vdash q : \Type{C} \\
-  \Sigma \nvdash \tau \subty C[\seq{\sigma}] \text{ and } \Sigma \nvdash C[\seq{\sigma}] \subty \tau \quad (\forall \seq{\sigma})
+  \Sigma \vdash C \parallel \tau \\
+  \Gamma(x) = \Unbound \quad (\forall x \in \binds(\patConstr{q}{a}))
 }
 {
   \Sigma; \Gamma \vdash \patConstr{q}{a} \checks \tau \binding \set{\bind{x}{\tyNever} \mid x \in \binds(\patConstr{q}{a})}
 }
 \end{mathpar}
-\subcaption{Pattern $p$ checks against type $\tau$, binding $\Delta$}
-\label{fig:checking-pat}
-\end{subfigure}
 \caption{Pattern checking}
-\label{fig:pattern-checking}
+\label{fig:checking-pat}
 \end{figure}

@@ -243,6 +243,7 @@
 \newcommand*{\headList}[1]{\pyinline{list}_{#1}}
 \newcommand*{\instanceAt}{\mathrel{\asymp}}
 \newcommand*{\joinTy}[3]{#2 \vee_{#1} #3}
+\newcommand*{\matchArgs}{\mathrm{match\text{-}args}}
 \newcommand*{\matchedAs}[1]{\mathrm{matched\text{-}as}_{#1}}
 \newcommand*{\meetTy}[3]{#2 \wedge_{#1} #3}
 \newcommand*{\merge}{\mathbin{\oplus}}
@@ -256,7 +257,6 @@
 \newcommand*{\shapes}[1]{\mathrm{shapes}_{#1}}
 \newcommand*{\shapeTy}{\mathrm{shape\text{-}type}}
 \newcommand*{\splits}{\mathrel{\rightsquigarrow_{\mathsf{h}}}}
-\newcommand*{\subterms}{\mathrm{subterms}}
 \newcommand*{\subty}{\mathrel{<:}}
 \newcommand*{\synth}{\mathrel{\triangleright}}
 \newcommand*{\tyEquiv}{\mathrel{\equiv}}
@@ -303,11 +303,14 @@
 \newcommand*{\modOp}{\mathrm{mod}}
 \newcommand*{\trunc}{\mathrm{trunc}}
 \newcommand*{\tyvars}{\mathrm{tyvars}}
+\newcommand*{\wf}{\mathrel{\mathsf{wf}}}
+\newcommand*{\wfClass}{\mathrel{\mathsf{wf\text{-}class}}}
 \newcommand*{\scopeS}{\mathrm{scope}}
 \newcommand*{\typeContext}[1]{\mathrm{type\text{-}context}_{#1}}
 \newcommand*{\typeEntry}[1]{\mathrm{type\text{-}entry}_{#1}}
 
 % Metafunctions: classes
+\newcommand*{\ancestorArgs}[1]{\mathrm{ancestor\text{-}args}_{#1}}
 \newcommand*{\ancestors}[1]{\mathrm{ancestors}_{#1}}
 \newcommand*{\base}[1]{\mathrm{base}_{#1}}
 \newcommand*{\fieldMap}[1]{\mathrm{field\text{-}map}_{#1}}
