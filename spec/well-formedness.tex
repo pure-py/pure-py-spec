@@ -35,6 +35,14 @@ inferred from its body. Within a type expression, a class name applied to as man
 literal type, taking $\tyLiteral{42}$ to \pyinline{int} and otherwise acting as the identity
 (\S\ref{aux:base-type}).
 
+\begin{AddedBlock}
+Lemmas about subtyping assume well-formed types and a well-formed class table (\specfigrefTwo{well-formed}{well-formed-class-table}). The
+base-class relation is acyclic by the definition of a class table rather than by well-formedness, since the auxiliary
+functions on classes are defined by recursion on that relation.
+\end{AddedBlock}
+
+\specinput{spec/fig/well-formed}
+
 \subsubsection{Subtyping}\label{sec:subtyping}%
 
 Subtyping (\specfigref{subtyping}) has every type below itself, a literal type below its base type, and an instantiated class $C[\seq{\tau}]$ below every type that its base class is below, once $\seq{\tau}$ is substituted into the arguments of the base (\ruleName{subty-class-extend}), and below $C[\seq{\sigma}]$ when $\seq{\tau}$ and $\seq{\sigma}$ are equivalent (\ruleName{subty-class}), so that type arguments are invariant, as for lists and dictionaries; a type variable is below itself and \pyinline{object} alone, with \pyinline{object} above every type and \pyinline{Never} below every type. A type that is not a union has one \emph{disjunct}, the type itself; the disjuncts of a union $\tyUnion{\sigma}{\tau}$ are the disjuncts of $\sigma$ together with the disjuncts of $\tau$. A union is above
