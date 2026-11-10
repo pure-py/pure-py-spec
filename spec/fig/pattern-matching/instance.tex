@@ -1,5 +1,6 @@
 \begin{figure}
 \setlength{\jot}{2pt}
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Sigma \vdash C[\seq{\sigma}] \instanceAt \tau$}
 \begin{mathpar}
 \small
@@ -32,7 +33,14 @@
   \Sigma \vdash C[\seq{\sigma}] \instanceAt \replaced{D[\seq{\sigma}']}{\tau}
 }
 \end{mathpar}
+\subcaption{$C[\seq{\sigma}]$ is the instance of $C$ at $\tau$}
+\label{fig:instance-at}
+\end{subfigure}
+
+\vspace{2mm}
+
 \begin{AddedBlock}
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Sigma \vdash C \parallel \tau$}
 \begin{mathpar}
 \small
@@ -64,7 +72,14 @@
   \Sigma \vdash C \parallel \tau
 }
 \end{mathpar}
-\flushleft \shadebox{$\tau \mathrel{\#} \sigma$} \quad \shadebox{$\seq{\tau} \mathrel{\#} \seq{\sigma}$}
+\subcaption{Class $C$ is incomparable with $\tau$}
+\label{fig:incomparable}
+\end{subfigure}
+
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
+\flushleft \shadebox{$\tau \mathrel{\#} \sigma$}
 \begin{mathpar}
 \small
 \inferrule*[lab={\ruleName{apart-list}}]
@@ -116,7 +131,10 @@
 {
   \tau \mathrel{\#} \sigma
 }
-\and
+\end{mathpar}
+\flushleft \shadebox{$\seq{\tau} \mathrel{\#} \seq{\sigma}$}
+\begin{mathpar}
+\small
 \inferrule*[lab={\ruleName{apart-head}}]
 {
   \tau \mathrel{\#} \sigma
@@ -141,6 +159,9 @@
   \seq{\tau} \mathrel{\#} \seq{\sigma}
 }
 \end{mathpar}
+\subcaption{Types $\tau$ and $\sigma$, or sequences $\seq{\tau}$ and $\seq{\sigma}$, are apart}
+\label{fig:apart}
+\end{subfigure}
 \end{AddedBlock}
 \caption{Instance of a class at a type\added{, class incomparable with a type, and apart types}}
 \label{fig:instance}
