@@ -63,8 +63,8 @@ results carrying a sequence of values in place of a value.
 The value typing judgement $\vdash v : \theta$ says that value $v$ is well-typed at context entry $\theta$,
 and the environment typing judgement $\vdash \rho : \Gamma$ says that environment $\rho$ is well-typed at context
 $\Gamma$, meaning every value in $\rho$ is well-typed at the corresponding entry in $\Gamma$ (\specfigref{value-env-typing}).
-\replaced{So that a value and a context entry determine the rule by which the value is typed at the entry, the rules
-typing a value at a type have a subtyping premise. The \ruleName{val-def} rule instantiates the type scheme of a
+\replaced{Each rule typing a value at a type has a subtyping premise, so at most one rule applies to a given value and
+context entry. The \ruleName{val-def} rule instantiates the type scheme of a
 function at closed types}{Values typed at a type scheme are also typed at the instances of the scheme at closed types
 (\ruleName{val-inst}) }, matching the instantiation of names bound at a scheme by the \ruleName{var-scheme} rule.
 The statement evaluation judgement $\rho, s \Rightarrow o$ says that $s$ evaluates
