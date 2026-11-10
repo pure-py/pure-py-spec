@@ -3,6 +3,30 @@
 \flushleft \shadebox{$\Sigma \vdash \tau \wf$}
 \begin{mathpar}
 \small
+\inferrule*[lab={\ruleName{wf-ty-prim}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \nu \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-ty-literal}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \tyLiteral{\ell} \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-ty-var}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \alpha \wf
+}
+\and
 \inferrule*[lab={\ruleName{wf-ty-list}}]
 {
   \Sigma \vdash \tau \wf
@@ -54,35 +78,43 @@
 {
   \Sigma \vdash \tyUnion{\sigma}{\tau} \wf
 }
-\and
-\inferrule*[lab={\ruleName{wf-ty-prim}}]
-{
-  \strut
-}
-{
-  \Sigma \vdash \nu \wf
-}
-\and
-\inferrule*[lab={\ruleName{wf-ty-literal}}]
-{
-  \strut
-}
-{
-  \Sigma \vdash \tyLiteral{\ell} \wf
-}
-\and
-\inferrule*[lab={\ruleName{wf-ty-var}}]
-{
-  \strut
-}
-{
-  \Sigma \vdash \alpha \wf
-}
 \end{mathpar}
 
 \flushleft \shadebox{$\Sigma \vdash \theta \wf$}
 \begin{mathpar}
 \small
+\inferrule*[lab={\ruleName{wf-unbound}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \Unbound \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-type-var}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \TypeVar \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-mod}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \modStub{q} \wf
+}
+\and
+\inferrule*[lab={\ruleName{wf-predef}}]
+{
+  \strut
+}
+{
+  \Sigma \vdash \predefName \wf
+}
+\and
 \inferrule*[lab={\ruleName{wf-du}}]
 {
   \Sigma \vdash \tau \wf
@@ -134,38 +166,6 @@
 }
 {
   \Sigma \vdash \TypeAlias[\Gamma]{q}{\seq{\chi}}{i} \wf
-}
-\and
-\inferrule*[lab={\ruleName{wf-unbound}}]
-{
-  \strut
-}
-{
-  \Sigma \vdash \Unbound \wf
-}
-\and
-\inferrule*[lab={\ruleName{wf-type-var}}]
-{
-  \strut
-}
-{
-  \Sigma \vdash \TypeVar \wf
-}
-\and
-\inferrule*[lab={\ruleName{wf-mod}}]
-{
-  \strut
-}
-{
-  \Sigma \vdash \modStub{q} \wf
-}
-\and
-\inferrule*[lab={\ruleName{wf-predef}}]
-{
-  \strut
-}
-{
-  \Sigma \vdash \predefName \wf
 }
 \end{mathpar}
 
