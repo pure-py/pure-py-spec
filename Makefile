@@ -3,9 +3,10 @@ BIBFILES := $(wildcard tex/*.bib)
 PYTHON_VERSION_TEX := tex/python-version.tex
 MYPY_VERSION_TEX := tex/mypy-version.tex
 ANON_NAME_TEX := tex/anon-name.tex
+MECHANISATION_NAMES_TEX := tex/mechanisation-names.tex
 SPEC_LABELS := xref/PurePy-spec.aux
 FIGURE_NUMBERS := src/purepy_conformance/figure-numbers.json
-TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX)
+TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(MECHANISATION_NAMES_TEX)
 PDFLATEX := pdflatex -interaction=nonstopmode -halt-on-error
 ISABELLE ?= isabelle
 BUILD_AUX := *.aux *.blg *.cb *.cb2 *.cut *.fdb_latexmk *.fls *.loc *.log *.out *.soc *.toc
@@ -30,6 +31,24 @@ $(ANON_NAME_TEX): .anon-name
 $(MYPY_VERSION_TEX): uv.lock
 	printf '\\newcommand*{\\mypyVersion}{%s}\n' \
 		"$$(sed -n '/^name = "mypy"$$/{n;s/^version = "\(.*\)"$$/\1/p;}' $<)" > $@
+
+# pin: release tag
+MECHANISATION_REPO := https://github.com/pure-py/isabelle-purepy
+MECHANISATION_RELEASE := v$(shell cat .mechanisation-version)
+# Clone of the release, made once per release
+MECHANISATION := .mechanisation/$(MECHANISATION_RELEASE)
+
+$(MECHANISATION)/ROOT:
+	@git ls-remote --exit-code --tags $(MECHANISATION_REPO).git $(MECHANISATION_RELEASE) >/dev/null || \
+		{ echo "report: no mechanisation release $(MECHANISATION_RELEASE)"; exit 1; }
+	rm -rf $(MECHANISATION) $(MECHANISATION).tmp
+	git -c advice.detachedHead=false clone -q --depth 1 --branch $(MECHANISATION_RELEASE) $(MECHANISATION_REPO).git \
+		$(MECHANISATION).tmp
+	mv $(MECHANISATION).tmp $(MECHANISATION)
+
+$(MECHANISATION_NAMES_TEX): script/mechanisation-names.py $(MECHANISATION)/ROOT
+	uv run --locked python $< $(MECHANISATION) > $@.tmp && mv $@.tmp $@
+
 # FINAL=1 renders the clean version, with change markup accepted; switching modes needs a forced
 # rebuild (make -B).
 ifdef FINAL
@@ -106,8 +125,8 @@ wheel: check-targets check-consistency check-suite-python check-suite-purepy $(F
 
 ## Remove build products
 clean:
-	rm -f $(AUX) *.pdf $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX)
-	rm -rf $(dir $(SPEC_LABELS)) $(FIGURE_NUMBERS)
+	rm -f $(AUX) *.pdf $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(MECHANISATION_NAMES_TEX)
+	rm -rf $(dir $(SPEC_LABELS)) $(FIGURE_NUMBERS) .mechanisation
 
 ## Make targets documented, and workflows named after their targets
 check-targets:
