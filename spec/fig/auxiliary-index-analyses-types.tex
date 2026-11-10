@@ -6,7 +6,7 @@
 \auxrow{$\typeContext{\Gamma}(q, \seq{\chi}, i)$}{context}{context resolving type expressions of definition $\chi_i$ of mutual type region $\seq{\chi}$ of module $q$ under $\Gamma$}{aux:type-context}
 \auxrow{$\classTable{\Gamma}(q, \seq{\chi}, i)$, $\classTable{\Gamma}(q, \seq{\chi})$}{class table}{class table contributed by definition $\chi_i$, or by all definitions, of mutual type region $\seq{\chi}$ of module $q$ under $\Gamma$}{aux:class-table}
 \auxrow{$\scopeS(\seq{y}, s)$}{context}{each variable declared or assigned in $s$ unbound; defined iff parameters or imported names $\seq{y}$, names declared in $s$, and pattern variables of $s$ are distinct and pairwise disjoint}{aux:scope}
-\auxrow{$\binds(p)$, \added{$\binds(\seq{p})$, }$\binds(\seq{g})$, $\binds(s)$}{set of variables}{variables bound by pattern $p$, \added{by patterns $\seq{p}$, }by generators of qualifiers $\seq{g}$, or by patterns within statement $s$}{aux:binds}
+\auxrow{$\binds(p)$, $\binds(\seq{p})$, $\binds(\seq{g})$, $\binds(s)$}{set of variables}{variables bound by pattern $p$, by patterns $\seq{p}$, by generators of qualifiers $\seq{g}$, or by patterns within statement $s$}{aux:binds}
 \auxrow{$\captures(e)$}{set of variables}{variables of enclosing scope captured by lambdas in $e$}{aux:captures-e}
 \auxrow{$\captures(\seq{g})$}{set of variables}{variables of enclosing scope captured by lambdas in qualifiers $\seq{g}$}{aux:captures}
 \auxrow{$\fv(e)$, $\fv(\seq{e})$, $\fv(\tau)$}{set of variables}{free variables of expression $e$, or of each expression in $\seq{e}$; type variables of type $\tau$}{aux:fv}
@@ -16,7 +16,7 @@
 \auxrow{$\baseType(\ell)$, $\baseType(\tau)$}{type}{base type of literal $\ell$, or of type $\tau$}{aux:base-type}
 \auxrow{$\joinTy{\Sigma}{\sigma}{\tau}$, $\bigJoinTy{\Sigma}{\seq{\tau}}$}{type}{larger type if comparable, and union otherwise}{aux:join}
 \auxrow{$\meetTy{\Sigma}{\sigma}{\tau}$}{type}{greatest type below both}{aux:meet}
-\added{$\matchArgs(\tau, \sigma)$, $\matchArgs(\seq{\tau}, \seq{\sigma})$} & \added{context binding type variables at types} & \added{type arguments from one-way matching of $\tau$ against $\sigma$, or of $\seq{\tau}$ against $\seq{\sigma}$} & \added{\S\ref{aux:match-args}} \\
+$\matchArgs(\tau, \sigma)$, $\matchArgs(\seq{\tau}, \seq{\sigma})$ & context binding type variables at types & type arguments from one-way matching of $\tau$ against $\sigma$, or of $\seq{\tau}$ against $\seq{\sigma}$ & \S\ref{aux:match-args} \\
 \auxrow{$\typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau)$, $\typeArgs{\Sigma}(\seq{\alpha}, \seq{\sigma}, \seq{\tau})$}{context binding type variables at types}{type arguments from one-way unification of $\sigma$ with $\tau$, or of $\seq{\sigma}$ with $\seq{\tau}$}{aux:type-args}
 \auxrow{$\elemTy{\Sigma}(\tau)$}{type}{type of elements drawn from $\tau$ by generator}{aux:elem-type}
 \auxrow{$\shapes{\Sigma}(\tau, H)$, $\shapes{\Sigma}(\seq{\tau})$}{ordered set of shapes or of shape sequences}{shapes of $\tau$ once heads in $H$ are excluded; sequences of shapes of $\seq{\tau}$}{aux:shapes}

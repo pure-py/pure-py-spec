@@ -21,7 +21,7 @@ cases are stated with each.
 \funccases{assigns}
 \end{auxfunction}
 
-\begin{auxfunction}{\binds(p), \added{\binds(\seq{p}), }\binds(s)}{set of variables}{aux:binds}
+\begin{auxfunction}{\binds(p), \binds(\seq{p}), \binds(s)}{set of variables}{aux:binds}
 \input{spec/functions/binds-text}
 \funccases{binds}
 \end{auxfunction}
@@ -94,12 +94,10 @@ The functions on types and shapes introduced in \secref{types}, each defined by 
 \funccases{meet}
 \end{auxfunction}
 
-\begin{AddedBlock}
 \begin{auxfunction}{\matchArgs(\tau, \sigma), \matchArgs(\seq{\tau}, \seq{\sigma})}{context binding type variables at types}{aux:match-args}
 \input{spec/functions/match-args-text}
 \funccases{match-args}
 \end{auxfunction}
-\end{AddedBlock}
 
 \begin{auxfunction}{\typeArgs{\Sigma}(\seq{\alpha}, \sigma, \tau), \typeArgs{\Sigma}(\seq{\alpha}, \seq{\sigma}, \seq{\tau})}{context binding type variables at types}{aux:type-args}
 \input{spec/functions/type-args-text}
@@ -194,12 +192,10 @@ the resolution of names in an environment.
 \funccases{ancestors}
 \end{auxfunction}
 
-\begin{AddedBlock}
 \begin{auxfunction}{\ancestorArgs{\Sigma}(C[\seq{\tau}], D)}{sequence of types}{aux:ancestor-args}
 \input{spec/functions/ancestor-args-text}
 \funccases{ancestor-args}
 \end{auxfunction}
-\end{AddedBlock}
 
 \begin{auxfunction}{\fieldMap{\Sigma}(C, \seq{u})}{map from variables}{aux:field-map}
 \input{spec/functions/field-map-text}
