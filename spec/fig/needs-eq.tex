@@ -39,7 +39,7 @@
 { \Sigma \vdash C \needsEq \varepsilon }
 { \Sigma \vdash C[\seq{\sigma}] \needsEq \varepsilon }
 \end{mathpar}
-\subcaption{Equality at type $\tau$ needs equality at type variable $\xi$, or at a callable type if $\xi$ is $\varepsilon$}
+\subcaption{Equality at type $\tau$ needs equality at type variable $\xi$, or at a callable type if $\xi$ is $\varepsilon$ (\mechref{needs_eq})}
 \label{fig:needs-eq-type}
 \end{subfigure}
 
@@ -53,9 +53,9 @@
 { \fields{\Sigma}(C) = \scheme{\seq{\alpha}}{\bind{\seq{x}}{\seq{\tau}}} \\ \Sigma \vdash \tau_i \needsEq \xi }
 { \Sigma \vdash C \needsEq \xi }
 \end{mathpar}
-\subcaption{Equality at class $C$ needs equality at its type parameter $\xi$, or at a callable type if $\xi$ is $\varepsilon$}
+\subcaption{Equality at class $C$ needs equality at its type parameter $\xi$, or at a callable type if $\xi$ is $\varepsilon$ (\mechref{needs_eq_class})}
 \label{fig:needs-eq-class}
 \end{subfigure}
-\caption{Types compared by structural equality (\mechref{needs_eq})}
+\caption{Types compared by structural equality}
 \label{fig:needs-eq}
 \end{figure}
