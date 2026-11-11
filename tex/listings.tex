@@ -41,12 +41,15 @@
   moredelim=[l][\color{base0B}]{@},
 }
 
-% Size adjustment for inline code, none at present; applied outside the listing, which applies its basic
-% style more than once
+% Size of inline code, a little below the surrounding text; applied outside the listing, which applies its basic
+% style more than once, and robust for use in captions. Scaling between the design sizes of Computer Modern
+% Typewriter needs fix-cm, loaded before the document class.
 \makeatletter
-\newcommand*{\pyinlinesize}{\fontsize{\strip@pt\dimexpr\f@size pt*19/20\relax}{\f@baselineskip}\selectfont}
+\DeclareRobustCommand*{\pyinlinesize}{\fontsize{\strip@pt\dimexpr\f@size pt*19/20\relax}{\f@baselineskip}\selectfont}
 \makeatother
 \newcommand*{\pyinlinestyle}{\renewcommand\ttdefault{cmtt}\ttfamily}
+% Mechanisation names, in the font and size of inline code
+\DeclareRobustCommand*{\mechnamestyle}{\pyinlinestyle\upshape\pyinlinesize}
 % File and directory names, in the size and font of inline code
 \newcommand*{\filename}[1]{{\pyinlinesize\pyinlinestyle #1}}
 
