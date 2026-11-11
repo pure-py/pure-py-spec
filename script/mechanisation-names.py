@@ -56,8 +56,14 @@ def main() -> None:
         "\\newcommand*{\\mechref}[1]{\\ifcsname mechanisation:#1\\endcsname\\textcolor{base0B}{\\texttt{\\detokenize{#1}}}"
         "\\else\\errmessage{No mechanisation name #1}\\fi}"
     )
-    for name in sorted(set().union(*map(names, theories(mechanisation)))):
-        print(f"\\expandafter\\def\\csname mechanisation:{name}\\endcsname{{}}")
+    declaring: dict[str, list[str]] = {}
+    for theory in theories(mechanisation):
+        for name in names(theory):
+            declaring.setdefault(name, []).append(theory.stem)
+    # Qualify a name by theory when several theories declare it, since Isabelle qualifies names by theory
+    for name, theory_names in sorted(declaring.items()):
+        for qualified in [name] if len(theory_names) == 1 else [f"{t}.{name}" for t in theory_names]:
+            print(f"\\expandafter\\def\\csname mechanisation:{qualified}\\endcsname{{}}")
 
 
 if __name__ == "__main__":
