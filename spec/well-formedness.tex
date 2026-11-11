@@ -35,7 +35,7 @@ inferred from its body. Within a type expression, a class name applied to as man
 literal type, taking $\tyLiteral{42}$ to \pyinline{int} and otherwise acting as the identity
 (\S\ref{aux:base-type}).
 
-Lemmas about subtyping assume well-formed types and a well-formed class table (\specfigrefTwo{well-formed}{well-formed-class-table}). The
+Lemmas about subtyping assume well-formed types and a well-formed class table (\specfigrefTwo{well-formed}{well-formed-classes}). The
 base-class relation is acyclic by the definition of a class table rather than by well-formedness, since the auxiliary
 functions on classes are defined by recursion on that relation.
 
@@ -387,8 +387,6 @@ its literals, so \pyinline{x: Literal[42] = 42} admits a match with a case for \
 $\tyTuple{\tyBool, \tyBool}$ the cases $\patTuple{\pyinline{True}, \patWild}$,
 $\patTuple{\patWild, \pyinline{False}}$ and $\patTuple{\pyinline{False}, \pyinline{True}}$ leave the empty residual,
 although each covers only part of the type.
-
-\input{spec/well-formedness/shape-typing}
 
 \subsection{Modules and programs}
 \label{sec:well-formedness-modules}
