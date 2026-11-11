@@ -8,79 +8,77 @@
     mypy/.style={densely dotted, orange!85!black, line width=0.9pt}, version/.style={fill=yellow!30},
     label/.style={anchor=north west, inner sep=3pt}, group/.style={font=\footnotesize\bfseries, inner sep=2pt}]
   % Rows: group headers, column headers, then SyntaxError, other exception, no exception, total.
-  % Columns: group labels, row headers, then parser, type checker, excluded from this version, undefined,
-  % agrees, total. Cells are named m-row-column, with python-outcome/purepy-outcome keys below.
+  % Columns: row headers, then parser, type checker, excluded from this version, undefined, agrees, total. Cells
+  % are named m-row-column, with python-outcome/purepy-outcome keys below.
   \matrix (m) [matrix of nodes, nodes in empty cells, column sep=0pt, row sep=0pt, nodes={anchor=center, inner sep=0pt,
-      minimum width=2.15cm, minimum height=0.95cm}, column 1/.style={nodes={minimum width=0.45cm}},
-      column 2/.style={nodes={minimum width=2.1cm}}, column 8/.style={nodes={minimum width=1.1cm}},
+      minimum width=2.15cm, minimum height=0.95cm}, column 1/.style={nodes={minimum width=2.1cm}},
+      column 7/.style={nodes={minimum width=1.1cm}},
       row 1/.style={nodes={minimum height=0.45cm}}, row 2/.style={nodes={minimum height=1.1cm}},
       row 6/.style={nodes={minimum height=0.45cm}}] {
-    & & & & & & & \\
-    & & & & & & & \\
-    & & & & & & & \\
-    & & & & & & & \\
-    & & & & & & & \\
-    & & & & & & & \\
+    & & & & & & \\
+    & & & & & & \\
+    & & & & & & \\
+    & & & & & & \\
+    & & & & & & \\
+    & & & & & & \\
   };
-  \fill[raises] (m-3-3.north west) rectangle (m-3-5.south east) (m-4-4.north west) rectangle (m-4-4.south east);
-  \fill[impossible] (m-3-6.north west) rectangle (m-3-7.south east);
-  \fill[excluded] (m-3-3.north west) rectangle (m-5-3.south east) (m-5-4.north west) rectangle (m-5-4.south east)
-    (m-3-6.north west) rectangle (m-5-6.south east);
-  \fill[version] (m-3-5.north west) rectangle (m-5-5.south east);
-  \fill[agree] (m-3-7.north west) rectangle (m-5-7.south east);
-  \draw[black!33] (m-1-2.north west) rectangle (m-6-8.south east)
-    (m-2-3.north west) -- (m-2-8.north east) (m-3-1.north west) -- (m-3-8.north east)
-    (m-4-2.north west) -- (m-4-4.north east) (m-4-7.north west) -- (m-4-8.north east)
-    (m-5-2.north west) -- (m-5-8.north east) (m-6-1.north west) -- (m-6-8.north east)
-    (m-1-3.north west) -- (m-6-3.south west) (m-2-4.north west) -- (m-6-4.south west)
-    (m-2-5.north west) -- (m-6-5.south west) (m-2-6.north west) -- (m-6-6.south west)
-    (m-1-7.north west) -- (m-6-7.south west) (m-1-8.north west) -- (m-6-8.south west)
-    (m-5-7.south west) ++(0,0.4cm) -- ++(2.15cm,0);
-  \node[group, anchor=north] at ($(m-1-3.north west)!0.5!(m-1-6.north east)$) {\PurePy rejects};
-  \node[group, anchor=north] at (m-1-7.north) {\PurePy accepts};
-  \node[group, anchor=center, rotate=90] at (m-3-1.center) {Invalid};
-  \node[group, anchor=center, rotate=90] at ($(m-4-1.center)!0.5!(m-5-1.center)$) {Valid};
-  \node[label] at (m-1-2.north west) {\textbf{Python}\\[2pt]\textbf{\PurePy}};
-  \node[label] at (m-2-3.north west) {Rejected by\\parser};
-  \node[label] at (m-2-4.north west) {Rejected by\\type checker};
-  \node[label] at (m-2-5.north west) {Excluded from\\this version};
-  \node[label] at (m-2-6.north west) {Well-formed,\\yields\\$\aborts{\errUndef}$};
-  \node[label] at (m-2-7.north west) {Well-formed,\\yields other\\result};
-  \node[label] at (m-2-8.north west) {Total};
-  \node[label] at (m-3-2.north west) {Raises\\\pyinline{SyntaxError}};
-  \node[label] at (m-4-2.north west) {Raises other\\exception};
-  \node[label] at (m-5-2.north west) {Does not raise\\exception};
-  \node[label] at (m-6-2.north west) {Total};
-  \node[label] at (m-4-4.north west) {Python runtime\\error};
-  \node[label] at (m-4-3.north west) {Syntactically\\excluded};
-  \node[label] at (m-5-4.north west) {Statically\\excluded};
-  \node[label] at (m-4-6.north west) {Dynamically\\excluded};
-  \node[label] at (m-4-5.north west) {Excluded\\for now};
-  \node[label, anchor=south west] at (m-5-7.south west) {mypy bug};
-  \draw[mypy] ($(m-4-6.north west)+(0.06,-0.06)$) -- ($(m-4-7.north east)+(-0.06,-0.06)$)
-    -- ($(m-5-7.south east)+(-0.06,0.45)$) -- ($(m-5-7.south west)+(0,0.45)$)
-    -- ($(m-5-6.south east)+(0,0.06)$) -- ($(m-5-6.south west)+(0.06,0.06)$) -- cycle;
+  \fill[raises] (m-3-2.north west) rectangle (m-3-4.south east) (m-4-3.north west) rectangle (m-4-3.south east);
+  \fill[impossible] (m-3-5.north west) rectangle (m-3-6.south east);
+  \fill[excluded] (m-3-2.north west) rectangle (m-5-2.south east) (m-5-3.north west) rectangle (m-5-3.south east)
+    (m-3-5.north west) rectangle (m-5-5.south east);
+  \fill[version] (m-3-4.north west) rectangle (m-5-4.south east);
+  \fill[agree] (m-3-6.north west) rectangle (m-5-6.south east);
+  \draw[black!33] (m-1-1.north west) rectangle (m-6-7.south east)
+    (m-2-2.north west) -- (m-2-7.north east) (m-3-1.north west) -- (m-3-7.north east)
+    (m-4-1.north west) -- (m-4-3.north east) (m-4-6.north west) -- (m-4-7.north east)
+    (m-5-1.north west) -- (m-5-7.north east) (m-6-1.north west) -- (m-6-7.north east)
+    (m-1-2.north west) -- (m-6-2.south west) (m-2-3.north west) -- (m-6-3.south west)
+    (m-2-4.north west) -- (m-6-4.south west) (m-2-5.north west) -- (m-6-5.south west)
+    (m-1-6.north west) -- (m-6-6.south west) (m-1-7.north west) -- (m-6-7.south west)
+    (m-5-6.south west) ++(0,0.4cm) -- ++(2.15cm,0);
+  \node[group, anchor=north] at ($(m-1-2.north west)!0.5!(m-1-5.north east)$) {\PurePy rejects};
+  \node[group, anchor=north] at (m-1-6.north) {\PurePy accepts};
+  \node[label, anchor=south west] at (m-2-1.south west) {\textbf{Python}};
+  \node[label] at (m-2-2.north west) {Rejected by\\parser};
+  \node[label] at (m-2-3.north west) {Rejected by\\type checker};
+  \node[label] at (m-2-4.north west) {Excluded from\\this version};
+  \node[label] at (m-2-5.north west) {Well-formed,\\yields\\$\aborts{\errUndef}$};
+  \node[label] at (m-2-6.north west) {Well-formed,\\yields other\\result};
+  \node[label] at (m-2-7.north west) {Total};
+  \node[label] at (m-3-1.north west) {\pyinline{SyntaxError}};
+  \node[label] at (m-4-1.north west) {Other exception};
+  \node[label] at (m-5-1.north west) {No exception};
+  \node[label] at (m-6-1.north west) {Total};
+  \node[label] at (m-4-3.north west) {Python runtime\\error};
+  \node[label] at (m-4-2.north west) {Syntactically\\excluded};
+  \node[label] at (m-5-3.north west) {Statically\\excluded};
+  \node[label] at (m-4-5.north west) {Dynamically\\excluded};
+  \node[label] at (m-4-4.north west) {Excluded\\for now};
+  \node[label, anchor=south west] at (m-5-6.south west) {mypy bug};
+  \draw[mypy] ($(m-4-5.north west)+(0.06,-0.06)$) -- ($(m-4-6.north east)+(-0.06,-0.06)$)
+    -- ($(m-5-6.south east)+(-0.06,0.45)$) -- ($(m-5-6.south west)+(0,0.45)$)
+    -- ($(m-5-5.south east)+(0,0.06)$) -- ($(m-5-5.south west)+(0.06,0.06)$) -- cycle;
   \foreach \row/\python in {3/python-rejects, 4/python-raises, 5/python-succeeds} {
-    \foreach \col/\purepy in {3/parser-rejects, 4/typing-rejects, 5/excluded-for-now, 6/undefined, 7/agrees} {
+    \foreach \col/\purepy in {2/parser-rejects, 3/typing-rejects, 4/excluded-for-now, 5/undefined, 6/agrees} {
       \node[anchor=south east, inner sep=3pt, font=\footnotesize\bfseries] at (m-\row-\col.south east)
         {\conformanceCount{\python/\purepy}};
     }
-    \node[anchor=south east, inner sep=3pt, font=\footnotesize] at (m-\row-8.south east) {\conformanceCount{\python}};
+    \node[anchor=south east, inner sep=3pt, font=\footnotesize] at (m-\row-7.south east) {\conformanceCount{\python}};
   }
-  \foreach \col/\purepy in {3/parser-rejects, 4/typing-rejects, 5/excluded-for-now, 6/undefined, 7/agrees} {
+  \foreach \col/\purepy in {2/parser-rejects, 3/typing-rejects, 4/excluded-for-now, 5/undefined, 6/agrees} {
     \node[anchor=south east, inner sep=3pt, font=\footnotesize] at (m-6-\col.south east) {\conformanceCount{\purepy}};
   }
-  \node[anchor=south east, inner sep=3pt, font=\footnotesize] at (m-6-8.south east) {\conformanceCount{tests}};
+  \node[anchor=south east, inner sep=3pt, font=\footnotesize] at (m-6-7.south east) {\conformanceCount{tests}};
   % Key, in two rows
   \foreach \style/\x/\y/\keylabel in {agree/0/-0.5/Same result as Python, excluded/4.2/-0.5/Excluded by \PurePy,
       raises/8.4/-0.5/Python raises exception, impossible/0/-0.95/Cannot occur,
       version/8.4/-0.95/Excluded from this version} {
-    \fill[\style] ($(m-6-1.south west)+(\x,\y)$) rectangle ++(0.35,0.3);
-    \draw[black!33] ($(m-6-1.south west)+(\x,\y)$) rectangle ++(0.35,0.3);
-    \node[anchor=west] at ($(m-6-1.south west)+(\x+0.45,\y+0.15)$) {\keylabel};
+    \fill[\style] ($(m.south)+(\x-6.1,\y)$) rectangle ++(0.35,0.3);
+    \draw[black!33] ($(m.south)+(\x-6.1,\y)$) rectangle ++(0.35,0.3);
+    \node[anchor=west] at ($(m.south)+(\x-5.65,\y+0.15)$) {\keylabel};
   }
-  \draw[mypy] ($(m-6-1.south west)+(4.2,-0.95)$) rectangle ++(0.35,0.3);
-  \node[anchor=west] at ($(m-6-1.south west)+(4.65,-0.8)$) {Well typed under mypy};
+  \draw[mypy] ($(m.south)+(-1.9,-0.95)$) rectangle ++(0.35,0.3);
+  \node[anchor=west] at ($(m.south)+(-1.45,-0.8)$) {Well typed under mypy};
 \end{tikzpicture}
 \caption{Programs and runs, classified by Python and by \PurePy, with the number of tests in each cell}
 \label{fig:taxonomy-counts}
