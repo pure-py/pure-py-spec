@@ -43,7 +43,9 @@
 
 % Size adjustment for inline code, none at present; applied outside the listing, which applies its basic
 % style more than once
-\newcommand*{\pyinlinesize}{}
+\makeatletter
+\newcommand*{\pyinlinesize}{\fontsize{\strip@pt\dimexpr\f@size pt*19/20\relax}{\f@baselineskip}\selectfont}
+\makeatother
 \newcommand*{\pyinlinestyle}{\renewcommand\ttdefault{cmtt}\ttfamily}
 % File and directory names, in the size and font of inline code
 \newcommand*{\filename}[1]{{\pyinlinesize\pyinlinestyle #1}}
