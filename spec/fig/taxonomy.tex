@@ -49,7 +49,7 @@
   \node[anchor=north, inner sep=3pt] at (m-2-5.north) {Dynamic};
   \node[heading] at ($(m-2-5.north east)+(0,-0.38cm)$) {$\aborts{\errUndef}$};
   \node[heading] at ($(m-2-6.north east)+(0,-0.38cm)$) {\textit{defined}};
-  \node[label] at (m-2-7.north west) {Total};
+  \node[heading] at ($(m-2-7.north east)+(0,-0.38cm)$) {Total};
   \node[label] at (m-3-1.north west) {\pyinline{SyntaxError}};
   \node[label] at (m-4-1.north west) {Other exception};
   \node[label] at (m-5-1.north west) {No exception};
@@ -80,6 +80,6 @@
   \draw[mypy] ($(m.south)+(2.3,-0.95)$) rectangle ++(0.35,0.3);
   \node[anchor=west] at ($(m.south)+(2.75,-0.8)$) {Well typed under mypy};
 \end{tikzpicture}
-\caption{Programs and runs, classified by Python and \PurePy, with number of tests in each cell}
+\caption{Tests of the conformance suite, by outcome under Python and under \PurePy}
 \label{fig:taxonomy}
 \end{figure}

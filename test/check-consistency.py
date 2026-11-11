@@ -104,11 +104,13 @@ def check_classification(r: Results, suite_dir: pathlib.Path) -> None:
             python, purepy = test.relative_to(suite_dir).parts[:2]
             text = error.read_text(encoding="utf-8").strip()
             ends = text.endswith(f" {CLASSIFICATION_PLACEHOLDER}")
-            required = python != PythonOutcome.REJECTS and purepy in (
-                PurePyOutcome.PARSER_REJECTS,
-                PurePyOutcome.EXCLUDED_FOR_NOW,
+            for_now = purepy == PurePyOutcome.EXCLUDED_FOR_NOW
+            required = for_now or (
+                python != PythonOutcome.REJECTS and purepy == PurePyOutcome.PARSER_REJECTS
             )
-            allowed = python != PythonOutcome.REJECTS and purepy != PurePyOutcome.AGREES
+            allowed = for_now or (
+                python != PythonOutcome.REJECTS and purepy != PurePyOutcome.AGREES
+            )
             if required and not ends:
                 r.fail(
                     f"{error.relative_to(suite_dir)} does not end with {CLASSIFICATION_PLACEHOLDER}"
