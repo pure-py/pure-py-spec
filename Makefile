@@ -4,6 +4,7 @@ PYTHON_VERSION_TEX := tex/python-version.tex
 MYPY_VERSION_TEX := tex/mypy-version.tex
 ANON_NAME_TEX := tex/anon-name.tex
 MECHANISATION_NAMES_TEX := tex/mechanisation-names.tex
+MECHANISATION_NAMES_INDEX := tex/mechanisation-names.txt
 SPEC_LABELS := xref/PurePy-spec.aux
 FIGURE_NUMBERS := src/purepy_conformance/figure-numbers.json
 TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(MECHANISATION_NAMES_TEX)
@@ -47,7 +48,7 @@ $(MECHANISATION)/ROOT:
 	mv $(MECHANISATION).tmp $(MECHANISATION)
 
 $(MECHANISATION_NAMES_TEX): script/mechanisation-names.py $(MECHANISATION)/ROOT
-	uv run --locked python $< $(MECHANISATION) > $@.tmp && mv $@.tmp $@
+	uv run --locked python $< $(MECHANISATION) $(MECHANISATION_NAMES_INDEX) > $@.tmp && mv $@.tmp $@
 
 # FINAL=1 renders the clean version, with change markup accepted; switching modes needs a forced
 # rebuild (make -B).
