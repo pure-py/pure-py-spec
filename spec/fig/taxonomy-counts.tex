@@ -1,7 +1,7 @@
 \begin{figure}
 \centering
-\newcommand*{\cellcount}[1]{\node[anchor=south east, inner sep=3pt, font=\footnotesize\bfseries] at (m-#1.south east)
-  {\conformanceCount{#1}};}
+\newcommand*{\cellcount}[3]{\node[anchor=south east, inner sep=3pt, font=\footnotesize\bfseries] at (m-#1-#2.south east)
+  {\conformanceCount{#3}};}
 \begin{tikzpicture}[font=\footnotesize, every node/.style={anchor=north west, align=left},
     agree/.style={fill=green!14}, excluded/.style={fill=cyan!60, fill opacity=0.13},
     raises/.style={fill=black!6}, impossible/.style={pattern=north east lines, pattern color=black!30},
@@ -25,9 +25,9 @@
   \fill[raises] (m-3-2.north west) rectangle (m-3-4.south east) (m-4-3.north west) rectangle (m-4-3.south east);
   \fill[impossible] (m-3-5.north west) rectangle (m-3-6.south east);
   \fill[excluded] (m-4-2.north west) rectangle (m-5-2.south east) (m-5-3.north west) rectangle (m-5-3.south east)
-    (m-3-5.north west) rectangle (m-5-5.south east);
+    (m-4-5.north west) rectangle (m-5-5.south east);
   \fill[version] (m-3-4.north west) rectangle (m-5-4.south east);
-  \fill[agree] (m-3-6.north west) rectangle (m-5-6.south east);
+  \fill[agree] (m-4-6.north west) rectangle (m-5-6.south east);
   \draw[black!33] (m-1-1.north west) rectangle (m-6-7.south east)
     (m-2-2.north west) -- (m-2-7.north east) (m-3-1.north west) -- (m-3-7.north east)
     (m-4-1.north west) -- (m-4-3.north east) (m-4-6.north west) -- (m-4-7.north east)
@@ -56,8 +56,8 @@
     -- ($(m-5-5.south east)+(0,0.06)$) -- ($(m-5-5.south west)+(0.06,0.06)$) -- cycle;
   \foreach \row/\python in {3/python-rejects, 4/python-raises, 5/python-succeeds} {
     \foreach \col/\purepy in {2/parser-rejects, 3/typing-rejects, 4/excluded-for-now, 5/undefined, 6/agrees} {
-      \node[anchor=south east, inner sep=3pt, font=\footnotesize\bfseries] at (m-\row-\col.south east)
-        {\conformanceCount{\python/\purepy}};
+      \ifnum\row=3 \ifnum\col<5 \cellcount{\row}{\col}{\python/\purepy}\fi
+      \else \cellcount{\row}{\col}{\python/\purepy}\fi
     }
     \node[anchor=south east, inner sep=3pt, font=\footnotesize] at (m-\row-7.south east) {\conformanceCount{\python}};
   }
