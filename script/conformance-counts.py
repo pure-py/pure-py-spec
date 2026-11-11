@@ -2,6 +2,8 @@
 """LaTeX definitions counting conformance tests by outcome, and the rules and judgements cited by tests of
 ill-formed programs"""
 
+from __future__ import annotations
+
 import pathlib
 import re
 from collections import Counter
