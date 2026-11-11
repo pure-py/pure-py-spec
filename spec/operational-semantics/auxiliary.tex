@@ -30,7 +30,7 @@ $\hat{\ominus}(v)$ is given in the same way. Given $\exAssign{x\exAnnot{\tyFloat
 $\exBinOp{x}{\pyinline{+}}{1}$ has type $\tyFloat$ but evaluates to $2$ via the run-time overload at
 $(\tyInt, \tyInt)$.
 
-\begin{lemma}[Soundness of overload resolution]
+\begin{lemma}[Soundness of overload resolution; \mechref{binop_meaning_typed}, \mechref{unop_meaning_typed}]
 \label{lem:overload-resolution-soundness}
 Suppose $\vdash v : \sigma_1$ and $\vdash v' : \sigma_2$ with $\resolveOp{\Sigma}(\odot, \sigma_1, \sigma_2) = \tau$.
 Then some run-time overload of $\odot$ applies at $(\typeOf(v), \typeOf(v'))$. Moreover, if
