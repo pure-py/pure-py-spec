@@ -12,7 +12,7 @@
   % Columns: row headers, then parser, type checker, excluded from this version, undefined, agrees, total. Cells
   % are named m-row-column, with python-outcome/purepy-outcome keys below.
   \matrix (m) [matrix of nodes, nodes in empty cells, column sep=0pt, row sep=0pt, nodes={anchor=center, inner sep=0pt,
-      minimum width=2.15cm, minimum height=0.95cm}, column 1/.style={nodes={minimum width=2.1cm}},
+      minimum width=2.15cm, minimum height=0.5cm}, column 1/.style={nodes={minimum width=2.1cm}},
       column 7/.style={nodes={minimum width=0.85cm}},
       row 1/.style={nodes={minimum height=0.45cm}}, row 2/.style={nodes={minimum height=0.8cm}},
       row 6/.style={nodes={minimum height=0.45cm}}] {
@@ -38,7 +38,7 @@
     (m-1-2.north west) -- (m-6-2.south west) ($(m-2-3.north west)+(0,-0.38cm)$) -- (m-6-3.south west)
     ($(m-2-4.north west)+(0,-0.38cm)$) -- (m-6-4.south west) (m-2-5.north west) -- (m-6-5.south west)
     (m-1-6.north west) -- (m-6-6.south west) (m-1-7.north west) -- (m-6-7.south west)
-    (m-5-6.south west) ++(0,0.4cm) -- ++(2.15cm,0);
+;
   \node[group, anchor=center] at ($(m-1-2.center)!0.5!(m-1-5.center)$) {\PurePy rejects};
   \node[group, anchor=center] at (m-1-6.center) {\PurePy accepts};
   \node[anchor=north, inner sep=3pt] at ($(m-2-2.north)!0.5!(m-2-4.north)$) {Static};
@@ -54,10 +54,7 @@
   \node[label] at (m-4-1.north west) {Other exception};
   \node[label] at (m-5-1.north west) {No exception};
   \node[label] at (m-6-1.north west) {Total};
-  \node[label, anchor=south west] at (m-5-6.south west) {mypy bug};
-  \draw[mypy] ($(m-4-5.north west)+(0.06,-0.06)$) -- ($(m-4-6.north east)+(-0.06,-0.06)$)
-    -- ($(m-5-6.south east)+(-0.06,0.45)$) -- ($(m-5-6.south west)+(0,0.45)$)
-    -- ($(m-5-5.south east)+(0,0.06)$) -- ($(m-5-5.south west)+(0.06,0.06)$) -- cycle;
+  \draw[mypy] ($(m-4-5.north west)+(0.06,-0.06)$) rectangle ($(m-5-6.south east)+(-0.06,0.06)$);
   \foreach \row/\python in {3/python-rejects, 4/python-raises, 5/python-succeeds} {
     \foreach \col/\purepy in {2/parser-rejects, 3/typing-rejects, 4/excluded-for-now, 5/undefined, 6/agrees} {
       \ifnum\row=3 \ifnum\col<5 \cellcount{\row}{\col}{\python/\purepy}\fi
