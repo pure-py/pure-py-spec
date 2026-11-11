@@ -34,6 +34,7 @@
     (m-4-1.north west) -- (m-4-3.north east) (m-4-6.north west) -- (m-4-7.north east)
     (m-5-1.north west) -- (m-5-7.north east) (m-6-1.north west) -- (m-6-7.north east)
     ($(m-2-2.north west)+(0,-0.38cm)$) -- ($(m-2-4.north east)+(0,-0.38cm)$)
+    ($(m-2-5.north west)+(0,-0.38cm)$) -- ($(m-2-5.north east)+(0,-0.38cm)$)
     (m-1-2.north west) -- (m-6-2.south west) ($(m-2-3.north west)+(0,-0.38cm)$) -- (m-6-3.south west)
     ($(m-2-4.north west)+(0,-0.38cm)$) -- (m-6-4.south west) (m-2-5.north west) -- (m-6-5.south west)
     (m-1-6.north west) -- (m-6-6.south west) (m-1-7.north west) -- (m-6-7.south west)
@@ -45,7 +46,7 @@
   \node[heading] at ($(m-2-2.north east)+(0,-0.38cm)$) {\textit{parser}};
   \node[heading] at ($(m-2-3.north east)+(0,-0.38cm)$) {\textit{type checker}};
   \node[heading] at ($(m-2-4.north east)+(0,-0.38cm)$) {\textit{not yet}};
-  \node[label, anchor=north east] at (m-2-5.north east) {Dynamic};
+  \node[anchor=north, inner sep=3pt] at (m-2-5.north) {Dynamic};
   \node[heading] at ($(m-2-5.north east)+(0,-0.38cm)$) {$\aborts{\errUndef}$};
   \node[heading] at ($(m-2-6.north east)+(0,-0.38cm)$) {\textit{defined}};
   \node[label] at (m-2-7.north west) {Total};
