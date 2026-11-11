@@ -1,6 +1,5 @@
 \begin{figure}
 \centering
-\newcommand*{\testdir}[1]{{\scriptsize\filename{#1}}}
 \newcommand*{\cellcount}[1]{\node[anchor=south east, inner sep=3pt, font=\footnotesize\bfseries] at (m-#1.south east)
   {\conformanceCount{#1}};}
 \begin{tikzpicture}[font=\footnotesize, every node/.style={anchor=north west, align=left},
@@ -14,7 +13,7 @@
   \matrix (m) [matrix of nodes, nodes in empty cells, column sep=0pt, row sep=0pt, nodes={anchor=center, inner sep=0pt,
       minimum width=2.15cm, minimum height=1.35cm}, column 1/.style={nodes={minimum width=0.45cm}},
       column 2/.style={nodes={minimum width=2.1cm}}, column 8/.style={nodes={minimum width=1.1cm}},
-      row 1/.style={nodes={minimum height=0.5cm}}, row 2/.style={nodes={minimum height=1.65cm}},
+      row 1/.style={nodes={minimum height=0.5cm}}, row 2/.style={nodes={minimum height=1.2cm}},
       row 6/.style={nodes={minimum height=0.5cm}}] {
     & & & & & & & \\
     & & & & & & & \\
@@ -41,23 +40,23 @@
   \node[group, anchor=north] at (m-1-7.north) {\PurePy accepts};
   \node[group, anchor=center, rotate=90] at (m-3-1.center) {Invalid};
   \node[group, anchor=center, rotate=90] at ($(m-4-1.center)!0.5!(m-5-1.center)$) {Valid};
-  \node[label] at (m-1-2.north west) {\textbf{Python}\\(directory)\\[2pt]\textbf{\PurePy}\\(subdirectory)};
-  \node[label] at (m-2-3.north west) {Rejected by\\parser\\\testdir{parser-rejects/}};
-  \node[label] at (m-2-4.north west) {Rejected by\\type checker\\\testdir{typing-rejects/}};
-  \node[label] at (m-2-5.north west) {Excluded from\\this version\\\testdir{excluded-for-now/}};
-  \node[label] at (m-2-6.north west) {Well-formed,\\yields\\$\aborts{\errUndef}$\\\testdir{undefined/}};
-  \node[label] at (m-2-7.north west) {Well-formed,\\yields other\\result\\\testdir{agrees/}};
+  \node[label] at (m-1-2.north west) {\textbf{Python}\\[2pt]\textbf{\PurePy}};
+  \node[label] at (m-2-3.north west) {Rejected by\\parser};
+  \node[label] at (m-2-4.north west) {Rejected by\\type checker};
+  \node[label] at (m-2-5.north west) {Excluded from\\this version};
+  \node[label] at (m-2-6.north west) {Well-formed,\\yields\\$\aborts{\errUndef}$};
+  \node[label] at (m-2-7.north west) {Well-formed,\\yields other\\result};
   \node[label] at (m-2-8.north west) {Total};
-  \node[label] at (m-3-2.north west) {Raises\\\pyinline{SyntaxError}\\\testdir{python-rejects/}};
-  \node[label] at (m-4-2.north west) {Raises other\\exception\\\testdir{python-raises/}};
-  \node[label] at (m-5-2.north west) {Does not raise\\exception\\\testdir{python-succeeds/}};
+  \node[label] at (m-3-2.north west) {Raises\\\pyinline{SyntaxError}};
+  \node[label] at (m-4-2.north west) {Raises other\\exception};
+  \node[label] at (m-5-2.north west) {Does not raise\\exception};
   \node[label] at (m-6-2.north west) {Total};
-  \node[label] at (m-4-4.north west) {Python runtime\\error\\(\speconly{\figref{prevented-errors}}\paperonly{\secref{runtime-errors}})};
+  \node[label] at (m-4-4.north west) {Python runtime\\error};
   \node[label] at (m-4-3.north west) {Syntactically\\excluded};
-  \node[label] at (m-5-4.north west) {Statically\\excluded\\(\speconly{\figref{coercions}}\paperonly{\secref{no-coercions}})};
-  \node[label] at (m-4-6.north west) {Dynamically\\excluded\\(\speconly{\figref{coercions}}\paperonly{\secref{no-coercions}})};
+  \node[label] at (m-5-4.north west) {Statically\\excluded};
+  \node[label] at (m-4-6.north west) {Dynamically\\excluded};
   \node[label] at (m-4-5.north west) {Excluded\\for now};
-  \node[label, anchor=south west] at (m-5-7.south west) {\testdir{mypy-bug/}};
+  \node[label, anchor=south west] at (m-5-7.south west) {mypy bug};
   \draw[mypy] ($(m-4-6.north west)+(0.06,-0.06)$) -- ($(m-4-7.north east)+(-0.06,-0.06)$)
     -- ($(m-5-7.south east)+(-0.06,0.5)$) -- ($(m-5-7.south west)+(0,0.5)$)
     -- ($(m-5-6.south east)+(0,0.06)$) -- ($(m-5-6.south west)+(0.06,0.06)$) -- cycle;
@@ -83,7 +82,6 @@
   \draw[mypy] ($(m-6-1.south west)+(4.2,-1.05)$) rectangle ++(0.35,0.3);
   \node[anchor=west] at ($(m-6-1.south west)+(4.65,-0.9)$) {Well typed under mypy};
 \end{tikzpicture}
-\caption{Programs and runs, classified by Python and by \PurePy, with test directories and the number of tests
-in each cell}
+\caption{Programs and runs, classified by Python and by \PurePy, with the number of tests in each cell}
 \label{fig:taxonomy-counts}
 \end{figure}
