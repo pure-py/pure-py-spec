@@ -165,7 +165,7 @@
   \rho, \exSeq{s}{s'} \Rightarrow \outcome{\seq{u}}{\returns{v}}
 }
 \end{mathpar}
-\caption{Statement $s$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
+\caption{Statement $s$ evaluates to outcome $o$ under environment $\rho : \Gamma$ (\mechref{eval_stmt})}
 \label{fig:eval-block-outcome}
 \end{figure}
 
@@ -281,7 +281,7 @@
   \rho, \exSeq{s}{s'} \Rightarrow \outcome{\seq{u}}{\aborts{\kappa}}
 }
 \end{mathpar}
-\caption{Statement evaluation, continued (propagation rules and aborting cases)}
+\caption{Statement evaluation, continued (propagation rules and aborting cases) (\mechref{eval_stmt})}
 \label{fig:eval-block-fails}
 \end{figure}
 
@@ -323,7 +323,7 @@
   q, \rho, \seq{\chi} \Rightarrow \outcome{\varepsilon}{\assigns{\rho'}}
 }
 \end{mathpar}
-\caption{Top-level statement $t$ of module $q$ evaluates to outcome $o$ under environment $\rho : \Gamma$}
+\caption{Top-level statement $t$ of module $q$ evaluates to outcome $o$ under environment $\rho : \Gamma$ (\mechref{eval_top})}
 \label{fig:eval-top-level}
 \end{figure}
 
@@ -540,7 +540,7 @@
   \rho, \exCondExpr{e_1}{e}{e_2} \Rightarrow r
 }
 \end{mathpar}
-\caption{Expression $e$ evaluates to result $r$ under environment $\rho : \Gamma$}
+\caption{Expression $e$ evaluates to result $r$ under environment $\rho : \Gamma$ (\mechref{eval_expr})}
 \label{fig:eval-result}
 \end{figure}
 
@@ -689,7 +689,7 @@
   \rho, \exCall{e}{\seq{e}, \seq{y} \mathord{=} \seq{e}'} \Rightarrow \aborts{\kappa}
 }
 \end{mathpar}
-\caption{Expression evaluation, continued (propagation rules)}
+\caption{Expression evaluation, continued (propagation rules) (\mechref{eval_expr})}
 \label{fig:eval-propagation}
 \end{figure}
 
@@ -821,7 +821,7 @@
   \rho, \exDictComp{e}{e'}{\seq{g}} \Rightarrow \aborts{\errExcluded}
 }
 \end{mathpar}
-\caption{Expression evaluation, continued (aborting cases)}
+\caption{Expression evaluation, continued (aborting cases) (\mechref{eval_expr})}
 \label{fig:eval-fails}
 \end{figure}
 
@@ -856,7 +856,7 @@
 }
 \end{mathpar}
 \caption{Expression sequence $\seq{e}$ evaluates left to right to result $r$ under environment $\rho :
-\Gamma$}
+\Gamma$ (\mechref{eval_exprs})}
 \label{fig:eval-seq}
 \end{figure}
 
@@ -945,7 +945,7 @@
   \rho, \qualGenerator{x}{e} \cons \seq{g} \Rightarrow \aborts{\kappa}
 }
 \end{mathpar}
-\caption{Comprehension qualifiers $\seq{g}$ evaluate to result $r$ under environment $\rho : \Gamma$}
+\caption{Comprehension qualifiers $\seq{g}$ evaluate to result $r$ under environment $\rho : \Gamma$ (\mechref{eval_quals})}
 \label{fig:eval-quals-result}
 \end{figure}
 

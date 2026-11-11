@@ -48,8 +48,8 @@ $q, \rho, t \Rightarrow o$ & top-level statement $t$ of module $q$ evaluates to 
 $\rho, e \Rightarrow r$ & expression $e$ evaluates to result $r$ & \judgementFigref{eval-expr}{eval-result} \\
 $\rho, \seq{e} \Rightarrow r$ & expressions $\seq{e}$ evaluate, left to right, to result $r$ & \judgementFigref{eval-exprs}{eval-seq} \\
 $\rho, \seq{g} \Rightarrow r$ & comprehension qualifiers $\seq{g}$ evaluate to result $r$ & \judgementFigref{eval-quals}{eval-quals-result} \\
-$q, \mathcal{L} \Rightarrow_{\mathsf{mod}} o$ & body of module $q$ evaluates to outcome $o$ given loaded module environments $\mathcal{L}$ & \judgementFigref{eval-module}{eval-modules} \\
-$\seq{q}, \mathcal{L} \Rightarrow_{\mathsf{mod}} o$ & bodies of modules $\seq{q}$ evaluate to outcome $o$ given loaded module environments $\mathcal{L}$ & \judgementFigref{eval-modules}{eval-modules} \\
-$\mathcal{M}, \mathcal{A} \Rightarrow \seq{v}, \kappa$ & program $\mathcal{M}$ run with arguments $\mathcal{A}$ prints $\seq{v}$ and ends with termination kind $\kappa$ & \judgementFigref{eval-program}{eval-modules}
+$q, \mathcal{L} \Rightarrow_{\mathsf{mod}} o$ & body of module $q$ evaluates to outcome $o$ given loaded module environments $\mathcal{L}$ & \judgementFigref{eval-module}{eval-module} \\
+$\seq{q}, \mathcal{L} \Rightarrow_{\mathsf{mod}} o$ & bodies of modules $\seq{q}$ evaluate to outcome $o$ given loaded module environments $\mathcal{L}$ & \judgementFigref{eval-modules}{eval-modules-seq} \\
+$\mathcal{M}, \mathcal{A} \Rightarrow \seq{v}, \kappa$ & program $\mathcal{M}$ run with arguments $\mathcal{A}$ prints $\seq{v}$ and ends with termination kind $\kappa$ & \judgementFigref{eval-program}{eval-program}
 \end{tabular}
 \end{center}
