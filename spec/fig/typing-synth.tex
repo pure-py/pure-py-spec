@@ -135,7 +135,7 @@
   \Sigma; \Gamma \vdash \exOr{e}{e'} \synth \tyBool
 }
 \end{mathpar}
-\caption{Expression synthesis: names, literals, attributes, calls and operators}
+\caption{Expression synthesis: names, literals, attributes, calls and operators (\mechref{synth_expr})}
 \label{fig:typing-synth}
 \end{figure}
 
@@ -243,7 +243,7 @@
   \Sigma; \Gamma \vdash \exBinOp{e}{\odot}{e'} \synth \joinTy{\Sigma}{\tau}{\tau'}
 }
 \end{mathpar}
-\caption{Expression synthesis: subscripts, and elimination at a union}
+\caption{Expression synthesis: subscripts, and elimination at a union (\mechref{synth_expr})}
 \label{fig:typing-synth-elim}
 \end{figure}
 
@@ -301,7 +301,7 @@
   \Sigma; \Gamma \vdash \exDictComp{e}{e'}{\seq{g}} \synth \tyDict{\baseType(\tau)}
 }
 \end{mathpar}
-\caption{Expression synthesis: tuples, lists, dictionaries and comprehensions}
+\caption{Expression synthesis: tuples, lists, dictionaries and comprehensions (\mechref{synth_expr})}
 \label{fig:typing-synth-ctd}
 \end{figure}
 
