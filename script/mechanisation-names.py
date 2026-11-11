@@ -71,7 +71,9 @@ def main() -> None:
         )
     # Qualify a name by theory when several theories declare it, since Isabelle qualifies names by theory
     for name, theory_paths in sorted(declaring.items()):
-        for qualified in [name] if len(theory_paths) == 1 else [f"{t.stem}.{name}" for t in theory_paths]:
+        for qualified in (
+            [name] if len(theory_paths) == 1 else [f"{t.stem}.{name}" for t in theory_paths]
+        ):
             print(f"\\expandafter\\def\\csname mechanisation:{qualified}\\endcsname{{}}")
 
 
