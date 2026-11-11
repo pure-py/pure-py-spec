@@ -67,7 +67,7 @@
   \node[anchor=south east, inner sep=3pt, font=\footnotesize] at (m-6-7.south east) {\conformanceCount{tests}};
   % Key, in two rows
   \foreach \style/\x/\y/\keylabel in {agree/0/-0.5/Same result as Python, excluded/4.2/-0.5/Excluded by \PurePy,
-      raises/8.4/-0.5/Python raises exception, impossible/0/-0.95/Cannot occur,
+      raises/8.4/-0.5/Python error prevented, impossible/0/-0.95/Cannot occur,
       version/8.4/-0.95/Excluded from this version} {
     \fill[\style] ($(m.south)+(\x-6.1,\y)$) rectangle ++(0.35,0.3);
     \draw[black!33] ($(m.south)+(\x-6.1,\y)$) rectangle ++(0.35,0.3);
