@@ -12,8 +12,8 @@
   % are named m-row-column, with python-outcome/purepy-outcome keys below.
   \matrix (m) [matrix of nodes, nodes in empty cells, column sep=0pt, row sep=0pt, nodes={anchor=center, inner sep=0pt,
       minimum width=2.15cm, minimum height=0.95cm}, column 1/.style={nodes={minimum width=2.1cm}},
-      column 7/.style={nodes={minimum width=1.1cm}},
-      row 1/.style={nodes={minimum height=0.45cm}}, row 2/.style={nodes={minimum height=1.1cm}},
+      column 7/.style={nodes={minimum width=0.85cm}},
+      row 1/.style={nodes={minimum height=0.75cm}}, row 2/.style={nodes={minimum height=0.5cm}},
       row 6/.style={nodes={minimum height=0.45cm}}] {
     & & & & & & \\
     & & & & & & \\
@@ -24,7 +24,7 @@
   };
   \fill[raises] (m-3-2.north west) rectangle (m-3-4.south east) (m-4-3.north west) rectangle (m-4-3.south east);
   \fill[impossible] (m-3-5.north west) rectangle (m-3-6.south east);
-  \fill[excluded] (m-3-2.north west) rectangle (m-5-2.south east) (m-5-3.north west) rectangle (m-5-3.south east)
+  \fill[excluded] (m-4-2.north west) rectangle (m-5-2.south east) (m-5-3.north west) rectangle (m-5-3.south east)
     (m-3-5.north west) rectangle (m-5-5.south east);
   \fill[version] (m-3-4.north west) rectangle (m-5-4.south east);
   \fill[agree] (m-3-6.north west) rectangle (m-5-6.south east);
@@ -34,25 +34,23 @@
     (m-5-1.north west) -- (m-5-7.north east) (m-6-1.north west) -- (m-6-7.north east)
     (m-1-2.north west) -- (m-6-2.south west) (m-2-3.north west) -- (m-6-3.south west)
     (m-2-4.north west) -- (m-6-4.south west) (m-2-5.north west) -- (m-6-5.south west)
-    (m-1-6.north west) -- (m-6-6.south west) (m-1-7.north west) -- (m-6-7.south west)
+    (m-1-5.north west) -- (m-6-5.south west) (m-1-6.north west) -- (m-6-6.south west) (m-1-7.north west) -- (m-6-7.south west)
     (m-5-6.south west) ++(0,0.4cm) -- ++(2.15cm,0);
-  \node[group, anchor=north] at ($(m-1-2.north west)!0.5!(m-1-5.north east)$) {\PurePy rejects};
-  \node[group, anchor=north] at (m-1-6.north) {\PurePy accepts};
+  \node[group, anchor=center, align=center] at ($(m-1-2.center)!0.5!(m-1-4.center)$) {Rejected\\statically};
+  \node[group, anchor=center, align=center] at (m-1-5.center) {Rejected\\dynamically};
+  \node[group, anchor=center] at (m-1-6.center) {Accepted};
   \node[label, anchor=south west] at (m-2-1.south west) {\textbf{Python}};
-  \node[label] at (m-2-2.north west) {Rejected by\\parser};
-  \node[label] at (m-2-3.north west) {Rejected by\\type checker};
-  \node[label] at (m-2-4.north west) {Excluded from\\this version};
-  \node[label] at (m-2-5.north west) {Well-formed,\\yields\\$\aborts{\errUndef}$};
-  \node[label] at (m-2-6.north west) {Well-formed,\\yields other\\result};
+  \node[label] at (m-2-2.north west) {Parser};
+  \node[label] at (m-2-3.north west) {Type checker};
+  \node[label] at (m-2-4.north west) {This version};
+  \node[label] at (m-2-5.north west) {$\aborts{\errUndef}$};
+  \node[label] at (m-2-6.north west) {Any other result};
   \node[label] at (m-2-7.north west) {Total};
   \node[label] at (m-3-1.north west) {\pyinline{SyntaxError}};
   \node[label] at (m-4-1.north west) {Other exception};
   \node[label] at (m-5-1.north west) {No exception};
   \node[label] at (m-6-1.north west) {Total};
   \node[label] at (m-4-3.north west) {Python runtime\\error};
-  \node[label] at (m-4-2.north west) {Syntactically\\excluded};
-  \node[label] at (m-5-3.north west) {Statically\\excluded};
-  \node[label] at (m-4-5.north west) {Dynamically\\excluded};
   \node[label, anchor=south west] at (m-5-6.south west) {mypy bug};
   \draw[mypy] ($(m-4-5.north west)+(0.06,-0.06)$) -- ($(m-4-6.north east)+(-0.06,-0.06)$)
     -- ($(m-5-6.south east)+(-0.06,0.45)$) -- ($(m-5-6.south west)+(0,0.45)$)
