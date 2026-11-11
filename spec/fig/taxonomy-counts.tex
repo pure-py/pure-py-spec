@@ -13,7 +13,7 @@
   \matrix (m) [matrix of nodes, nodes in empty cells, column sep=0pt, row sep=0pt, nodes={anchor=center, inner sep=0pt,
       minimum width=2.15cm, minimum height=0.95cm}, column 1/.style={nodes={minimum width=2.1cm}},
       column 7/.style={nodes={minimum width=0.85cm}},
-      row 1/.style={nodes={minimum height=0.75cm}}, row 2/.style={nodes={minimum height=0.5cm}},
+      row 1/.style={nodes={minimum height=0.45cm}}, row 2/.style={nodes={minimum height=0.8cm}},
       row 6/.style={nodes={minimum height=0.45cm}}] {
     & & & & & & \\
     & & & & & & \\
@@ -32,19 +32,19 @@
     (m-2-2.north west) -- (m-2-7.north east) (m-3-1.north west) -- (m-3-7.north east)
     (m-4-1.north west) -- (m-4-3.north east) (m-4-6.north west) -- (m-4-7.north east)
     (m-5-1.north west) -- (m-5-7.north east) (m-6-1.north west) -- (m-6-7.north east)
-    (m-1-2.north west) -- (m-6-2.south west) (m-2-3.north west) -- (m-6-3.south west)
-    (m-2-4.north west) -- (m-6-4.south west) (m-2-5.north west) -- (m-6-5.south west)
-    (m-1-5.north west) -- (m-6-5.south west) (m-1-6.north west) -- (m-6-6.south west) (m-1-7.north west) -- (m-6-7.south west)
+    (m-1-2.north west) -- (m-6-2.south west) ($(m-2-3.north west)+(0,-0.38cm)$) -- (m-6-3.south west)
+    ($(m-2-4.north west)+(0,-0.38cm)$) -- (m-6-4.south west) (m-2-5.north west) -- (m-6-5.south west)
+    (m-1-6.north west) -- (m-6-6.south west) (m-1-7.north west) -- (m-6-7.south west)
     (m-5-6.south west) ++(0,0.4cm) -- ++(2.15cm,0);
-  \node[group, anchor=center, align=center] at ($(m-1-2.center)!0.5!(m-1-4.center)$) {Rejected\\statically};
-  \node[group, anchor=center, align=center] at (m-1-5.center) {Rejected\\dynamically};
-  \node[group, anchor=center] at (m-1-6.center) {Accepted};
+  \node[group, anchor=center] at ($(m-1-2.center)!0.5!(m-1-5.center)$) {\PurePy rejects};
+  \node[group, anchor=center] at (m-1-6.center) {\PurePy accepts};
+  \node[anchor=north, inner sep=3pt] at ($(m-2-2.north)!0.5!(m-2-4.north)$) {Static};
   \node[label, anchor=south west] at (m-2-1.south west) {\textbf{Python}};
-  \node[label] at (m-2-2.north west) {Parser};
-  \node[label] at (m-2-3.north west) {Type checker};
-  \node[label] at (m-2-4.north west) {This version};
-  \node[label] at (m-2-5.north west) {$\aborts{\errUndef}$};
-  \node[label] at (m-2-6.north west) {Any other result};
+  \node[label] at ($(m-2-2.north west)+(0,-0.38cm)$) {(parser)};
+  \node[label] at ($(m-2-3.north west)+(0,-0.38cm)$) {(type checker)};
+  \node[label] at ($(m-2-4.north west)+(0,-0.38cm)$) {(this version)};
+  \node[label] at (m-2-5.north west) {Dynamic\\($\aborts{\errUndef}$)};
+  \node[label] at (m-2-6.north west) {Any other\\result};
   \node[label] at (m-2-7.north west) {Total};
   \node[label] at (m-3-1.north west) {\pyinline{SyntaxError}};
   \node[label] at (m-4-1.north west) {Other exception};
@@ -77,6 +77,6 @@
   \draw[mypy] ($(m.south)+(-1.9,-0.95)$) rectangle ++(0.35,0.3);
   \node[anchor=west] at ($(m.south)+(-1.45,-0.8)$) {Well typed under mypy};
 \end{tikzpicture}
-\caption{Programs and runs, classified by Python and by \PurePy, with the number of tests in each cell}
+\caption{Programs and runs, classified by Python and by \PurePy, with number of tests in each cell}
 \label{fig:taxonomy-counts}
 \end{figure}
