@@ -3,6 +3,6 @@ produces the Python result; on any other run it may either abort and report $\er
 produce the Python result. For each rejected program which is syntactically valid, a conforming implementation also
 reports whether the rejection is by design or for an exclusion from this version\speconly{
 (\secref{excluded-features})}\paperonly{ (\specref{sec:excluded-features})}. The conformance suite
-(\paperonly{\secref{reference-implementation}}\speconly{\secref{conformance-suite}}) organises its tests by their outcomes under Python and under \PurePy (\figref{taxonomy}).\paperonly{ \PurePy is also
+(\secref{conformance-suite}) organises its tests by their outcomes under Python and under \PurePy (\figref{taxonomy}).\paperonly{ \PurePy is also
 designed so that every well-formed program is well typed under the mypy type checker, a requirement that
 constrains the rules for variables, in particular how names are scoped (\secref{scope}). The only exceptions are programs rejected by mypy because of a behaviour reported as a bug, which are listed in \specfigref{reported-bugs}.}

@@ -4,10 +4,10 @@
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.55\textwidth}>{\raggedright\arraybackslash}p{0.13\textwidth}}
 \textbf{Judgement} & \textbf{Reading} & \textbf{Defined in} \\[1mm]
 \metaGroup{Well-formedness} \\
-$\Sigma \vdash \tau \wf$ & type $\tau$ is well-formed & \judgementFigref{wf-type}{well-formed} \\
-$\Sigma \vdash \theta \wf$ & context entry $\theta$ is well-formed & \judgementFigref{wf-entry}{well-formed} \\
-$\Sigma \vdash \Gamma \wf$ & context $\Gamma$ is well-formed & \judgementFigref{wf-cxt}{well-formed} \\
-$\Sigma \vdash C \wfClass$ & class $C$ is well-formed & \judgementFigref{wf-class-def}{well-formed-class-table} \\
+$\Sigma \vdash \tau \wf$ & type $\tau$ is well-formed & \judgementFigref{wf-type}{well-formed-type} \\
+$\Sigma \vdash \theta \wf$ & context entry $\theta$ is well-formed & \judgementFigref{wf-entry}{well-formed-entry} \\
+$\Sigma \vdash \Gamma \wf$ & context $\Gamma$ is well-formed & \judgementFigref{wf-cxt}{well-formed-entry} \\
+$\Sigma \vdash C \wfClass$ & class $C$ is well-formed & \judgementFigref{wf-class-def}{well-formed-class} \\
 $\vdash \Sigma \wf$ & class table $\Sigma$ is well-formed & \judgementFigref{wf-class-table}{well-formed-class-table} \\
 $\Sigma \vdash h : \tau$ & head $h$ has type $\tau$ & \judgementFigref{head}{head-typing} \\
 $\Sigma \vdash k : \tau$ & shape $k$ has type $\tau$ & \judgementFigref{shape}{shape-typing} \\
@@ -48,8 +48,8 @@ $q, \rho, t \Rightarrow o$ & top-level statement $t$ of module $q$ evaluates to 
 $\rho, e \Rightarrow r$ & expression $e$ evaluates to result $r$ & \judgementFigref{eval-expr}{eval-result} \\
 $\rho, \seq{e} \Rightarrow r$ & expressions $\seq{e}$ evaluate, left to right, to result $r$ & \judgementFigref{eval-exprs}{eval-seq} \\
 $\rho, \seq{g} \Rightarrow r$ & comprehension qualifiers $\seq{g}$ evaluate to result $r$ & \judgementFigref{eval-quals}{eval-quals-result} \\
-$q, \mathcal{L} \Rightarrow_{\mathsf{mod}} o$ & body of module $q$ evaluates to outcome $o$ given loaded module environments $\mathcal{L}$ & \judgementFigref{eval-module}{eval-modules} \\
-$\seq{q}, \mathcal{L} \Rightarrow_{\mathsf{mod}} o$ & bodies of modules $\seq{q}$ evaluate to outcome $o$ given loaded module environments $\mathcal{L}$ & \judgementFigref{eval-modules}{eval-modules} \\
-$\mathcal{M}, \mathcal{A} \Rightarrow \seq{v}, \kappa$ & program $\mathcal{M}$ run with arguments $\mathcal{A}$ prints $\seq{v}$ and ends with termination kind $\kappa$ & \judgementFigref{eval-program}{eval-modules}
+$q, \mathcal{L} \Rightarrow_{\mathsf{mod}} o$ & body of module $q$ evaluates to outcome $o$ given loaded module environments $\mathcal{L}$ & \judgementFigref{eval-module}{eval-module} \\
+$\seq{q}, \mathcal{L} \Rightarrow_{\mathsf{mod}} o$ & bodies of modules $\seq{q}$ evaluate to outcome $o$ given loaded module environments $\mathcal{L}$ & \judgementFigref{eval-modules}{eval-modules-seq} \\
+$\mathcal{M}, \mathcal{A} \Rightarrow \seq{v}, \kappa$ & program $\mathcal{M}$ run with arguments $\mathcal{A}$ prints $\seq{v}$ and ends with termination kind $\kappa$ & \judgementFigref{eval-program}{eval-program}
 \end{tabular}
 \end{center}

@@ -8,8 +8,12 @@ $e$ & $\coloncolonequals$ & $x$ & \speconly{(Var)} \\
     & $\mid$ & $\exSubscript{e}{e'}$ & \speconly{(Subscript)} \\
     & $\mid$ & $\exBinOp{e}{\odot}{e'}$ & \speconly{(BinOp)} \\
     & $\mid$ & $\exUnOp{\ominus}{e}$ & \speconly{(UnOp)} \\
-    & $\mid$ & $\exAnd{e}{e'}$ & \speconly{(And)} \\
-    & $\mid$ & $\exOr{e}{e'}$ & \speconly{(Or)} \\
+\ifdefined\specmode
+    & $\mid$ & $\exAnd{e}{e'}$ & (And) \\
+    & $\mid$ & $\exOr{e}{e'}$ & (Or) \\
+\else
+    & $\mid$ & $\exAnd{e}{e'} \mid \exOr{e}{e'}$ & \\
+\fi
     & $\mid$ & $\exCondExpr{e_1}{e}{e_2}$ & \speconly{(CondExpr)} \\
     & $\mid$ & $\exList{e_1, \ldots, e_n}$ & \speconly{(List)} \\
     & $\mid$ & $e_1, \ldots, e_n$ & \speconly{(Tuple)} \\
@@ -24,8 +28,12 @@ $g$ & $\coloncolonequals$ & $\qualGuard{e}$ & \speconly{(Guard)} \\
 \grammarGroup{Literals} \\
 $\ell$ & $\coloncolonequals$ & $n$ & \speconly{(Number)} \\
     & $\mid$ & $w$ & \speconly{(String)} \\
-    & $\mid$ & $\pyinline{True}$ & \speconly{(True)} \\
-    & $\mid$ & $\pyinline{False}$ & \speconly{(False)} \\
+\ifdefined\specmode
+    & $\mid$ & $\pyinline{True}$ & (True) \\
+    & $\mid$ & $\pyinline{False}$ & (False) \\
+\else
+    & $\mid$ & $\pyinline{True} \mid \pyinline{False}$ & \\
+\fi
     & $\mid$ & $\pyinline{None}$ & \speconly{(None)}
    \\[3mm]
 \grammarGroup{Argument lists} \\

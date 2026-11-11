@@ -3,12 +3,12 @@
   \input{tex/anon-name}
   \newcommand*{\PurePy}{\anonName\xspace}
   \newcommand*{\Fluid}{[PyProv]\xspace}
-  \newcommand*{\Fortl}{[PySci]\xspace}
+  \newcommand*{\Cosi}{[PySci]\xspace}
   \newcommand*{\anononly}[1]{#1}
 \else
   \newcommand*{\PurePy}{PurePy\xspace}
   \newcommand*{\Fluid}{Fluid\xspace}
-  \newcommand*{\Fortl}{Fortl\xspace}
+  \newcommand*{\Cosi}{Cosi\xspace}
   \newcommand*{\anononly}[1]{}
 \fi
 \newcommand*{\versionstring}{}
@@ -115,7 +115,20 @@
 \newcommand*{\secref}[1]{\S\ref{sec:#1}}
 \providecommand*{\seckind}{section}
 \providecommand*{\thisdoc}{paper}
-\newcommand*{\todo}[1]{\textcolor{blue}{[\textbf{TODO:} #1]}}
+
+% Author notes and todos, omitted in anonymous mode but listed in the log for the submission check
+\ifdefined\anonmode
+  \newcommand{\authorcomment}[3]{\typeout{Author comment: #2}}
+  \newcommand{\authorcommentM}{\authorcomment}
+\else
+  \newcommand{\authorcomment}[3]{\textcolor{#1}{[\textbf{#2:} #3]}}
+  \newcommand{\authorcommentM}[3]{\textcolor{#1}{*}\marginpar{\authorcomment{#1}{#2}{#3}}}
+\fi
+\newcommand{\dnote}{\authorcomment{blue}{DAO}}
+\newcommand{\dnoteM}{\authorcommentM{blue}{DAO}}
+\newcommand{\nnote}{\authorcomment{red}{NH}}
+\newcommand{\nnoteM}{\authorcommentM{red}{NH}}
+\newcommand{\todo}{\authorcomment{blue}{TODO}}
 
 % Figure and rule presentation
 \definecolor{shadecolor}{rgb}{0.9,0.9,0.9}

@@ -20,7 +20,7 @@
 }
 \end{mathpar}
 
-\caption{Name $x$ imported from module signature $\Gamma$ has context entry $\theta$}
+\caption{Name $x$ imported from module signature $\Gamma$ has context entry $\theta$ (\mechref{imports_entry})}
 \label{fig:typing-imports}
 \end{figure}
 
@@ -63,7 +63,7 @@
 }
 \end{mathpar}
 
-\subcaption{Import prefix $\seq{\iota}$ of module $q$ produces bindings $\Gamma$}
+\subcaption{Import prefix $\seq{\iota}$ of module $q$ produces bindings $\Gamma$ (\mechref{check_imports})}
 \label{fig:typing-import-prefix}
 \end{subfigure}
 
@@ -90,7 +90,7 @@
   \Sigma \vdash_{\mathsf{sub}} q, \Gamma, x \cons \seq{x} : \Gamma \extend \set{\bind{x}{\modLoaded{q.x}{\Delta'}}} \binding \Sigma'
 }
 \end{mathpar}
-\subcaption{Submodule chain $\seq{x}$ extends signature $\Gamma$ of module $q$ to $\Gamma'$}
+\subcaption{Submodule chain $\seq{x}$ extends signature $\Gamma$ of module $q$ to $\Gamma'$ (\mechref{submodules})}
 \label{fig:typing-submodules}
 \end{subfigure}
 \caption{Import typing}
@@ -112,7 +112,7 @@
 \and
 \input{spec/rules/module}
 \end{mathpar}
-\subcaption{Module $q$ checks with signature $\Gamma$}
+\subcaption{Module $q$ checks with signature $\Gamma$ (\mechref{check_module})}
 \label{fig:typing-mod}
 \end{subfigure}
 
@@ -130,7 +130,7 @@
   \vdash \mathcal{M}
 }
 \end{mathpar}
-\subcaption{Program $\mathcal{M}$ is well-formed}
+\subcaption{Program $\mathcal{M}$ is well-formed (\mechref{check_program})}
 \label{fig:typing-program}
 \end{subfigure}
 \caption{Module typing}

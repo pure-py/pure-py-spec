@@ -1,4 +1,4 @@
-\begin{specdefinition}{Static outcome}
+\begin{specdefinition}{Static outcome; \mechref{static_outcome}}
 A well-typed statement has a \emph{static outcome} $R$, which is either $\Returns$ or $\Assigns{\Delta}$. The
 outcome is $\Returns$ when the statement \emph{definitely returns} or definitely reaches \pyinline{assert False}.
 Otherwise it is $\Assigns{\Delta}$, where $\Delta$ is a context with an entry for each variable declared or assigned

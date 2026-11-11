@@ -1,5 +1,6 @@
 % The PurePy language specification, built separately from the paper (paper.tex).
 % \anonmode anonymises the language name, including in the copyright notice, as for the paper.
+\RequirePackage{fix-cm}
 \documentclass[a4paper,10pt,DIV=12,twoside=false,numbers=noenddot,appendixprefix=true]{scrreprt}
 \AtBeginDocument{\renewcommand*{\appendixname}{Annex}}
 
@@ -101,7 +102,10 @@
 This chapter collects the notation of the specification: the metavariables
 (\figref{metavariables}), the judgement forms with the figure defining each
 (\figref{judgement-index}), and the auxiliary functions with the section defining each
-(\figrefTwo{auxiliary-index}{auxiliary-index-values}).
+(\figrefTwo{auxiliary-index}{auxiliary-index-values}). The specification is mechanised in
+Isabelle/HOL\ifdefined\anonmode\else\footnote{\url{https://github.com/pure-py/isabelle-purepy}}\fi; where a figure,
+definition or result has a counterpart in the mechanisation, its caption or heading ends with the name of the
+counterpart, such as \mechref{check_program} in \figref{typing-module}.
 
 \input{spec/fig/metavariables}
 

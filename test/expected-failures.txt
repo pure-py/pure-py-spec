@@ -1,4 +1,0 @@
-python-succeeds/typing-rejects/pat_dict_on_object.py	pure-py/pure-py-spec#130
-python-succeeds/typing-rejects/pat_int_literal_on_float.py	pure-py/pure-py-spec#130
-python-succeeds/typing-rejects/pattern_union_base_unique.py	pure-py/pure-py-spec#130
-python-succeeds/typing-rejects/pattern_union_base_unique_disjunct.py	pure-py/pure-py-spec#130

@@ -1,4 +1,5 @@
 \begin{figure}
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Sigma \vdash \tau \wf$}
 \begin{mathpar}
 \small
@@ -78,7 +79,13 @@
   \Sigma \vdash \tyUnion{\sigma}{\tau} \wf
 }
 \end{mathpar}
+\subcaption{Type $\tau$ is well-formed (\mechref{wf_ty})}
+\label{fig:well-formed-type}
+\end{subfigure}
 
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Sigma \vdash \theta \wf$}
 \begin{mathpar}
 \small
@@ -179,11 +186,15 @@
   \Sigma \vdash \Gamma \wf
 }
 \end{mathpar}
+\subcaption{Context entry $\theta$ and context $\Gamma$ are well-formed (\mechref{wf_entry}, \mechref{wf_cxt})}
+\label{fig:well-formed-entry}
+\end{subfigure}
 \caption{Well-formed types, context entries and contexts}
 \label{fig:well-formed}
 \end{figure}
 
 \begin{figure}
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\Sigma \vdash C \wfClass$}
 \begin{mathpar}
 \small
@@ -203,7 +214,13 @@
   \Sigma \vdash C \wfClass
 }
 \end{mathpar}
+\subcaption{Class $C$ is well-formed}
+\label{fig:well-formed-class}
+\end{subfigure}
 
+\vspace{2mm}
+
+\begin{subfigure}{\textwidth}
 \flushleft \shadebox{$\vdash \Sigma \wf$}
 \begin{mathpar}
 \small
@@ -215,6 +232,9 @@
   \vdash \Sigma \wf
 }
 \end{mathpar}
-\caption{Well-formed classes and class tables}
+\subcaption{Class table $\Sigma$ is well-formed (\mechref{wf_class_table})}
 \label{fig:well-formed-class-table}
+\end{subfigure}
+\caption{Well-formed classes and class tables}
+\label{fig:well-formed-classes}
 \end{figure}
