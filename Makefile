@@ -5,9 +5,12 @@ MYPY_VERSION_TEX := tex/mypy-version.tex
 ANON_NAME_TEX := tex/anon-name.tex
 MECHANISATION_NAMES_TEX := tex/mechanisation-names.tex
 MECHANISATION_NAMES_INDEX := tex/mechanisation-names.txt
+CONFORMANCE_COUNTS_TEX := tex/conformance-counts.tex
+SUITE_FILES := $(shell find src/purepy_conformance/conformance-suite -type f -not -path '*/__pycache__/*')
 SPEC_LABELS := xref/PurePy-spec.aux
 FIGURE_NUMBERS := src/purepy_conformance/figure-numbers.json
-TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(MECHANISATION_NAMES_TEX)
+TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(MECHANISATION_NAMES_TEX) \
+	$(CONFORMANCE_COUNTS_TEX)
 PDFLATEX := pdflatex -interaction=nonstopmode -halt-on-error
 ISABELLE ?= isabelle
 BUILD_AUX := *.aux *.blg *.cb *.cb2 *.cut *.fdb_latexmk *.fls *.loc *.log *.out *.soc *.toc
@@ -49,6 +52,9 @@ $(MECHANISATION)/ROOT:
 
 $(MECHANISATION_NAMES_TEX): script/mechanisation-names.py $(MECHANISATION)/ROOT
 	uv run --locked python $< $(MECHANISATION) $(MECHANISATION_NAMES_INDEX) > $@.tmp && mv $@.tmp $@
+
+$(CONFORMANCE_COUNTS_TEX): script/conformance-counts.py $(SUITE_FILES)
+	uv run --locked python $< > $@.tmp && mv $@.tmp $@
 
 # FINAL=1 renders the clean version, with change markup accepted; switching modes needs a forced
 # rebuild (make -B).
@@ -126,7 +132,8 @@ wheel: check-targets check-consistency check-suite-python check-suite-purepy $(F
 
 ## Remove build products
 clean:
-	rm -f $(AUX) *.pdf $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(MECHANISATION_NAMES_TEX)
+	rm -f $(AUX) *.pdf $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(MECHANISATION_NAMES_TEX) \
+		$(CONFORMANCE_COUNTS_TEX)
 	rm -rf $(dir $(SPEC_LABELS)) $(FIGURE_NUMBERS) .mechanisation
 
 ## Make targets documented, and workflows named after their targets
