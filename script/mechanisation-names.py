@@ -21,6 +21,7 @@ DEFINITIONS = [
     re.compile(rf"^\s*{CONSTANT}(?:\s*\([^)]*\))?\s+{NAME}", re.MULTILINE),
     re.compile(rf"^\s*{CONSTANT}\b.*\band\s+{NAME}\s*::", re.MULTILINE),
     re.compile(rf"^\s*and\s+{NAME}\s*::", re.MULTILINE),
+    re.compile(rf"\band\s*\n\s*{NAME}\s*::"),
     re.compile(
         rf"^\s*(?:datatype|codatatype|type_synonym|record|typedef)\s+{TYPE_PARAMS}{NAME}",
         re.MULTILINE,
