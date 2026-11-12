@@ -2,7 +2,7 @@
 
 [![status page](https://github.com/pure-py/org-workflow/actions/workflows/status.yml/badge.svg)](https://pure-py.github.io/org-workflow/status.html)
 
-## [v0.27.8](https://pure-py.github.io/pure-py-spec/v0.27.8/PurePy-spec.pdf)
+## [v0.27.9](https://pure-py.github.io/pure-py-spec/v0.27.9/PurePy-spec.pdf)
 
 PurePy is a pure (side-effect free) subset of Python, intended initially for researchers in programming
 languages, and in the longer term as a common language for scientific computing,
