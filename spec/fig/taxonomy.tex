@@ -9,7 +9,7 @@
     label/.style={anchor=north west, inner sep=3pt},
     heading/.style={label, anchor=north east, text height=1.6ex, text depth=0.4ex}, group/.style={font=\footnotesize\bfseries, inner sep=2pt}]
   % Rows: group headers, column headers, then SyntaxError, other exception, no exception, total.
-  % Columns: row headers, then parser, type checker, excluded from this version, undefined, agrees, total. Cells
+  % Columns: row headers, then parser, type checker, omitted from this version, undefined, agrees, total. Cells
   % are named m-row-column, with python-outcome/purepy-outcome keys below.
   \matrix (m) [matrix of nodes, nodes in empty cells, column sep=0pt, row sep=0pt, nodes={anchor=center, inner sep=0pt,
       minimum width=2.15cm, minimum height=0.5cm}, column 1/.style={nodes={minimum width=2.1cm}},
@@ -70,7 +70,7 @@
   % Key, in two rows
   \foreach \style/\x/\y/\keylabel in {agree/8.4/-0.5/Same result as Python, excluded/4.2/-0.5/Excluded by design,
       raises/0/-0.5/Python error prevented, impossible/0/-0.95/Cannot occur,
-      version/4.2/-0.95/Excluded from this version} {
+      version/4.2/-0.95/Omitted from this version} {
     \fill[\style] ($(m.south)+(\x-6.1,\y)$) rectangle ++(0.35,0.3);
     \draw[black!33] ($(m.south)+(\x-6.1,\y)$) rectangle ++(0.35,0.3);
     \node[anchor=west] at ($(m.south)+(\x-5.65,\y+0.15)$) {\keylabel};
