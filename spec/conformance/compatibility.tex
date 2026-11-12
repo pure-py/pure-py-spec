@@ -1,8 +1,8 @@
-A language implementation conforms to the \PurePy specification if it accepts exactly\paperonly{\dnoteM{does exactly mean `and nothing else'?}} the well-formed programs and, on every run with defined behaviour,
-produces the Python result; on any other run it may either abort and report $\errUndef$, following the semantics, or
-produce the Python result. For each rejected program which is syntactically valid, a conforming implementation also
-reports whether the rejection is by design or for an exclusion from this version\speconly{
-(\secref{excluded-features})}\paperonly{ (\specref{sec:excluded-features})}. The conformance suite
+A language implementation conforms to the \PurePy specification if\deleted{ it accepts exactly the well-formed
+programs and}, on every run \added{of a well-formed program }with defined behaviour, \added{it }produces the Python result; on any other run it may either abort and report $\errUndef$, following the semantics, or
+produce the Python result. \deleted{For each rejected program which is syntactically valid, a conforming implementation
+also reports whether the rejection is by design or for an exclusion from this version\speconly{
+(\secref{excluded-features})}\paperonly{ (\specref{sec:excluded-features})}. }The conformance suite
 (\secref{conformance-suite}) organises its tests by their outcomes under Python and under \PurePy (\figref{taxonomy}).\paperonly{ \PurePy is also
 designed so that every well-formed program is well typed under the mypy type checker, a requirement that
 constrains the rules for variables, in particular how names are scoped (\secref{scope}). The only exceptions are programs rejected by mypy because of a behaviour reported as a bug, which are listed in \specfigref{reported-bugs}.}
