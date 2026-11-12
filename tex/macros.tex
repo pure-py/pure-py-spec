@@ -2,11 +2,16 @@
 \ifdefined\anonmode
   \input{tex/anon-name}
   \newcommand*{\PurePy}{\anonName\xspace}
+  % \PurePy with its indefinite article, which differs between the real and anonymised names
+  \newcommand*{\aPurePy}{an \PurePy}
+  \newcommand*{\APurePy}{An \PurePy}
   \newcommand*{\Fluid}{[PyProv]\xspace}
   \newcommand*{\Cosi}{[PySci]\xspace}
   \newcommand*{\anononly}[1]{#1}
 \else
   \newcommand*{\PurePy}{PurePy\xspace}
+  \newcommand*{\aPurePy}{a \PurePy}
+  \newcommand*{\APurePy}{A \PurePy}
   \newcommand*{\Fluid}{Fluid\xspace}
   \newcommand*{\Cosi}{Cosi\xspace}
   \newcommand*{\anononly}[1]{}
