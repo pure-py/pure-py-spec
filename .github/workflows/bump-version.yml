@@ -75,7 +75,7 @@ jobs:
         run: |
           make tex/python-version.tex tex/mypy-version.tex tex/anon-name.tex tex/mechanisation-names.tex \
             tex/conformance-counts.tex
-          printf '\\def\\anonmode{}\\input{PurePy-spec}\n' > spec-anon.tex
+          printf '\\def\\anonmode{}\\def\\nonotesmode{}\\input{PurePy-spec}\n' > spec-anon.tex
 
       - name: Build LaTeX document
         uses: xu-cheng/latex-action@v4
