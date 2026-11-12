@@ -22,8 +22,11 @@ all: PurePy-spec.pdf spec-anon.pdf graduality.pdf check-consistency
 
 # Unresolved references are only warnings to pdflatex.
 define check-log
-@! grep -E "Reference .* undefined|Citation .* undefined|multiply defined" $(1).log || \
-	{ echo "$(1).log: unresolved references"; exit 1; }
+@unresolved=$$(sed -n -e 's/.*Reference `\([^ ]*\). on page.*/reference \1/p' \
+	-e 's/.*Citation `\([^ ]*\). on page.*/citation \1/p' -e 's/.*Label `\([^ ]*\). multiply defined.*/label \1 multiply defined/p' \
+	$(1).log | sort -u | paste -sd , - | sed 's/,/, /g'); \
+	if [ -n "$$unresolved" ] || grep -qE "Reference .* undefined|Citation .* undefined|multiply defined" $(1).log; then \
+	echo "report: unresolved in $(1).log: $${unresolved:-see log}"; exit 1; fi
 endef
 
 $(PYTHON_VERSION_TEX): .python-version
