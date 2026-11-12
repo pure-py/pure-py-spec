@@ -32,12 +32,12 @@
   \draw[black!33] (m-1-1.north west) rectangle (m-6-7.south east)
     (m-2-2.north west) -- (m-2-7.north east) (m-3-1.north west) -- (m-3-7.north east)
     (m-4-1.north west) -- (m-4-7.north east)
-    (m-5-1.north west) -- (m-5-7.north east) (m-6-1.north west) -- (m-6-7.north east)
+    (m-5-1.north west) -- (m-5-7.north east)
     ($(m-2-2.north west)+(0,-0.38cm)$) -- ($(m-2-4.north east)+(0,-0.38cm)$)
     ($(m-2-5.north west)+(0,-0.38cm)$) -- ($(m-2-5.north east)+(0,-0.38cm)$)
     (m-1-2.north west) -- (m-6-2.south west) ($(m-2-3.north west)+(0,-0.38cm)$) -- (m-6-3.south west)
     ($(m-2-4.north west)+(0,-0.38cm)$) -- (m-6-4.south west) (m-2-5.north west) -- (m-6-5.south west)
-    (m-1-6.north west) -- (m-6-6.south west) (m-1-7.north west) -- (m-6-7.south west)
+    (m-1-6.north west) -- (m-6-6.south west)
 ;
   \node[group, anchor=center] at ($(m-1-2.center)!0.5!(m-1-5.center)$) {\PurePy rejects};
   \node[group, anchor=center] at (m-1-6.center) {\PurePy accepts};
@@ -49,23 +49,24 @@
   \node[anchor=north, inner sep=3pt] at (m-2-5.north) {Dynamic};
   \node[heading] at ($(m-2-5.north east)+(0,-0.38cm)$) {$\aborts{\errUndef}$};
   \node[heading] at ($(m-2-6.north east)+(0,-0.38cm)$) {\textit{defined}};
-  \node[heading] at ($(m-2-7.north east)+(0,-0.38cm)$) {Total};
+  \draw[black!33, dashed] (m-6-1.north west) -- (m-6-7.north east) (m-1-7.north west) -- (m-6-7.south west);
+  \node[heading, black!55] at ($(m-2-7.north east)+(0,-0.38cm)$) {Total};
   \node[label] at (m-3-1.north west) {\pyinline{SyntaxError}};
   \node[label] at (m-4-1.north west) {Other exception};
   \node[label] at (m-5-1.north west) {No exception};
-  \node[label] at (m-6-1.north west) {Total};
+  \node[label, black!55] at (m-6-1.north west) {Total};
   \draw[mypy] ($(m-4-5.north west)+(0.06,-0.06)$) rectangle ($(m-5-6.south east)+(-0.06,0.06)$);
   \foreach \row/\python in {3/python-rejects, 4/python-raises, 5/python-succeeds} {
     \foreach \col/\purepy in {2/parser-rejects, 3/typing-rejects, 4/excluded-for-now, 5/undefined, 6/agrees} {
       \ifnum\row=3 \ifnum\col<5 \cellcount{\row}{\col}{\python/\purepy}\fi
       \else \cellcount{\row}{\col}{\python/\purepy}\fi
     }
-    \node[anchor=south east, inner sep=3pt, font=\footnotesize] at (m-\row-7.south east) {\conformanceCount{\python}};
+    \node[anchor=south east, inner sep=3pt, font=\footnotesize, black!55] at (m-\row-7.south east) {\conformanceCount{\python}};
   }
   \foreach \col/\purepy in {2/parser-rejects, 3/typing-rejects, 4/excluded-for-now, 5/undefined, 6/agrees} {
-    \node[anchor=south east, inner sep=3pt, font=\footnotesize] at (m-6-\col.south east) {\conformanceCount{\purepy}};
+    \node[anchor=south east, inner sep=3pt, font=\footnotesize, black!55] at (m-6-\col.south east) {\conformanceCount{\purepy}};
   }
-  \node[anchor=south east, inner sep=3pt, font=\footnotesize] at (m-6-7.south east) {\conformanceCount{tests}};
+  \node[anchor=south east, inner sep=3pt, font=\footnotesize, black!55] at (m-6-7.south east) {\conformanceCount{tests}};
   % Key, in two rows
   \foreach \style/\x/\y/\keylabel in {agree/0/-0.5/Same result as Python, excluded/4.2/-0.5/Excluded by design,
       raises/8.4/-0.5/Python error prevented, impossible/0/-0.95/Cannot occur,
