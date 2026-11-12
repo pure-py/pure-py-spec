@@ -5,7 +5,7 @@
 \begin{tikzpicture}[font=\footnotesize, every node/.style={anchor=north west, align=left},
     agree/.style={fill=green!14}, excluded/.style={fill=cyan!60, fill opacity=0.13},
     raises/.style={fill=red!10}, impossible/.style={pattern=north east lines, pattern color=black!30},
-    mypy/.style={densely dotted, orange!85!black, line width=0.9pt}, version/.style={fill=yellow!30},
+    mypy/.style={densely dotted, green!40!black, line width=0.9pt}, version/.style={fill=yellow!30},
     label/.style={anchor=north west, inner sep=3pt},
     heading/.style={label, anchor=north east, text height=1.6ex, text depth=0.4ex}, group/.style={font=\footnotesize\bfseries, inner sep=2pt}]
   % Rows: group headers, column headers, then SyntaxError, other exception, no exception, total.
@@ -49,8 +49,8 @@
   \node[anchor=north, inner sep=3pt] at (m-2-5.north) {Dynamic};
   \node[heading] at ($(m-2-5.north east)+(0,-0.38cm)$) {$\aborts{\errUndef}$};
   \node[heading] at ($(m-2-6.north east)+(0,-0.38cm)$) {\textit{defined}};
-  \draw[black!33, dashed] (m-6-1.north west) -- (m-6-7.north east) (m-1-7.north west) -- (m-6-7.south west);
-  \node[heading, black!55] at ($(m-2-7.north east)+(0,-0.38cm)$) {Total};
+  \draw[black!33, densely dashed] (m-6-1.north west) -- (m-6-7.north east) (m-1-7.north west) -- (m-6-7.south west);
+  \node[heading, black!55] at ($(m-2-7.north east)+(0,-0.38cm)$) {\textit{Total}};
   \node[label] at (m-3-1.north west) {\pyinline{SyntaxError}};
   \node[label] at (m-4-1.north west) {Other exception};
   \node[label] at (m-5-1.north west) {No exception};
