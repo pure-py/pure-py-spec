@@ -23,7 +23,7 @@ jobs:
 
       # Specification built for the figure numbers exported by the wheel
       - name: Generate LaTeX macros
-        run: make tex/python-version.tex tex/mypy-version.tex tex/mechanisation-names.tex
+        run: make tex/python-version.tex tex/mypy-version.tex tex/mechanisation-names.tex tex/conformance-counts.tex
 
       - name: Build LaTeX document
         uses: xu-cheng/latex-action@v4
