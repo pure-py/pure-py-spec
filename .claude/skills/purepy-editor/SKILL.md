@@ -13,7 +13,7 @@ description: PurePy-specific additions to the technical-authoring, coding-conven
 
 - New issues: add to the PurePy project with Status either Planned or Proposed.
 - Default label: `spec-1.0`, unless the issue is an extension or config.
-- Features under consideration, not yet committed to, also get the `Proposed` label.
+- An issue for a feature under consideration, not yet committed to, also gets the `Proposed` label.
 
 ## LaTeX
 
