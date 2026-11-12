@@ -1,6 +1,6 @@
-\PurePy is a subset of Python, defined by static rules: a Python program is a \emph{\PurePy program} if it has the
-syntax of \secref{syntax}, and a \PurePy program is \emph{well-formed} if it satisfies the well-formedness rules of
-\secref{well-formedness}. Not every behaviour excluded by \PurePy can be rejected statically,
+\PurePy is a subset of Python, defined by static rules: a Python program is \emph{\aPurePy program} if it has the
+syntax of \secref{syntax}, and \aPurePy program is \emph{well-formed} if it satisfies the well-formedness rules of
+\secref{well-formedness}. Not every behaviour excluded by \PurePy can be rejected statically
 however\paperonly{ (\secref{strict-typing})}\speconly{ (the excluded behaviours are summarised in informative
 \annexref{exclusions})}. A run which reaches one of these \emph{dynamically excluded} operations, such as comparison
 of two functions, has undefined behaviour, and aborts with $\errUndef$. In all other respects \PurePy agrees with

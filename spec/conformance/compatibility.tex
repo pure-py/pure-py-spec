@@ -1,5 +1,5 @@
 A language implementation conforms to the \PurePy specification if, on every run of a well-formed program with defined behaviour, it produces the Python result; on any other run it may either abort and report $\errUndef$, following the semantics, or
-produce the Python result. The conformance suite
-(\secref{conformance-suite}) organises its tests by their outcomes under Python and under \PurePy (\figref{taxonomy}).\paperonly{ \PurePy is also
-designed so that every well-formed program is well typed under the mypy type checker, a requirement that
-constrains the rules for variables, in particular how names are scoped (\secref{scope}). The only exceptions are programs rejected by mypy because of a behaviour reported as a bug, which are listed in \specfigref{reported-bugs}.}
+produce the Python result.\dnoteM{not sure I get this last bit} The conformance suite
+(\secref{conformance-suite}) is organised by outcome under Python and \PurePy (\figref{taxonomy}).\paperonly{ \PurePy is
+designed so that every well-formed program is well-typed under the mypy type checker, a requirement that
+constrains variables, in particular name scoping (\secref{scope}). The only exceptions are programs rejected by mypy because of a behaviour reported as a bug, which are listed in \specfigref{reported-bugs}.}
