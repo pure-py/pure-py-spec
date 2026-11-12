@@ -117,8 +117,8 @@
 \providecommand*{\seckind}{section}
 \providecommand*{\thisdoc}{paper}
 
-% Author notes and todos, omitted in anonymous mode but listed in the log for the submission check
-\ifdefined\anonmode
+% Author notes and todos; \nonotesmode omits them from the document and lists them in the log for the submission check
+\ifdefined\nonotesmode
   \newcommand{\authorcomment}[3]{\typeout{Author comment: #2}}
   \newcommand{\authorcommentM}{\authorcomment}
 \else

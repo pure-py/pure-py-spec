@@ -87,10 +87,10 @@ graduality.pdf: $(GRADUALITY_INPUTS)
 
 # Anonymised build of source $(2) under job name $(1).
 define anon
-$(PDFLATEX) -jobname=$(1) "\def\anonmode{}\input{$(2)}"
+$(PDFLATEX) -jobname=$(1) "\def\anonmode{}\def\nonotesmode{}\input{$(2)}"
 bibtex $(1)
-$(PDFLATEX) -jobname=$(1) "\def\anonmode{}\input{$(2)}"
-$(PDFLATEX) -jobname=$(1) "\def\anonmode{}\input{$(2)}"
+$(PDFLATEX) -jobname=$(1) "\def\anonmode{}\def\nonotesmode{}\input{$(2)}"
+$(PDFLATEX) -jobname=$(1) "\def\anonmode{}\def\nonotesmode{}\input{$(2)}"
 $(call check-log,$(1))
 endef
 

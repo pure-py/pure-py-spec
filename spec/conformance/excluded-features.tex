@@ -3,14 +3,14 @@
 
 A syntactically valid Python program may use an \emph{excluded Python feature}: a syntactic form, module or attribute
 which \PurePy does not include. Each excluded feature is either \emph{excluded by design}, because it conflicts
-with the design goals of \PurePy, such as immutability, or \emph{excluded from this version}, meaning it is likely to
+with the design goals of \PurePy, such as immutability, or \emph{omitted from this version}, meaning it is likely to
 appear in a future version of the language. \figref{excluded-by-design} lists the features excluded by design; any
-other excluded feature is merely excluded from this version, and \figref{excluded-from-version} in informative
+other excluded feature is merely omitted from this version, and \figref{excluded-from-version} in informative
 \annexref{exclusions} lists the common ones.
 
 A program may also be rejected because it uses an included feature in a way which the well-formedness rules do not
 allow, such as a non-Boolean test. Such uses are excluded by design, except for the uses of predefined functions
-listed in \figref{excluded-uses}, each of which depends on a feature excluded from this version. Every dynamically
+listed in \figref{excluded-uses}, each of which depends on a feature omitted from this version. Every dynamically
 excluded operation is excluded by design.
 
 \input{spec/fig/excluded-by-design}
