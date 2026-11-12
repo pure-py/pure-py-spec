@@ -195,14 +195,14 @@ class Results:
     def fail(self, msg: str) -> None:
         self.failures.append(msg)
 
-    def record(self, label: object, failures: list[str]) -> None:
+    def record(self, label: object, failures: list[str], report: bool = True) -> None:
         if len(failures) > 0:
             self.failed.append(str(label))
             print(f"  {RED}✗{RESET} {label} ({'; '.join(failures)})")
         else:
             self.passed += 1
             print(f"  {GREEN}✓{RESET} {label}")
-        if os.environ.get("REPORT"):
+        if report and os.environ.get("REPORT"):
             print(f"report: {label}\t{'failed' if len(failures) > 0 else 'passed'}")
 
     def summary(self) -> None:
@@ -316,7 +316,9 @@ class Runner(Results):
         ]
 
     def run_suite(self, suite: pathlib.Path, jobs: int | None) -> None:
+        """Run each test, with a report line for each failing test and one for the suite"""
         found = list(tests(suite))
+        failed = 0
         with concurrent.futures.ThreadPoolExecutor(jobs) as pool:
             results = pool.map(lambda test: self.run_test(suite, test), found)
             last = None
@@ -325,7 +327,13 @@ class Runner(Results):
                 if header != last:
                     print(header)
                     last = header
-                self.record(test.relative_to(suite), failures)
+                self.record(test.relative_to(suite), failures, report=len(failures) > 0)
+                failed += len(failures) > 0
+        if os.environ.get("REPORT"):
+            outcome = "failed" if failed > 0 else "passed"
+            print(
+                f"report: conformance suite, {len(found) - failed}/{len(found)} passed\t{outcome}"
+            )
 
 
 def is_well_formed(suite: pathlib.Path, test: pathlib.Path) -> bool:
