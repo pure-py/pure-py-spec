@@ -1,11 +1,17 @@
 % Document metadata
 \ifdefined\anonmode
   \newcommand*{\PurePy}{\anonName\xspace}
+  % Name with its indefinite article
+  \def\capitaliseFirst#1#2\relax{\MakeUppercase{#1}#2}
+  \newcommand*{\aPurePy}{\anonArticle\ \PurePy}
+  \newcommand*{\APurePy}{\expandafter\capitaliseFirst\anonArticle\relax\ \PurePy}
   \newcommand*{\Fluid}{[PyProv]\xspace}
   \newcommand*{\Cosi}{[PySci]\xspace}
   \newcommand*{\anononly}[1]{#1}
 \else
   \newcommand*{\PurePy}{PurePy\xspace}
+  \newcommand*{\aPurePy}{a \PurePy}
+  \newcommand*{\APurePy}{A \PurePy}
   \newcommand*{\Fluid}{Fluid\xspace}
   \newcommand*{\Cosi}{Cosi\xspace}
   \newcommand*{\anononly}[1]{}
