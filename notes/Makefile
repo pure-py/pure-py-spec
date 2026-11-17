@@ -13,6 +13,6 @@ graduality.pdf: graduality.tex $(wildcard graduality/*.tex graduality/*/*.tex)
 	$(PDFLATEX) graduality
 
 clean:
-	rm -f *.aux *.bbl *.blg *.log *.out *.pdf
+	rm -f *.aux *.bbl *.blg *.cb *.cb2 *.log *.out *.pdf
 
 .PHONY: clean
