@@ -23,7 +23,7 @@ jobs:
 
       # Specification built for the figure numbers exported by the wheel
       - name: Generate LaTeX macros
-        run: make tex/python-version.tex tex/mypy-version.tex tex/mechanisation-names.tex tex/conformance-counts.tex
+        run: make generated/python-version.tex generated/mypy-version.tex generated/mechanisation-names.tex generated/conformance-counts.tex
 
       - name: Build LaTeX document
         uses: xu-cheng/latex-action@v4
@@ -31,7 +31,7 @@ jobs:
           root_file: PurePy-spec.tex
 
       - name: Keep LaTeX auxiliary file of specification
-        run: mkdir -p xref && cp PurePy-spec.aux xref/
+        run: mkdir -p generated && cp PurePy-spec.aux generated/
 
       - name: Run checks and build wheel
         env:

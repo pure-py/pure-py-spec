@@ -9,7 +9,7 @@ import sys
 
 from spec_sources import ROOT, SPEC, rules, source
 
-LABELS = ROOT / "xref" / "PurePy-spec.aux"
+LABELS = ROOT / "generated" / "PurePy-spec.aux"
 
 NEWLABEL = re.compile(r"\\newlabel\{fig:([a-z0-9-]+)\}\{\{([^{}]*)\}")
 JUDGEMENT_FIGURE = re.compile(r"\\judgementFigure\{([a-z-]+)\}\{([a-z0-9-]+)\}")

@@ -1,13 +1,13 @@
 INPUTS := $(wildcard tex/*.tex spec/*.tex spec/*/*.tex spec/*/*/*.tex)
 BIBFILES := $(wildcard tex/*.bib)
-PYTHON_VERSION_TEX := tex/python-version.tex
-MYPY_VERSION_TEX := tex/mypy-version.tex
-ANON_NAME_TEX := tex/anon-name.tex
-MECHANISATION_NAMES_TEX := tex/mechanisation-names.tex
-MECHANISATION_NAMES_INDEX := tex/mechanisation-names.txt
-CONFORMANCE_COUNTS_TEX := tex/conformance-counts.tex
+PYTHON_VERSION_TEX := generated/python-version.tex
+MYPY_VERSION_TEX := generated/mypy-version.tex
+ANON_NAME_TEX := generated/anon-name.tex
+MECHANISATION_NAMES_TEX := generated/mechanisation-names.tex
+MECHANISATION_NAMES_INDEX := generated/mechanisation-names.txt
+CONFORMANCE_COUNTS_TEX := generated/conformance-counts.tex
 SUITE_FILES := $(shell find src/purepy_conformance/conformance-suite -type f -not -path '*/__pycache__/*')
-SPEC_LABELS := xref/PurePy-spec.aux
+SPEC_LABELS := generated/PurePy-spec.aux
 FIGURE_NUMBERS := src/purepy_conformance/figure-numbers.json
 TEXFILES := $(wildcard *.tex) $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(MECHANISATION_NAMES_TEX) \
 	$(CONFORMANCE_COUNTS_TEX)
@@ -30,12 +30,15 @@ define check-log
 endef
 
 $(PYTHON_VERSION_TEX): .python-version
+	@mkdir -p $(@D)
 	printf '\\newcommand*{\\pythonVersion}{%s}\n' "$$(cat $<)" > $@
 
 $(ANON_NAME_TEX): .anon-name
+	@mkdir -p $(@D)
 	printf '\\newcommand*{\\anonName}{%s}\n' "$$(cat $<)" > $@
 
 $(MYPY_VERSION_TEX): uv.lock
+	@mkdir -p $(@D)
 	printf '\\newcommand*{\\mypyVersion}{%s}\n' \
 		"$$(sed -n '/^name = "mypy"$$/{n;s/^version = "\(.*\)"$$/\1/p;}' $<)" > $@
 
@@ -54,9 +57,11 @@ $(MECHANISATION)/ROOT:
 	mv $(MECHANISATION).tmp $(MECHANISATION)
 
 $(MECHANISATION_NAMES_TEX): script/mechanisation-names.py $(MECHANISATION)/ROOT
+	@mkdir -p $(@D)
 	uv run --locked python $< $(MECHANISATION) $(MECHANISATION_NAMES_INDEX) > $@.tmp && mv $@.tmp $@
 
 $(CONFORMANCE_COUNTS_TEX): script/conformance-counts.py $(SUITE_FILES)
+	@mkdir -p $(@D)
 	uv run --locked python $< > $@.tmp && mv $@.tmp $@
 
 # FINAL=1 renders the clean version, with change markup accepted; switching modes needs a forced
@@ -83,6 +88,11 @@ $(SPEC_LABELS): PurePy-spec.pdf
 
 $(FIGURE_NUMBERS): script/figure-numbers.py $(SPEC_LABELS)
 	uv run --locked python script/figure-numbers.py > $@.tmp && mv $@.tmp $@
+
+## LaTeX sources, generated macros and labels of the specification, for documents which input them
+PurePy-spec-sources.zip: $(INPUTS) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) \
+		$(MECHANISATION_NAMES_TEX) $(CONFORMANCE_COUNTS_TEX) $(SPEC_LABELS)
+	rm -f $@ && zip -q -9 $@ $(sort $^)
 
 GRADUALITY_INPUTS := $(wildcard graduality/*.tex graduality/*/*.tex)
 ## Draft notes on gradual typing, outside the 1.0 spec and paper
@@ -135,9 +145,8 @@ wheel: check-targets check-consistency check-suite-python check-suite-purepy $(F
 
 ## Remove build products
 clean:
-	rm -f $(AUX) *.pdf $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) $(MECHANISATION_NAMES_TEX) \
-		$(CONFORMANCE_COUNTS_TEX)
-	rm -rf $(dir $(SPEC_LABELS)) $(FIGURE_NUMBERS) .mechanisation
+	rm -f $(AUX) *.pdf *.zip
+	rm -rf generated $(FIGURE_NUMBERS) .mechanisation
 
 ## Make targets documented, and workflows named after their targets
 check-targets:

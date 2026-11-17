@@ -73,8 +73,8 @@ jobs:
 
       - name: Generate LaTeX macros and anonymised root file
         run: |
-          make tex/python-version.tex tex/mypy-version.tex tex/anon-name.tex tex/mechanisation-names.tex \
-            tex/conformance-counts.tex
+          make generated/python-version.tex generated/mypy-version.tex generated/anon-name.tex generated/mechanisation-names.tex \
+            generated/conformance-counts.tex
           printf '\\def\\anonmode{}\\def\\nonotesmode{}\\input{PurePy-spec}\n' > spec-anon.tex
 
       - name: Build LaTeX document
@@ -83,7 +83,7 @@ jobs:
           root_file: PurePy-spec.tex
 
       - name: Keep LaTeX auxiliary file of specification
-        run: mkdir -p xref && cp PurePy-spec.aux xref/
+        run: mkdir -p generated && cp PurePy-spec.aux generated/
 
       - name: Build anonymised LaTeX document
         uses: xu-cheng/latex-action@v4
@@ -113,10 +113,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: make wheel
 
+      - name: Build LaTeX sources archive
+        run: make PurePy-spec-sources.zip
+
       - name: Create release
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.version.outputs.tag }}
           body: "Specification: https://pure-py.github.io/pure-py-spec/${{ steps.version.outputs.tag }}/PurePy-spec.pdf"
-          files: dist/*.whl
+          files: |
+            dist/*.whl
+            PurePy-spec-sources.zip
 

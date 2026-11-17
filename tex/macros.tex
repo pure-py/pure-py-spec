@@ -1,6 +1,6 @@
 % Document metadata
 \ifdefined\anonmode
-  \input{tex/anon-name}
+  \input{generated/anon-name}
   \newcommand*{\PurePy}{\anonName\xspace}
   \newcommand*{\Fluid}{[PyProv]\xspace}
   \newcommand*{\Cosi}{[PySci]\xspace}
@@ -12,10 +12,10 @@
   \newcommand*{\anononly}[1]{}
 \fi
 \newcommand*{\versionstring}{}
-\input{tex/python-version}
-\input{tex/mypy-version}
-\input{tex/mechanisation-names}
-\input{tex/conformance-counts}
+\input{generated/python-version}
+\input{generated/mypy-version}
+\input{generated/mechanisation-names}
+\input{generated/conformance-counts}
 
 % Audience. \specmode selects the specification; otherwise the paper. \paperonly and \speconly carry a
 % phrase for one document only; \paperinput reads a file of material belonging only to the paper at that point.
