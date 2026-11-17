@@ -103,16 +103,16 @@ $(PDFLATEX) -jobname=$(1) "\def\anonmode{}\def\nonotesmode{}\input{$(2)}"
 $(call check-log,$(1))
 endef
 
-## Anonymised spec builds, with no undefined references or citations
+## Anonymised spec build, which fails on an undefined reference or citation
 spec-anon.pdf: $(TEXFILES) $(ANON_NAME_TEX)
 	$(call anon,spec-anon,PurePy-spec.tex)
 	rm -f $(BUILD_AUX)
 
-## Spec consistent with conformance suite
+## Check consistency of spec with conformance suite
 check-consistency:
 	uv run --locked python test/check-consistency.py
 
-## Python passes conformance suite, with mypy as type checker
+## Run conformance suite on Python, with mypy as type checker
 check-suite-python:
 	uv run --locked purepy-conformance --python-mode \
 		--type-checker "mypy --python-version $$(cat .python-version) --config-file $(CURDIR)/test/mypy.ini --no-error-summary"
@@ -121,12 +121,12 @@ check-suite-python:
 PUREPY_LATEST_WHEEL = $(shell gh release view --repo https://github.com/pure-py/isabelle-purepy --json assets \
 	--jq '.assets[] | select(.name | endswith(".whl")) | .url')
 
-## Latest mechanisation release passes the suite, except for listed expected failures
+## Run conformance suite on latest mechanisation release, allowing listed expected failures
 check-suite-purepy:
 	@test -n "$(PUREPY_LATEST_WHEEL)" || { echo "no release of the mechanisation found"; exit 1; }
 	uv run --locked python test/expected-failures.py --type-checker "uvx --from $(PUREPY_LATEST_WHEEL) purepy --check"
 
-## Suite against the isabelle-purepy branch of the same issue, or else the latest release
+## Run conformance suite on mechanisation branch for current issue, or else on latest release
 check-suite-mechanisation:
 	@tree=$$(uv run --locked python test/mechanisation-worktree.py) || exit 1; \
 	if [ -z "$$tree" ]; then $(MAKE) check-suite-purepy; else \
@@ -144,7 +144,7 @@ clean:
 	rm -f $(AUX) *.pdf *.zip
 	rm -rf generated $(FIGURE_NUMBERS) .mechanisation
 
-## Make targets documented, and workflows named after their targets
+## Check that every make target is documented and every workflow is named after its target
 check-targets:
 	script/submission-report.py --check
 
