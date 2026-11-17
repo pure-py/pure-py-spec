@@ -55,7 +55,7 @@ jobs:
 
       # Outside the LaTeX container, which lacks uv
       - name: Generate mechanisation names and conformance counts
-        run: make tex/mechanisation-names.tex tex/conformance-counts.tex
+        run: make generated/mechanisation-names.tex generated/conformance-counts.tex
 
       # Make as compiler, for its checks of unresolved references; the root file, passed by the action as a further
       # target, is already up to date
@@ -64,5 +64,5 @@ jobs:
         with:
           root_file: Makefile
           compiler: make
-          args: PurePy-spec.pdf spec-anon.pdf graduality.pdf
+          args: PurePy-spec.pdf spec-anon.pdf
           extra_system_packages: make
