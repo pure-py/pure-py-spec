@@ -38,22 +38,16 @@ $(MYPY_VERSION_TEX): uv.lock
 		"$$(sed -n '/^name = "mypy"$$/{n;s/^version = "\(.*\)"$$/\1/p;}' $<)" > $@
 
 # pin: release tag
-MECHANISATION_REPO := https://github.com/pure-py/isabelle-purepy
 MECHANISATION_RELEASE := v$(shell cat .mechanisation-version)
-# Clone of the release, made once per release
-MECHANISATION := .mechanisation/$(MECHANISATION_RELEASE)
 
-$(MECHANISATION)/ROOT:
-	@git ls-remote --exit-code --tags $(MECHANISATION_REPO).git $(MECHANISATION_RELEASE) >/dev/null || \
-		{ echo "report: no mechanisation release $(MECHANISATION_RELEASE)"; exit 1; }
-	rm -rf $(MECHANISATION) $(MECHANISATION).tmp
-	git -c advice.detachedHead=false clone -q --depth 1 --branch $(MECHANISATION_RELEASE) $(MECHANISATION_REPO).git \
-		$(MECHANISATION).tmp
-	mv $(MECHANISATION).tmp $(MECHANISATION)
-
-$(MECHANISATION_NAMES_TEX): script/mechanisation-names.py $(MECHANISATION)/ROOT
+$(MECHANISATION_NAMES_INDEX): .mechanisation-version
 	@mkdir -p $(@D)
-	uv run --locked python $< $(MECHANISATION) $(MECHANISATION_NAMES_INDEX) > $@.tmp && mv $@.tmp $@
+	curl -fsSL -o $@.tmp https://github.com/pure-py/isabelle-purepy/releases/download/$(MECHANISATION_RELEASE)/names.txt || \
+		{ echo "report: no mechanisation release $(MECHANISATION_RELEASE)"; exit 1; }
+	mv $@.tmp $@
+
+$(MECHANISATION_NAMES_TEX): script/mechanisation-names.py $(MECHANISATION_NAMES_INDEX)
+	uv run --locked python $^ > $@.tmp && mv $@.tmp $@
 
 $(CONFORMANCE_COUNTS_TEX): script/conformance-counts.py $(SUITE_FILES)
 	@mkdir -p $(@D)
@@ -123,7 +117,7 @@ wheel: check-targets check-consistency check-suite-python check-suite-purepy $(F
 ## Remove build products
 clean:
 	rm -f $(AUX) *.pdf *.zip
-	rm -rf generated $(FIGURE_NUMBERS) .mechanisation
+	rm -rf generated $(FIGURE_NUMBERS)
 
 # pin: release tag
 ORG_WORKFLOW := git+https://github.com/pure-py/org-workflow@v0.1.0

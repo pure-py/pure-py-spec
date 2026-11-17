@@ -21,4 +21,3 @@ __pycache__/
 dist/
 generated/
 src/purepy_conformance/figure-numbers.json
-.mechanisation/
