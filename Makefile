@@ -18,7 +18,7 @@ AUX := $(BUILD_AUX) *.bbl
 
 default: PurePy-spec.pdf
 
-all: PurePy-spec.pdf spec-anon.pdf graduality.pdf check-consistency
+all: PurePy-spec.pdf spec-anon.pdf check-consistency
 
 # Unresolved references are only warnings to pdflatex.
 define check-log
@@ -93,10 +93,6 @@ $(FIGURE_NUMBERS): script/figure-numbers.py $(SPEC_LABELS)
 PurePy-spec-sources.zip: $(INPUTS) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) \
 		$(MECHANISATION_NAMES_TEX) $(CONFORMANCE_COUNTS_TEX) $(SPEC_LABELS)
 	rm -f $@ && zip -q -9 $@ $(sort $^)
-
-GRADUALITY_INPUTS := $(wildcard graduality/*.tex graduality/*/*.tex)
-## Draft notes on gradual typing, outside the 1.0 spec and paper
-graduality.pdf: $(GRADUALITY_INPUTS)
 
 # Anonymised build of source $(2) under job name $(1).
 define anon

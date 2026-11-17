@@ -64,5 +64,5 @@ jobs:
         with:
           root_file: Makefile
           compiler: make
-          args: PurePy-spec.pdf spec-anon.pdf graduality.pdf
+          args: PurePy-spec.pdf spec-anon.pdf
           extra_system_packages: make
