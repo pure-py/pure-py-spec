@@ -71,11 +71,10 @@ jobs:
         with:
           ref: ${{ steps.version.outputs.tag }}
 
-      - name: Generate LaTeX macros and anonymised root file
+      - name: Generate LaTeX macros
         run: |
-          make generated/python-version.tex generated/mypy-version.tex generated/anon-name.tex generated/mechanisation-names.tex \
+          make generated/python-version.tex generated/mypy-version.tex generated/mechanisation-names.tex \
             generated/conformance-counts.tex
-          printf '\\def\\anonmode{}\\def\\nonotesmode{}\\input{PurePy-spec}\n' > spec-anon.tex
 
       - name: Build LaTeX document
         uses: xu-cheng/latex-action@v4
@@ -85,14 +84,9 @@ jobs:
       - name: Keep LaTeX auxiliary file of specification
         run: mkdir -p generated && cp PurePy-spec.aux generated/
 
-      - name: Build anonymised LaTeX document
-        uses: xu-cheng/latex-action@v4
-        with:
-          root_file: spec-anon.tex
-
-      # The PDFs are served from GitHub Pages rather than attached to the release, since GitHub serves release files
-      # as downloads, which drops the destination named in a link such as PurePy-spec.pdf#fig:typing-synth.
-      - name: Publish PDFs to GitHub Pages
+      # Serve PDF from GitHub Pages rather than the release, since downloading a release file loses the destination
+      # of a link such as PurePy-spec.pdf#fig:typing-synth
+      - name: Publish PDF to GitHub Pages
         run: |
           TAG="${{ steps.version.outputs.tag }}"
           git config user.name "github-actions[bot]"
@@ -100,8 +94,8 @@ jobs:
           git fetch origin gh-pages:refs/remotes/origin/gh-pages
           git worktree add -B gh-pages pages origin/gh-pages
           mkdir -p "pages/$TAG" pages/latest
-          cp PurePy-spec.pdf spec-anon.pdf "pages/$TAG/"
-          cp PurePy-spec.pdf spec-anon.pdf pages/latest/
+          cp PurePy-spec.pdf "pages/$TAG/"
+          cp PurePy-spec.pdf pages/latest/
           cd pages
           bash ../.github/scripts/pages-index.sh
           git add -A

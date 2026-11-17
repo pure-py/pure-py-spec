@@ -2,7 +2,6 @@ INPUTS := $(wildcard tex/*.tex spec/*.tex spec/*/*.tex spec/*/*/*.tex)
 BIBFILES := $(wildcard tex/*.bib)
 PYTHON_VERSION_TEX := generated/python-version.tex
 MYPY_VERSION_TEX := generated/mypy-version.tex
-ANON_NAME_TEX := generated/anon-name.tex
 MECHANISATION_NAMES_TEX := generated/mechanisation-names.tex
 MECHANISATION_NAMES_INDEX := generated/mechanisation-names.txt
 CONFORMANCE_COUNTS_TEX := generated/conformance-counts.tex
@@ -18,7 +17,7 @@ AUX := $(BUILD_AUX) *.bbl
 
 default: PurePy-spec.pdf
 
-all: PurePy-spec.pdf spec-anon.pdf check-consistency
+all: PurePy-spec.pdf check-consistency
 
 # Unresolved references are only warnings to pdflatex.
 define check-log
@@ -32,10 +31,6 @@ endef
 $(PYTHON_VERSION_TEX): .python-version
 	@mkdir -p $(@D)
 	printf '\\newcommand*{\\pythonVersion}{%s}\n' "$$(cat $<)" > $@
-
-$(ANON_NAME_TEX): .anon-name
-	@mkdir -p $(@D)
-	printf '\\newcommand*{\\anonName}{%s}\n' "$$(cat $<)" > $@
 
 $(MYPY_VERSION_TEX): uv.lock
 	@mkdir -p $(@D)
@@ -89,24 +84,10 @@ $(SPEC_LABELS): PurePy-spec.pdf
 $(FIGURE_NUMBERS): script/figure-numbers.py $(SPEC_LABELS)
 	uv run --locked python script/figure-numbers.py > $@.tmp && mv $@.tmp $@
 
-## Archive of specification LaTeX sources, generated macros and labels
-PurePy-spec-sources.zip: $(INPUTS) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) \
+## Archive of specification LaTeX sources, bibliography, generated macros and labels
+PurePy-spec-sources.zip: PurePy-spec.tex $(INPUTS) $(BIBFILES) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) \
 		$(MECHANISATION_NAMES_TEX) $(CONFORMANCE_COUNTS_TEX) $(SPEC_LABELS)
 	rm -f $@ && zip -q -9 $@ $(sort $^)
-
-# Anonymised build of source $(2) under job name $(1).
-define anon
-$(PDFLATEX) -jobname=$(1) "\def\anonmode{}\def\nonotesmode{}\input{$(2)}"
-bibtex $(1)
-$(PDFLATEX) -jobname=$(1) "\def\anonmode{}\def\nonotesmode{}\input{$(2)}"
-$(PDFLATEX) -jobname=$(1) "\def\anonmode{}\def\nonotesmode{}\input{$(2)}"
-$(call check-log,$(1))
-endef
-
-## Anonymised spec build, which fails on an undefined reference or citation
-spec-anon.pdf: $(TEXFILES) $(ANON_NAME_TEX)
-	$(call anon,spec-anon,PurePy-spec.tex)
-	rm -f $(BUILD_AUX)
 
 ## Check consistency of spec with conformance suite
 check-consistency:
@@ -144,9 +125,12 @@ clean:
 	rm -f $(AUX) *.pdf *.zip
 	rm -rf generated $(FIGURE_NUMBERS) .mechanisation
 
+# pin: release tag
+ORG_WORKFLOW := git+https://github.com/pure-py/org-workflow@v0.1.0
+
 ## Check that every make target is documented and every workflow is named after its target
 check-targets:
-	script/submission-report.py --check
+	uvx --from $(ORG_WORKFLOW) check-makefile
 
 ## List targets with descriptions
 help:
