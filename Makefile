@@ -89,7 +89,7 @@ $(SPEC_LABELS): PurePy-spec.pdf
 $(FIGURE_NUMBERS): script/figure-numbers.py $(SPEC_LABELS)
 	uv run --locked python script/figure-numbers.py > $@.tmp && mv $@.tmp $@
 
-## LaTeX sources, generated macros and labels of the specification, for documents which input them
+## Archive of specification LaTeX sources, generated macros and labels
 PurePy-spec-sources.zip: $(INPUTS) $(PYTHON_VERSION_TEX) $(MYPY_VERSION_TEX) $(ANON_NAME_TEX) \
 		$(MECHANISATION_NAMES_TEX) $(CONFORMANCE_COUNTS_TEX) $(SPEC_LABELS)
 	rm -f $@ && zip -q -9 $@ $(sort $^)
