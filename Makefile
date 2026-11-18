@@ -39,6 +39,7 @@ $(MYPY_VERSION_TEX): uv.lock
 
 # pin: release tag
 MECHANISATION_RELEASE := v$(shell cat .mechanisation-version)
+PUREPY_WHEEL := https://github.com/pure-py/isabelle-purepy/releases/download/$(MECHANISATION_RELEASE)/purepy-$(shell cat .mechanisation-version)-py3-none-any.whl
 
 $(MECHANISATION_NAMES_INDEX): .mechanisation-version
 	@mkdir -p $(@D)
@@ -92,16 +93,11 @@ check-suite-python:
 	uv run --locked purepy-conformance --python-mode \
 		--type-checker "mypy --python-version $$(cat .python-version) --config-file $(CURDIR)/test/mypy.ini --no-error-summary"
 
-# tracks: latest release
-PUREPY_LATEST_WHEEL = $(shell gh release view --repo https://github.com/pure-py/isabelle-purepy --json assets \
-	--jq '.assets[] | select(.name | endswith(".whl")) | .url')
-
-## Run conformance suite on latest mechanisation release, allowing listed expected failures
+## Run conformance suite on pinned mechanisation release, allowing listed expected failures
 check-suite-purepy:
-	@test -n "$(PUREPY_LATEST_WHEEL)" || { echo "no release of the mechanisation found"; exit 1; }
-	uv run --locked python test/expected-failures.py --type-checker "uvx --from $(PUREPY_LATEST_WHEEL) purepy --check"
+	uv run --locked python test/expected-failures.py --type-checker "uvx --from $(PUREPY_WHEEL) purepy --check"
 
-## Run conformance suite on mechanisation branch for current issue, or else on latest release
+## Run conformance suite on mechanisation branch for current issue, or else on pinned release
 check-suite-mechanisation:
 	@tree=$$(uv run --locked python test/mechanisation-worktree.py) || exit 1; \
 	if [ -z "$$tree" ]; then $(MAKE) check-suite-purepy; else \
